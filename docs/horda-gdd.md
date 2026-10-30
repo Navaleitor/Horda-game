@@ -19,7 +19,7 @@
 | LB (4) | **Toque = granada rápida** (al punto de mira) · **mantener = Tac-Com** | Rotar −45° | Pestaña ← |
 | LT (6) | Apuntar | — | — |
 | RT (7) | Disparar | **Colocar** (válido = fantasma verde) | — |
-| D-pad ←/→ (14/15) | Armas principales: rifle de asalto / arma comprada | — | Navegar |
+| D-pad ←/→ (14/15) | Armas principales: rifle de asalto / arma comprada (si la ranura está vacía, el arma **no cambia** y el HUD muestra "Vacía" un instante) | — | Navegar |
 | D-pad ↓ (13) | Pistola, o **pistola de reparación** si la compraste (la reemplaza) | — | Navegar |
 | D-pad ↑ (12) | **Mantener** = radial de comodines místicos; elegir con RS; **soltar = activar** (tiempo al 50% con el radial abierto) | — | Navegar |
 | View (8) | Mantener = marcador | — | — |
@@ -130,7 +130,11 @@ Solo puedes comprar el exclusivo de tu clase.
 | *Bot* Ametralladora ligera | 16 | 13/s | 100 | — |
 | *Bot* Subfusil | 12 | 14/s | 40 | — |
 
-- **Recarga activa**: perfecta = +10% daño 5 s (con Recarga incendiaria, además DoT); fallida = encasquillada 1.5 s.
+- **Recarga activa** (segundo toque de RB durante la recarga; un solo intento), tres resultados:
+  - **Buena** (zona ancha): solo acelera la recarga.
+  - **Perfecta** (zona estrecha dentro de la buena): recarga rápida + **10% de daño durante 5 s** (con Recarga incendiaria, además DoT).
+  - **Fallida** (fuera de la zona): arma **encasquillada 1.5 s**.
+- Cifras *(prov.)*: headshot **×2.0** (rifle de asalto y pistola), golpe cuerpo a cuerpo **50** de daño, munición de reserva inicial **240** (rifle) y **72** (pistola).
 - **Granadas**: fragmentación 150 de daño en r4 · incendiaria con zona de fuego de 6 s (20/s) · aturdidora aturde 2 s en r5 (no a jefes).
 
 ## 8. Enemigos (robots, `RobotExpressive.glb` + geometría)
