@@ -38,7 +38,7 @@ src/
   level/     levelLoader.js, maps/outpost.js (datos del mapa a mano), lighting.js
   assets/    models.js (glb embebidos), props/ (geometría procedural: armas, torretas, barreras, señuelo, fabricador)
   modes/     hordeMode.js (máquina de estados: Preparación → Oleada → Recompensa → …)
-template.html   HUD DOM + pantalla de inicio + <script> inline
+template.html   esqueleto (#app, #ui-root, #boot) + marcador <!--BUNDLE--> (el HUD inyecta su DOM/CSS desde JS)
 build.js        esbuild bundle → inyecta en template → horda.html (loader dataurl para .glb)
 tests/e2e/      Playwright + gamepad simulado
 tests/anim/     capturas por estado/transición para revisión de animación

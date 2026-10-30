@@ -42,9 +42,10 @@ export function createLoop(game) {
     game.time.tick++;
   }
 
-  function frame(tMs) {
+  function frame() {
     rafId = requestAnimationFrame(frame);
-    const t = tMs / 1000;
+    // performance.now() y no el timestamp de rAF: en Chromium headless este último puede ir desacoplado del reloj real.
+    const t = performance.now() / 1000;
     let frameDt = last < 0 ? fixedDt : t - last;
     last = t;
     if (frameDt > maxFrameDt) frameDt = maxFrameDt;
