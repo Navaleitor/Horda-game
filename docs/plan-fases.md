@@ -87,8 +87,9 @@ Resumen; el detalle está en `docs/horda-gdd.md`.
 - Controles: sprint **toggle** L3, B melee, R3 hombro, LB toque granada / mantener Tac-Com, View marcador, D-pad ←/→ armas, ↓ pistola o reparación, ↑ radial.
 - Enemigos **robots**; archivo final **`horda.html`**.
 
-### Pendiente de confirmar
-- ¿El bot Ingeniero repara fortificaciones solo (herramienta de clase)?
+- El **bot Ingeniero repara fortificaciones solo** con su herramienta de clase (cobra de la bolsa común y respeta una reserva mínima).
+
+### Pendiente
 - Precios de desbloqueo y de pasivas/comodines: se ajustan jugando.
 
 ## Verificación (cada fase)

@@ -24,7 +24,7 @@ Eres responsable de que enemigos y aliados se sientan inteligentes y legibles, c
   - 3 bots con las clases que no eligió el jugador y su arma fija de clase.
   - Siguen al jugador o defienden la base, usan cobertura, priorizan objetivos y reviven a los derribados (X 3 s).
   - **Uso de comodines** con reglas: Llamado del Vínculo con ≥2 derribados; Escudo Espectral bajo fuego intenso; Aura de Resurrección antes de una oleada de jefe; Lluvia de Suministros con munición baja del escuadrón; Fortaleza Arcana con fortificaciones <40%; Velo de Sombras cuando el bot está rodeado; Granada Arcana contra jefes y Brutos.
-  - Pendiente de confirmar: si el Ingeniero repara solo.
+  - **Bot Ingeniero**: repara fortificaciones solo con su herramienta de clase. Prioriza las piezas por debajo del 70% de HP en las rutas activas (en preparación, todo lo que esté por debajo del 100%). No repara bajo fuego intenso ni si la bolsa quedaría por debajo de la reserva mínima de `config.js`. Cobra con `fortifications/repairTool` (mismo coste por HP).
 - Presupuesto de CPU: IA escalonada (no todos los agentes piensan en el mismo frame).
 - Depuración: dibujar rutas, objetivos y flow-field con un flag. Exponer en `window.__game.ai` y `window.__game.squad`.
 

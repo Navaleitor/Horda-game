@@ -110,7 +110,11 @@ Solo puedes comprar el exclusivo de tu clase.
 | Reconocimiento | Rifle de francotirador |
 
 - Comportamiento: siguen al jugador o defienden la base, se cubren, reviven a derribados.
-- *Pendiente de confirmar*: el bot Ingeniero repara fortificaciones con una herramienta de clase.
+- **El bot Ingeniero repara fortificaciones por su cuenta** con una **herramienta de reparación de clase** (no se compra ni se pierde al morir):
+  - Mismo haz y coste que la pistola de reparación (1 punto por cada 4 HP, de la bolsa común). Aplica sus pasivas de Ingeniero (Reparación experta), que suben en espejo con las tuyas.
+  - Prioridad: piezas por debajo del 70% de HP, empezando por la más dañada en la ruta con enemigos activos. En preparación repara todo lo que esté por debajo del 100%.
+  - No repara si está bajo fuego intenso ni si la bolsa quedaría por debajo de una **reserva mínima** (300 *(prov.)*) para no dejarte sin puntos.
+  - No usa la reparación instantánea del radial (×1.5); eso solo lo decides tú.
 
 ## 7. Armas (stats base *(prov.)*)
 | Arma | Daño | Cadencia | Cargador | Notas |
