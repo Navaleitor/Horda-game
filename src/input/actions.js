@@ -58,10 +58,13 @@ export function createActionTable(names, cfg) {
     }
   }
 
+  const NONE = Object.freeze({ down: false, pressed: false, released: false, held: 0, doubleTap: false, lastHeld: 0, repeat: false });
+  const warned = new Set();
   function get(name) {
     const a = table.get(name);
-    if (!a && typeof console !== 'undefined') console.warn(`[input] acción desconocida: ${name}`);
-    return a;
+    if (a) return a;
+    if (!warned.has(name)) { warned.add(name); console.warn(`[input] acción desconocida: ${name}`); }
+    return NONE;
   }
 
   function resetAll() {
