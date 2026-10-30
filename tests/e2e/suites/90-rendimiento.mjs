@@ -6,6 +6,7 @@ import { sleep, measureFps, waitFor, assert } from '../lib.mjs';
 export default {
   name: 'Rendimiento',
   waitState: 'menu',
+  lowgfx: false, // mide con calidad completa (sombras y antialias)
   caseTimeout: 30000,
   cases: [
     {

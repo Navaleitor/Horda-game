@@ -29,14 +29,18 @@ function showBootMessage(text, isError = false) {
   el.style.display = text ? '' : 'none';
 }
 
+// Solo --debug: ?lowgfx baja la calidad (sin sombras ni antialias, media resolución) para que las
+// pruebas headless con render por software mantengan suficientes pasos de simulación por segundo.
+const LOW_GFX = __DEBUG__ && /[?&]lowgfx\b/.test(location.search);
+
 function createRenderer(container) {
-  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, config.core.pixelRatioMax));
+  const renderer = new THREE.WebGLRenderer({ antialias: !LOW_GFX, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(LOW_GFX ? 0.5 : Math.min(window.devicePixelRatio || 1, config.core.pixelRatioMax));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.0;
-  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.enabled = !LOW_GFX;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   container.appendChild(renderer.domElement);
   return renderer;

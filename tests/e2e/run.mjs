@@ -86,7 +86,7 @@ async function main() {
 
       let page, logs, context;
       try {
-        ({ page, logs, context } = await lib.openGame(browser, { waitState: suite.waitState ?? 'menu' }));
+        ({ page, logs, context } = await lib.openGame(browser, { waitState: suite.waitState ?? 'menu', lowgfx: suite.lowgfx ?? true }));
         if (!report.renderer) report.renderer = await lib.glInfo(page).catch(() => null);
       } catch (e) {
         sres.cases.push({ name: 'abrir el juego', status: 'FAIL', ms: 0, error: e.message });

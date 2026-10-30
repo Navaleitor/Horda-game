@@ -56,7 +56,9 @@ export async function launch() {
  * Devuelve { page, context, logs } donde logs = { errors[], warnings[], all[] }.
  * Cada `pageerror`, `console.error` o petición fallida cuenta como error.
  */
-export async function openGame(browser, { html = DEBUG_HTML, waitState = 'menu', timeout = 30000 } = {}) {
+// lowgfx (por defecto en el build debug): sin sombras y a media resolución, para que SwiftShader
+// mantenga suficientes pasos/s y no se pierdan pulsaciones del mando simulado. 90-rendimiento lo desactiva.
+export async function openGame(browser, { html = DEBUG_HTML, waitState = 'menu', timeout = 30000, lowgfx = html === DEBUG_HTML } = {}) {
   if (!existsSync(html)) throw new Error(`no existe ${html} (¿se ejecutó node build.js --debug?)`);
   const context = await browser.newContext({ viewport: VIEWPORT });
   await context.addInitScript({ path: MOCK_PATH });
@@ -75,7 +77,7 @@ export async function openGame(browser, { html = DEBUG_HTML, waitState = 'menu',
   page.on('requestfailed', (req) => logs.errors.push({ type: 'requestfailed', text: `${req.url().slice(0, 120)} ${req.failure()?.errorText}` }));
   page.on('crash', () => logs.errors.push({ type: 'crash', text: 'la página se colgó (crash)' }));
 
-  await page.goto(pathToFileURL(html).href, { waitUntil: 'load', timeout });
+  await page.goto(pathToFileURL(html).href + (lowgfx ? '?lowgfx' : ''), { waitUntil: 'load', timeout });
   if (waitState) {
     await waitFor(page, (s) => window.__game && window.__game.state === s, { arg: waitState, timeout, what: `estado '${waitState}'` });
   }
