@@ -289,6 +289,44 @@ const config = {
     upperCrossfade: 0.12,
     aimBlendSpeed: 10,
     footstepMinSpeed: 0.5,
+    // poses de torso con arma (weapon-animator, src/anim/weapons/). [px,py,pz,rx,ry,rz] en el marco de la mira.
+    weapons: {
+      breath: { freq: 0.28, aim: 0.0025, ready: 0.008 },   // Hz, amplitud (m / rad)
+      recoil: {               // back/up: impulsos del muelle; wrist/yaw/roll/chest: patada visual (rad)
+        assaultRifle: { back: 0.9, up: 1.4, kickTime: 0.09, wrist: 0.05, yaw: 0.015, roll: 0.03, chest: 0.02 },
+        pistol:       { back: 1.1, up: 2.4, kickTime: 0.14, wrist: 0.22, yaw: 0.01, roll: 0.02, chest: 0.015 },
+      },
+      reload: {               // claves de curva [t, v, …] sobre la fracción de la recarga
+        assaultRifle: {
+          tilt: [-0.04, 0.06, 0.04, 0.25, 0.2, 0.5],
+          tiltKeys: [0, 0, 0.12, 1, 0.82, 1, 1, 0],
+          toMag: [0, 0, 0.15, 1, 0.75, 1, 0.9, 0],
+          away: [0.2, 0, 0.32, 1, 0.45, 1, 0.57, 0],
+          magOut: [0.18, 0, 0.26, 1, 0.5, 1, 0.6, 0],
+          pouch: [-0.18, 0.95, 0.02], drop: 0.25, insertAt: 0.62,
+        },
+        pistol: {
+          tilt: [-0.02, 0.08, 0.06, 0.35, 0.35, 0.25],
+          tiltKeys: [0, 0, 0.1, 1, 0.85, 1, 1, 0],
+          toMag: [0, 0, 0.12, 0.6, 0.22, 0, 0.42, 1, 0.68, 1, 0.82, 0],
+          away: [0.18, 0, 0.28, 1, 0.45, 1, 0.55, 0],
+          magOut: [0.1, 0, 0.2, 1, 0.5, 1, 0.58, 0],
+          pouch: [-0.14, 0.98, -0.04], drop: 0.35, insertAt: 0.6,
+        },
+      },
+      activeReload: {
+        punchTime: 0.25, perfectPunch: 1.4, goodPunch: 0.9,
+        jamShake: 0.06, jamShakeFreq: 38, jamRoll: 0.35, jamHitFreq: 2.2,
+      },
+      stow: {                 // cambio de arma: hacia dónde se guarda (offset sobre 'low')
+        assaultRifle: { offset: [0.06, 0.18, 0.2, 1.1, 0.5, 0.6], twist: -0.25, shrug: 0.2 },
+        pistol:       { offset: [0.1, -0.12, 0.12, -0.6, 0.1, 0], twist: -0.1, shrug: 0 },
+      },
+      melee: {                // wind = recoger, strike = golpe; leftHand: la izq. sigue en el arma
+        assaultRifle: { wind: [0.05, 0.08, 0.12, -0.2, -0.5, 0], strike: [-0.12, 0.1, -0.3, -0.9, 0.5, 0], chestTwist: 0.15, leftHand: true },
+        pistol:       { wind: [0.08, 0.22, 0.18, 0.9, -0.2, 0.2], strike: [-0.02, -0.12, -0.32, -1.1, 0.25, -0.2], chestTwist: 0.2, leftHand: false },
+      },
+    },
     playbackRef: {            // velocidad (m/s) a la que el clip va a ×1 (respaldo: el rig mide la zancada real)
       walk: 1.6,
       run: 4.14,

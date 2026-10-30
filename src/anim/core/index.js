@@ -113,8 +113,19 @@ export default function create() {
       const rig = byEntity.get(e.who); if (!rig) return;
       if (rig.upper === 'reload' || rig.upper === 'activeReload') rig.endUpper();
     });
+    // El gesto de cambio empieza con weapon:swapStart (el arma nueva se monta a mitad del gesto);
+    // weapon:switched solo lo lanza si nadie avisó del inicio (otras entidades, cambios instantáneos).
+    on('weapon:swapStart', (e) => {
+      const rig = byEntity.get(e.who); if (!rig) return;
+      const p = rig._ev.swap;
+      p.weaponId = e.weaponId;
+      p.duration = e.duration || 0.45;
+      rig.mem.swapPending = e.weaponId;
+      rig._setUpper('swap', p);
+    });
     on('weapon:switched', (e) => {
       const rig = byEntity.get(e.who); if (!rig) return;
+      if (rig.mem.swapPending === e.weaponId) { rig.mem.swapPending = null; return; }
       const p = rig._ev.swap;
       p.weaponId = e.weaponId;
       const wc = game.config.weapons[e.weaponId];

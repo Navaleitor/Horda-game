@@ -46,6 +46,7 @@ const pReloadStart = { who: null, weaponId: null, duration: 0, activeWindow: nul
 const pActive = { who: null, weaponId: null, result: null };
 const pReloaded = { who: null, weaponId: null };
 const pSwitched = { who: null, weaponId: null, slot: 0 };
+const pSwapStart = { who: null, weaponId: null, slot: 0, duration: 0 };
 const pCancel = { who: null, weaponId: null, reason: null };
 
 /** Estado `entity.weapon` (contrato §3.6 + campos extra documentados). */
@@ -187,6 +188,8 @@ export function requestSwitch(game, entity, slot, weaponId) {
   w.swapTo = id;
   w.swapSlot = slot;
   w.swapT = weaponCfg(game, id).swapTime;
+  pSwapStart.who = entity; pSwapStart.weaponId = id; pSwapStart.slot = slot; pSwapStart.duration = w.swapT;
+  game.events.emit('weapon:swapStart', pSwapStart);
   return true;
 }
 

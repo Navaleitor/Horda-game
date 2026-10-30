@@ -249,6 +249,7 @@ El sistema de animación escucha `weapon:*` / `melee:*` filtrando por `who === e
 | `cover:swat` / `cover:slide` | `{ who, from, to }` | player → anim, camera |
 | `player:shoulder` | `{ who, shoulder }` | player → camera, anim |
 | `weapon:switchRequest` | `{ who, slot, weaponId }` | player → combat |
+| `weapon:swapStart` | `{ who, weaponId, slot, duration }` (cambio aceptado; empieza el gesto) | combat → anim |
 | `weapon:switched` | `{ who, weaponId, slot }` | combat → anim, hud |
 | `weapon:fired` | `{ who, weaponId, origin, dir, hit }` | combat → fx, anim, camera, hud |
 | `weapon:ammo` | `{ who, weaponId, mag, reserve, magSize }` | combat → hud |
