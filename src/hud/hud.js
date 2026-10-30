@@ -23,6 +23,7 @@ export function createGameHud(parent, game) {
     <div class="hz-vit">
       <div class="hz-vit-head"><span class="hz-classdot"></span><span class="hz-cname"></span><span class="hz-hpnum">100</span></div>
       <div class="hz-hpbar"><div class="hz-hpfill"></div></div>
+      <div class="hz-stance hz-hidden"><span class="hz-stance-ico"></span><span class="hz-stance-g"></span><span>Agachado</span></div>
     </div>
     <div class="hz-xh"><i class="t"></i><i class="b"></i><i class="l"></i><i class="r"></i><span class="hz-dot"></span></div>
     <div class="hz-hit"><i></i><i></i><i></i><i></i></div>
@@ -64,6 +65,7 @@ export function createGameHud(parent, game) {
   const rlRes = q('.hz-rl-res');
   const rlHint = q('.hz-rl-hint');
   const toast = q('.hz-toast');
+  const stanceEl = q('.hz-stance');
   const wbox = q('.hz-wbox');
   const wname = q('.hz-wname');
   const magEl = q('.hz-mag');
@@ -84,6 +86,7 @@ export function createGameHud(parent, game) {
     reloading: false, reloadResult: null, reloadHideT: 0,
     buffT: 0,
     aiming: false, inCover: false, xhHidden: false,
+    crouched: false,          // player:crouch; oculto en cobertura (manda su pose)
     hitFlip: false, toastFlip: false, rlFlip: false,
     slots: (cfg.weapons && cfg.weapons.startSlots ? cfg.weapons.startSlots.slice() : ['assaultRifle', null, 'pistol']),
     lastEmptyAt: -1,
@@ -114,6 +117,7 @@ export function createGameHud(parent, game) {
   function renderGlyphs() {
     slotDpad.innerHTML = glyph('DPad', 'gamepad');
     rlHint.innerHTML = `${glyph('RB', device)}<span>Recarga activa</span>`;
+    q('.hz-stance-g').innerHTML = glyph('L3', device);
     renderHint(true);
   }
 
@@ -310,9 +314,15 @@ export function createGameHud(parent, game) {
       else if (!st.player && source && source.kind === 'player') hitmarker(part === 'head', killed);
       if (st.player && target === st.player) setHp(target.hp, target.maxHp);
     },
-    'cover:enter': ({ who }) => { if (isMe(who)) { st.inCover = true; updateXhVisibility(); } },
-    'cover:exit': ({ who }) => { if (isMe(who)) { st.inCover = false; updateXhVisibility(); } },
+    'cover:enter': ({ who }) => { if (isMe(who)) { st.inCover = true; updateXhVisibility(); renderStance(); } },
+    'cover:exit': ({ who }) => { if (isMe(who)) { st.inCover = false; updateXhVisibility(); renderStance(); } },
+    'player:crouch': ({ who, crouched }) => { if (!who || isMe(who)) { st.crouched = !!crouched; renderStance(); } },
   };
+
+  // ── Postura (agachado con L3, fuera de cobertura) ───────────────────────
+  function renderStance() {
+    stanceEl.classList.toggle('hz-hidden', !(st.crouched && !st.inCover));
+  }
 
   const offs = [];
   for (const type in handlers) offs.push(game.events.on(type, handlers[type]));

@@ -39,6 +39,7 @@ export function createTpsCamera(game) {
     len: -1,                 // distancia pivote→cámara tras colisión (suavizada)
     collided: false,
     shakeAmp: 0, shakeDur: 0, shakeT: 0,
+    shakeClock: 0,           // s; fase de la sacudida (sin inicializar daba NaN → frame vacío al disparar)
     lookAccelT: 0,
     menuT: 0,
     preset: 'shoulder',
@@ -163,7 +164,8 @@ export function createTpsCamera(game) {
       st.shakeT = Math.max(0, st.shakeT - dt);
       const w = st.shakeDur > 0 ? st.shakeT / st.shakeDur : 0;
       const a = st.shakeAmp * w * w;
-      const t = st.bobT;
+      st.shakeClock += dt;
+      const t = st.shakeClock;
       sy = a * (Math.sin(t * 47.3) + 0.5 * Math.sin(t * 91.7 + 1.3));
       sp = a * (Math.sin(t * 53.1 + 0.7) + 0.5 * Math.sin(t * 83.9 + 2.1));
     }

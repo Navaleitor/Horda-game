@@ -139,10 +139,11 @@ export default function create() {
     },
     get hp() { return { hp: gameHud.st.hp, maxHp: gameHud.st.maxHp }; },
     get aiming() { return gameHud.st.aiming; },
+    get crouched() { return gameHud.st.crouched && !gameHud.st.inCover; },
     /** Instantánea serializable para Playwright. */
     state() {
       return { screen, device, selection: debugApi.selection, prompts: debugApi.prompts, weapon: debugApi.weapon,
-        hp: debugApi.hp, aiming: debugApi.aiming };
+        hp: debugApi.hp, aiming: debugApi.aiming, crouched: debugApi.crouched };
     },
     select(classId, difficulty) { startMenu.select(classId, difficulty); },
   };

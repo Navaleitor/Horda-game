@@ -143,6 +143,9 @@ const CSS = `
   transform-origin:0 50%; transition: transform .18s ease-out; }
 .hz-vit.low .hz-hpfill { background:linear-gradient(180deg,#ff6a5a,#b8261a); animation: hz-pulse .8s ease-in-out infinite; }
 .hz-vit.low .hz-hpnum { color:var(--red); }
+.hz-stance { display:flex; align-items:center; gap:.45em; margin-top:.5em; font-size:.8em; font-weight:800; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--amber); }
+.hz-stance-ico { width:.9em; height:.55em; border:.14em solid var(--amber); border-top:none; border-radius:0 0 .3em .3em; }
 @keyframes hz-pulse { 50% { opacity:.55; } }
 
 .hz-wpn { position:absolute; right:2.2em; bottom:2em; display:flex; align-items:flex-end; gap:1.2em; }
