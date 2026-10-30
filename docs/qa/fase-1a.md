@@ -31,3 +31,28 @@ Controles E-Day (§1 del GDD), cámara siempre en tercera persona, cobertura med
 8. **RB** recarga; pulsa **RB otra vez** cuando el cursor pase por la zona: zona estrecha = perfecta (+10% de daño 5 s), ancha = buena (más rápida), fuera = encasquillada 1,5 s. **B** = golpe cuerpo a cuerpo (cancela la recarga).
 9. **D-pad ↓** pistola, **←** rifle, **→** ranura vacía (no cambia el arma; el HUD muestra "Vacía"). **Menu** pausa (ahí está la tabla de controles).
 10. Teclado solo de respaldo para desarrollo: WASD, ratón (clic para capturarlo), Shift, Espacio, C, F, R, Q, 1/2/3, Esc.
+
+---
+
+# Fase 1a.2 — Animación y cambios de control: reporte de cierre
+
+## Estado
+- `node build.js` → `horda.html` 4,51 MB (Xbot.glb embebido; Soldier.glb eliminado). Unitarias 39/39. `node tests/e2e/run.mjs` → **27/27 PASS, 0 errores y 0 avisos de consola**. Headless SwiftShader: 7,1 FPS medio, 35 draw calls, ~53,6 k triángulos.
+- Revisión de animación (`animation-reviewer`): **APROBADO CON RESERVAS**, sin bloqueantes → `docs/qa/animacion/fase-1a2.md` (capturas en `docs/qa/animacion/fase-1a2/`).
+
+## Cambios de control
+- Sin sprint: L3 sin función; correr a fondo = 4,14 m/s. Sin slide.
+- A con cobertura a ≤ 2,5 m = entrar corriendo a 4,14 m/s. A sin cobertura = maroma en la dirección del stick; quieto, hacia delante. Doble A = maroma.
+- SWAT si el hueco ≤ 1,5 m; si es mayor, deslizar a la contigua.
+- Evento nuevo `weapon:swapStart` (combat → anim) para sincronizar el gesto de cambio de arma.
+
+## Animación
+- Personaje: Xbot.glb (r170, Mixamo), color de clase en carcasa y articulaciones, accesorios de clase.
+- Locomoción, cobertura y armas (rifle y pistola: apuntar, retroceso, recarga normal/perfecta/encasquillada, cambio, melee).
+
+## Pendiente (no bloqueante)
+- D1 (media): tirón de brazo en un frame al pasar de maroma a correr (locomotion-animator).
+- D2 (media-baja): al terminar el SWAT el tobillo se hunde 0,17 m y el cañón cruza la caja (cover-animator).
+- D3 (baja): patinaje 0,25–0,34 m/s en trote/carrera/strafe según la métrica del revisor.
+- Núcleo: `handsFreeR` (soltar la mano derecha), pasar altura/landPos de queryLedge al rig, protección de clips con rate 0, `measureClip` del Run.
+- Agacharse no tiene botón todavía (no revisado en juego).
