@@ -40,10 +40,22 @@ const config = {
     gravity: 22,              // m/s² (algo más que la real para que el salto sea seco)
     stepHeight: 0.35,
     skin: 0.01,
-    maxSubsteps: 4,
+    maxSubsteps: 48,          // tope de sub-pasos horizontales por moveCapsule; por encima, barrido anti-túnel
+    substepFraction: 0.5,     // longitud de sub-paso = radio × esto
+    resolveIterations: 4,     // pasadas de depenetración por sub-paso
     hashCellSize: 4,
     groundSnap: 0.2,
     terminalVelocity: 40,
+    groundPlane: true,        // plano de suelo implícito (boxId 0 en raycast)
+    groundY: 0,
+    dynamicMargin: 0.5,       // m de holgura de las hitboxes en el hash dinámico
+    maxRayCells: 512,         // celdas máx. recorridas por raycast
+    ledgeReach: 0.75,         // m delante de la cápsula para detectar vault/climb
+    vaultMaxHeight: 1.25,
+    vaultMaxDepth: 1.0,       // fondo máx. del obstáculo para saltarlo por encima
+    vaultClearance: 0.6,      // hueco libre exigido sobre la cima
+    vaultMaxDrop: 3.0,        // caída máx. detrás del obstáculo
+    climbMaxHeight: 2.4,
   },
 
   // ── player (controls-camera-engineer) ────────────────────────────────────
@@ -104,6 +116,18 @@ const config = {
     swatMaxGap: 4.0,
     slideAdjacentMaxGap: 6.0,
     exitStickHold: 0.15,      // s tirando del stick hacia atrás para salir
+    // clasificación/geometría (physics-engineer)
+    coverMinHeight: 0.8,      // sin tag 'cover', una caja es cobertura si su altura sobre los pies ∈ [min, max]
+    coverMaxHeight: 2.6,
+    maxAngle: 60 * DEG,       // desviación máx. entre la dirección pedida y −normal de la cara
+    minFaceWidth: 0.4,
+    edgeInset: 0.2,           // el anclaje no pasa de tMin+inset / tMax−inset
+    edgeEpsilon: 0.05,        // tolerancia para atLeftEdge/atRightEdge
+    mergeGap: 0.05,           // cajas coplanares a menos de esto se fusionan en una sola cara
+    adjacentDepthTol: 0.5,    // |Δplano| máx. para cobertura contigua
+    swatDepthTol: 1.5,        // |Δplano| máx. para SWAT
+    swatMinGap: 0.5,          // hueco mínimo para SWAT
+    probeHeight: 0.5,         // altura (sobre los pies) de los rayos de oclusión/paso
   },
 
   // ── weapons (gameplay-programmer) — GDD §7 ───────────────────────────────
@@ -147,6 +171,7 @@ const config = {
     spreadCoverPeekMult: 0.75,  // en cobertura asomado / apuntando por encima (prov.)
     spreadBlindFireMult: 2.5,   // disparo a ciegas desde cobertura (prov.)
     sameHitTolerance: 0.05,     // m: el rayo desde la boca "llega" al punto de la mira (técnico)
+    headshotImpactColor: 0xff3030, // color del fx 'impact' en headshot (fx:spawn.color)
   },
 
   // ── activeReload (gameplay-programmer) — GDD §7 ──────────────────────────
@@ -179,14 +204,27 @@ const config = {
     respawn: 3,               // s caída hasta volver a levantarse
     fallTime: 0.35,
     riseTime: 0.5,
+    hitWobble: 0.07,          // fracción de setDown al recibir un impacto sin morir
+    hitWobbleTime: 0.18,      // s
   },
 
   // ── level (level-designer) ───────────────────────────────────────────────
   level: {
     map: 'outpost',
     size: 90,
-    fog: { color: 0x3a2e2a, near: 30, far: 140 },
+    fog: { color: 0x7a5446, near: 35, far: 170 },
     showDebugMarkers: true,
+    uvTile: 2,                // m por baldosa de la textura de rejilla (UV en espacio de mundo)
+    sky: { zenith: 0x24304f, horizon: 0xd9844f, ground: 0x2a2026, sunGlow: 0xffb36b, radius: 320 },
+    hemi: { sky: 0xffc8a0, ground: 0x2b2230, intensity: 1.1 },
+    sun: {
+      color: 0xffa860, intensity: 2.6,
+      dir: [-0.82, 0.42, 0.38],   // hacia el sol (oeste, bajo: atardecer)
+      shadowExtent: 66,           // semilado de la cámara de sombra (cubre el mapa en diagonal)
+      shadowBias: -0.0004, shadowNormalBias: 0.04,
+    },
+    fabLights: { color: 0x9fe8ff, intensity: 90, angle: 0.55, penumbra: 0.6, height: 7 },
+    markerOpacity: 0.35,
   },
 
   // ── anim (animation-engineer y animadores) ───────────────────────────────

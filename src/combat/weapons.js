@@ -39,7 +39,8 @@ const hit = {
 // ── payloads reutilizados ─────────────────────────────────────────────────────
 const pAmmo = { who: null, weaponId: null, mag: 0, reserve: 0, magSize: 0 };
 const pFired = { who: null, weaponId: null, origin: _muzzle, dir: _shotDir, hit: null };
-const pFx = { type: null, pos: null, dir: null, end: null };
+// fx:spawn: FX no escucha weapon:fired; combat emite muzzle + tracer + impact por disparo.
+const pFx = { type: null, pos: null, dir: null, end: null, color: undefined, decal: true };
 const pEmpty = { who: null, weaponId: null };
 const pReloadStart = { who: null, weaponId: null, duration: 0, activeWindow: null, goodWindow: null };
 const pActive = { who: null, weaponId: null, result: null };
@@ -235,8 +236,9 @@ function finishReload(game, entity) {
 
 // ── disparo ─────────────────────────────────────────────────────────────────
 
-function emitFx(game, type, pos, dir, end) {
+function emitFx(game, type, pos, dir, end, color, decal) {
   pFx.type = type; pFx.pos = pos; pFx.dir = dir; pFx.end = end;
+  pFx.color = color; pFx.decal = decal !== false;
   game.events.emit('fx:spawn', pFx);
 }
 
@@ -307,7 +309,8 @@ function fire(game, entity, c, ctx) {
   const w = entity.weapon;
   if (!ctx.infiniteAmmo) { w.mag--; syncAmmo(entity); }
   w.shots++;
-  if (w.fireT < -game.config.core.fixedDt) w.fireT = 0;
+  // Fuego continuo: se arrastra el sobrante (< 1 paso). Tras reposo, se parte de 0.
+  if (w.fireT <= -game.config.core.fixedDt + 1e-9) w.fireT = 0;
   w.fireT += 1 / c.fireRate;
 
   const aim = getAimRay(game, entity, ctx.camera);
@@ -339,7 +342,12 @@ function fire(game, entity, c, ctx) {
 
   emitFx(game, 'muzzle', _muzzle, _shotDir, null);
   emitFx(game, 'tracer', _muzzle, _shotDir, _end);
-  if (result) emitFx(game, result.entity ? 'spark' : 'impact', result.point, result.normal, null);
+  // impact: dir = normal de la superficie; sobre entidades sin calcomanía; rojo en headshot.
+  if (result) {
+    const onEntity = !!result.entity;
+    const color = onEntity && result.part === 'head' ? game.config.weapons.headshotImpactColor : undefined;
+    emitFx(game, 'impact', result.point, result.normal, null, color, !onEntity);
+  }
 
   pFired.who = entity;
   pFired.weaponId = w.id;
@@ -391,7 +399,8 @@ export function stepWeapon(game, entity, dt, ctx) {
   if (w.reloading) {
     if (intent.reloadPressed) tryActiveReload(game, entity);
     if (w.jammedT > 0) {
-      w.jammedT = Math.max(0, w.jammedT - dt);
+      w.jammedT -= dt;
+      if (w.jammedT <= EPS) w.jammedT = 0;
     } else {
       w.reloadT += dt * w.reloadRate;
       if (w.reloadT >= w.reloadDur - EPS) finishReload(game, entity);
@@ -399,7 +408,11 @@ export function stepWeapon(game, entity, dt, ctx) {
     return;
   }
 
-  if (w.jammedT > 0) { w.jammedT = Math.max(0, w.jammedT - dt); return; }
+  if (w.jammedT > 0) {
+    w.jammedT -= dt;
+    if (w.jammedT > EPS) return;
+    w.jammedT = 0;
+  }
   if (isMeleeSwinging(game, w)) return;
 
   if (intent.reloadPressed && startReload(game, entity)) return;

@@ -18,10 +18,10 @@ export function normButton(b) {
   return ALIAS[b] || b;
 }
 
-// Respaldo de teclado (arquitectura §3.7). Solo lo que está definido en el contrato.
+// Respaldo de teclado (arquitectura §3.7 y extras de desarrollo de src/input/presets.js).
 const KEYS_GAME = {
-  A: 'Espacio', B: 'F', Y: 'C', RB: 'R', LT: 'Clic der.', RT: 'Clic izq.', L3: 'Shift', R3: 'Q',
-  Left: '1', Right: '2', Down: '3', Menu: 'Esc', LS: 'WASD', RS: 'Ratón',
+  A: 'Espacio', B: 'F', X: 'E', Y: 'C', LB: 'G', RB: 'R', LT: 'Clic der.', RT: 'Clic izq.', L3: 'Shift', R3: 'Q',
+  Left: '1', Right: '2', Down: '3', Up: '4', View: 'Tab', Menu: 'Esc', LS: 'WASD', RS: 'Ratón',
 };
 const KEYS_UI = {
   A: 'Enter', B: 'Esc', Up: '↑', Down: '↓', Left: '←', Right: '→', Menu: 'Esc', DPad: '↑↓←→', LS: '↑↓←→',

@@ -45,8 +45,10 @@ export function createStartMenu(parent, game, { onStart, onControls }) {
   const classIds = cfg.classOrder.slice();
   const diffIds = cfg.difficultyOrder.slice();
 
+  // Foco inicial en "Empezar": la clase y la dificultad están preseleccionadas y a la vista
+  // (↑ para cambiarlas). Un solo A / Enter arranca (lo espera scripts/smoke.mjs).
   const state = {
-    row: 0,
+    row: 2,
     classIndex: 0,
     diffIndex: Math.max(0, diffIds.indexOf(cfg.defaultDifficulty)),
   };
