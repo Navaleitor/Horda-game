@@ -132,8 +132,7 @@ body.slide = {
   aimWeight: 0.3, lowCarry: 0.7,
   update(rig, dt, p) {
     rig.clip('Run', 1, 0.0001);
-    const dur = p.duration || rig.config.player.slide.duration;
-    const k = envelope(rig.t, 0.08, 0.15, dur + 0.1) || (rig.t < dur ? 1 : 0);
+    const k = ease.smooth(rig.phase(0.1));
     rig.hips(0, rig.core.slideHips * k, 0.1 * k);
     rig.rot('hips', 0.25 * k, 0, 0);
     rig.rot('spine', 0.15 * k, 0, 0);
@@ -165,7 +164,7 @@ function coverPose(rig, p, forcePeek) {
   const low = (p.height || (rig.state === 'coverHigh' ? 'high' : 'low')) === 'low';
   const side = p.side || 1;
   const peek = forcePeek || !!p.peeking;
-  const over = !!p.aimingOver;
+  const over = !!(p.aimingOver || p.over);
   const s = spd(rig, p);
   rig.locomotion(s, s > 0.1 ? side * PI * 0.5 : 0, 0.7);
   rig.clip('Idle', 0.3);
@@ -184,7 +183,7 @@ function coverPose(rig, p, forcePeek) {
 }
 body.coverLow = {
   aimWeight: 0.35,
-  update(rig, dt, p) { coverPose(rig, p, false); if (p.peeking || p.aimingOver) rig.w *= 1; },
+  update(rig, dt, p) { coverPose(rig, p, false); },
 };
 body.coverHigh = { aimWeight: 0.35, update(rig, dt, p) { coverPose(rig, p, false); } };
 body.peek = { aimWeight: 1, update(rig, dt, p) { coverPose(rig, p, true); } };
@@ -281,7 +280,7 @@ upper.fire = {
 
 upper.reload = {
   aimWeight: 0.5, transient: true,
-  enter(rig, p) { rig._insertDone = false; },
+  enter(rig, p) { rig.mem.insertDone = false; },
   update(rig, dt, p) {
     const dur = p.duration || 2;
     const t = rig.phase(dur);
@@ -306,7 +305,7 @@ upper.reload = {
       wpn.magazine.visible = out < 0.95;
     }
     const ins = p.insertPhase !== undefined ? p.insertPhase : rig.core.reloadInsertPhase;
-    if (!rig._insertDone && t >= ins) { rig._insertDone = true; rig.emit('anim:reload:insert', p.weaponId || null); }
+    if (!rig.mem.insertDone && t >= ins) { rig.mem.insertDone = true; rig.emit('anim:reload:insert', p.weaponId || null); }
     return rig.t >= dur;
   },
   exit(rig) { restoreMag(rig); },
@@ -338,7 +337,7 @@ upper.activeReload = {
     // Perfecta/buena: golpe seco del cargador
     const k = bell(rig.phase(0.3));
     rig.holdAdd(0, 0.03 * k, 0, 0.12 * k, 0, 0.3 * k);
-    if (!rig._insertDone && rig.t >= 0.08) { rig._insertDone = true; rig.emit('anim:reload:insert', null); }
+    if (!rig.mem.insertDone && rig.t >= 0.08) { rig.mem.insertDone = true; rig.emit('anim:reload:insert', null); }
     return rig.t >= 0.3;
   },
   exit(rig) { restoreMag(rig); },
@@ -346,13 +345,13 @@ upper.activeReload = {
 
 upper.swap = {
   aimWeight: 0.3, transient: true,
-  enter(rig, p) { rig._swapDone = false; },
+  enter(rig, p) { rig.mem.swapDone = false; },
   update(rig, dt, p) {
     const id = p.weaponId;
     const dur = p.duration || (id && rig.config.weapons[id] && rig.config.weapons[id].swapTime) || 0.45;
     const t = rig.phase(dur);
-    if (!rig._swapDone && t >= 0.5) {
-      rig._swapDone = true;
+    if (!rig.mem.swapDone && t >= 0.5) {
+      rig.mem.swapDone = true;
       const w = id ? rig.weaponProp(id) : null;
       if (w && w !== rig.weapon) rig.attachWeapon(w.root, w);
     }
@@ -406,10 +405,10 @@ upper.cast = {
     rig.hold('low'); rig.ik(0, 1);
     const k = bell(t);
     rig.rot('lArm', 1.4 * k, 0, 0);
-    if (!rig._castDone && t >= 0.5) { rig._castDone = true; rig.emit('anim:cast:impact', p.id || null); }
+    if (!rig.mem.castDone && t >= 0.5) { rig.mem.castDone = true; rig.emit('anim:cast:impact', p.id || null); }
     return t >= 1;
   },
-  enter(rig) { rig._castDone = false; },
+  enter(rig) { rig.mem.castDone = false; },
 };
 upper.repair = {
   aimWeight: 0.3,
@@ -418,6 +417,6 @@ upper.repair = {
 
 /** Registra todos los proveedores por defecto en el servicio. */
 export function registerDefaults(anim) {
-  for (const k in body) { body[k].layer = 'body'; anim.registerProvider([k], body[k]); }
-  for (const k in upper) { upper[k].layer = 'upper'; anim.registerProvider([k], upper[k]); }
+  for (const k in body) anim.registerProvider([k], body[k], 'body');
+  for (const k in upper) anim.registerProvider([k], upper[k], 'upper');
 }

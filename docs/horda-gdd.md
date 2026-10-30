@@ -134,6 +134,10 @@ Solo puedes comprar el exclusivo de tu clase.
   - **Buena** (zona ancha): solo acelera la recarga.
   - **Perfecta** (zona estrecha dentro de la buena): recarga rápida + **10% de daño durante 5 s** (con Recarga incendiaria, además DoT).
   - **Fallida** (fuera de la zona): arma **encasquillada 1.5 s**.
+- **Fallida**: la recarga se queda encasquillada 1.5 s y luego termina sola.
+- **Bonus de la perfecta** (+10% de daño 5 s): solo para **el arma recargada**. Si cambias de arma, la otra no lo tiene; si vuelves a la recargada antes de 5 s, el bonus sigue (el tiempo corre igual).
+- **Melee (B) cancela la recarga** en curso (también durante la ventana de recarga activa): el golpe sale al instante, la recarga se pierde y hay que volver a recargar con RB.
+- **Disparo a ciegas** desde cobertura (RT sin LT): permitido, con dispersión ×2.5.
 - Cifras *(prov.)*: headshot **×2.0** (rifle de asalto y pistola), golpe cuerpo a cuerpo **50** de daño, munición de reserva inicial **240** (rifle) y **72** (pistola).
 - **Granadas**: fragmentación 150 de daño en r4 · incendiaria con zona de fuego de 6 s (20/s) · aturdidora aturde 2 s en r5 (no a jefes).
 

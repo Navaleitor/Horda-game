@@ -70,8 +70,10 @@
 //     swap                  { weaponId (el que entra), duration (defecto config.weapons[id].swapTime) }
 //     melee                 { duration (defecto config.melee.duration), hitTime }
 //   Comunes: { fade (s) } fuerza la duración del crossfade; { restart:true } reinicia el mismo estado.
-//   Los params se COPIAN a un búfer del rig (el llamador puede reutilizar su objeto). Llamar a
-//   setState con el MISMO estado solo actualiza params (no reinicia, no llama a enter).
+//   Los params se guardan POR REFERENCIA: el llamador puede reutilizar y mutar su objeto cada paso
+//   (p. ej. speed) sin volver a llamar a setState; los proveedores solo los LEEN. Llamar a setState
+//   con el MISMO estado solo cambia la referencia de params (no reinicia, no llama a enter).
+//   Alias aceptados por los proveedores por defecto: cover { over } = { aimingOver }.
 //   Torso: los estados `transient` (fire, reload, activeReload, swap, melee…) vuelven solos al
 //   estado base (aim/none) cuando su update devuelve true. setUpper('aim'|'none') durante un
 //   transitorio solo cambia la base; para cortarlo usa { interrupt:true }. Repetir un transitorio
@@ -168,10 +170,10 @@ const _m4 = new THREE.Matrix4();
 const _axis = new THREE.Vector3();
 const _ID = new THREE.Quaternion();
 
+const EMPTY = Object.freeze({});
 function makeSlot() {
-  return { state: null, provider: null, params: {}, t: 0 };
+  return { state: null, provider: null, params: EMPTY, t: 0 };
 }
-function clearObj(o) { for (const k in o) delete o[k]; }
 
 export class CharacterRig {
   /**
@@ -179,14 +181,16 @@ export class CharacterRig {
    * @param {object} o.entity      entidad (puede ser null en pruebas)
    * @param {object} o.soldier     resultado de models.createSoldier
    * @param {Map<string,object>} o.providers  estado → proveedor (compartido por el servicio)
+   * @param {Map<string,string>} o.layers     estado → 'body' | 'upper'
    * @param {object} o.events      bus (game.events) o null
    * @param {object} o.config      game.config
    */
-  constructor({ entity, soldier, providers, events, config }) {
+  constructor({ entity, soldier, providers, layers, events, config }) {
     this.entity = entity || null;
     this.soldier = soldier;
     this.root = soldier.root;
     this.providers = providers;
+    this.layers = layers;
     this.events = events || null;
     this.config = config;
     this.cfg = config.anim;
@@ -217,7 +221,8 @@ export class CharacterRig {
     this.body = makeSlot(); this.bodyPrev = makeSlot(); this.bodyBlend = 1; this.bodyFade = 0;
     this.up = makeSlot(); this.upPrev = makeSlot(); this.upBlend = 1; this.upFade = 0;
     this.upperBase = 'none';
-    this.upperBaseParams = {};
+    this.upperBaseParams = EMPTY;
+    this.mem = Object.create(null);   // memoria libre por rig para proveedores (flags, contadores)
     this.t = 0; this.w = 1; this.params = null;
 
     // Mira
@@ -275,14 +280,11 @@ export class CharacterRig {
   /** Capa de torso/armas. */
   setUpper(state, params) {
     const prov = this.providers.get(state);
-    if (!prov) { this._warnMissing(state); return; }
+    if (!prov || this.layers.get(state) !== 'upper') { this._warnMissing(state); return; }
     if (!prov.transient) {
       // Estado base
-      if (this.upperBase !== state) {
-        this.upperBase = state;
-        clearObj(this.upperBaseParams);
-      }
-      if (params) Object.assign(this.upperBaseParams, params);
+      this.upperBase = state;
+      this.upperBaseParams = params || EMPTY;
       const cur = this.up.provider;
       if (cur && cur.transient && !(params && params.interrupt)) return; // no cortar un transitorio
       this._switchUpper(state, this.upperBaseParams, false);
@@ -520,7 +522,7 @@ export class CharacterRig {
 
   _setBody(state, params) {
     let prov = this.providers.get(state);
-    if (!prov || prov.layer === 'upper') {
+    if (!prov || this.layers.get(state) !== 'body') {
       this._warnMissing(state);
       state = 'idle';
       prov = this.providers.get('idle');
@@ -528,7 +530,7 @@ export class CharacterRig {
     }
     const cur = this.body;
     if (cur.state === state && !(params && params.restart)) {
-      if (params) Object.assign(cur.params, params);
+      if (params) cur.params = params;
       return;
     }
     const fade = params && params.fade !== undefined ? params.fade : this.cfg.crossfade;
@@ -539,12 +541,12 @@ export class CharacterRig {
     const prov = this.providers.get(state);
     const cur = this.up;
     if (cur.state === state && !restartSame && !(params && params.restart)) {
-      if (params && params !== cur.params) Object.assign(cur.params, params);
+      if (params) cur.params = params;
       return;
     }
     if (cur.state === state && restartSame) {
       // Reinicio inmediato (ráfagas): sin crossfade
-      if (params && params !== cur.params) { clearObj(cur.params); Object.assign(cur.params, params); }
+      cur.params = params || EMPTY;
       cur.t = 0;
       if (prov.enter) { this._bind(cur, 1); prov.enter(this, cur.params); }
       return;
@@ -572,8 +574,7 @@ export class CharacterRig {
     free.state = state;
     free.provider = prov;
     free.t = 0;
-    clearObj(free.params);
-    if (params) Object.assign(free.params, params);
+    free.params = params || EMPTY;
     if (fade > 0 && this[prevKey].provider) {
       this[blendKey] = 0;
       this[fadeKey] = fade;
@@ -588,6 +589,7 @@ export class CharacterRig {
     if (slot.provider && slot.provider.exit) { this._bind(slot, 0); slot.provider.exit(this); }
     slot.provider = null;
     slot.state = null;
+    slot.params = EMPTY;
   }
 
   _bind(slot, w) {
