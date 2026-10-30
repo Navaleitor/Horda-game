@@ -1,9 +1,8 @@
-// STUB: lo reemplaza cover-animator
-// Punto de registro de los proveedores de pose de esta carpeta. Lo importa src/anim/core/registry.js.
-// Contrato: exporta `default function register(anim)` y llama a
-//   anim.registerProvider(['estado', …], { enter(rig, params), update(rig, dt, params), exit(rig) })
-// Convenciones y utilidades del rig: cabecera de src/anim/core/characterRig.js.
+// Punto de registro de los proveedores de pose de cobertura (cover-animator). Lo importa src/anim/core/registry.js.
+// Estados: coverLow, coverHigh, peek, swat, coverSlide (cuerpo) y blindfire (torso). Ver poses.js.
+
+import { registerAll } from './poses.js';
 
 export default function register(anim) {
-  // Sin proveedores todavía: se usan los de src/anim/core/providers.js.
+  registerAll(anim);
 }

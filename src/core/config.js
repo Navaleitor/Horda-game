@@ -383,6 +383,95 @@ const config = {
       crouchHips: -0.36,        // m
       coverLowHips: -0.42,
     },
+
+    // cobertura (cover-animator): src/anim/cover/. Unidades m, s, rad. "Marco de la pared": +X = derecha del
+    // jugador mirando a la pared, −Z = hacia la pared (la pared está a −0.36 del anclaje). En cobertura el
+    // personaje se gira π (espalda a la pared); asomándose gira de cara a la mira.
+    cover: {
+      // Geometría del Xbot en Idle (espacio de personaje, medida) para el IK analítico de piernas.
+      legs: {
+        hips: [0.002, 1.025, -0.017],
+        hipJoint: [[0.080, -0.066, 0.026], [-0.083, -0.067, 0.015]],   // [derecha, izquierda] respecto a la cadera
+        thigh: 0.442, shin: 0.442, ankleH: 0.087,
+        restThigh: [0.066, -0.436, -0.033],   // dirección muslo en Idle (pierna derecha; la izquierda es el espejo en x)
+        restShin: [0.070, -0.436, 0.043],
+      },
+      // Pose por altura × (agazapado | asomado). drop = bajada de cadera, back = cadera hacia la pared,
+      // lean = inclinación del tronco hacia delante del cuerpo (rad), headUp = cabeza arriba (rad),
+      // footW = semianchura de pisada, footF = pie por delante de la cadera, gun = [subir arma (rad), x, y, z] sobre 'ready'.
+      high:     { drop: 0.06, back: 0.17, lean: 0.10, headUp: 0.0,  footW: 0.17, footF: 0.02, gunPitch: 1.55, gunYaw: 0.0, gunY: 0.02 },
+      low:      { drop: 0.68, back: 0.17, lean: 1.25, headUp: -0.3, footW: 0.19, footF: 0.06, gunPitch: 0.3,  gunYaw: 1.2, gunY: 0.0 },
+      peekHigh: { drop: 0.04, back: -0.12, lean: 0.0,  headUp: 0.0,  footW: 0.17, footF: 0.0,  gunPitch: 0.0,  gunYaw: 0.0, gunY: 0.0 },
+      peekLow:  { drop: 0.16, back: 0.0,  lean: 0.1,  headUp: 0.0,  footW: 0.19, footF: 0.0,  gunPitch: 0.0,  gunYaw: 0.0, gunY: 0.0 },
+      bodyBackZ: 0.17,          // z (marco de personaje, Idle) de la superficie de la espalda; lo que sobresalga (mochila…) se descuenta de `back`
+      headComp: 0.3,            // fracción de la inclinación del tronco que la cabeza devuelve (mira al frente)
+      peekShift: 0.32,          // m que se adelanta la cadera hacia el borde al asomarse en alta
+      peekClear: 0.12,          // m mínimos de la boca del cañón sobre el borde al asomarse por encima (cobertura baja)
+      peekLiftMax: 0.4,         // m máx. que se sube el cuerpo para cumplirlo (apuntando hacia abajo)
+      peekRoll: 0.18,           // rad de inclinación lateral del tronco al asomarse en alta
+      // Entrada: impacto y giro hasta quedar con la espalda a la pared (s desde la llegada)
+      entry: { impactDrop: 0.10, impactTime: 0.28, squatStart: 0.05, squatTime: 0.38, turnStart: 0.08, turnTime: 0.32, handTime: 0.3, braceDist: 0.9 },
+      // Desplazamiento lateral (paso de lado): amplitud de zancada, elevación y velocidad mínima para cadenciar
+      step: { amp: 0.15, lift: 0.07, minSpeed: 0.12 },
+      // SWAT y deslizamiento a la contigua (carrera agachada hacia la dirección de marcha)
+      dash: {
+        swat:  { drop: 0.40, lean: 0.70, amp: 0.34, lift: 0.15, footW: 0.13 },
+        slide: { drop: 0.30, lean: 0.45, amp: 0.34, lift: 0.15, footW: 0.13 },
+        headTurn: 25,           // 1/s: suavizado del rumbo
+      },
+      // Disparo a ciegas: arma por encima del borde (baja) o por el extremo (alta)
+      blind: { lowLeanLess: 0.1, lowClear: 0.17, lowX: 0.15, wallZ: -0.28, highReach: 0.40, highShift: 0.03, highY: 1.28, pitch: 0.15 },
+    },
+
+    // locomoción (locomotion-animator): src/anim/locomotion/. Unidades m, s, rad.
+    locomotion: {
+      // Velocidad media (m/s) del pie apoyado de cada clip a ×1, medida con el tobillo en el suelo (la que
+      // mide el núcleo subestima la del Run). La cadencia se deduce de aquí: cero patinaje.
+      contactSpeed: { walk: 1.54, run: 3.65 },
+      fade: { evade: 0.05, vault: 0.07, climb: 0.08, jump: 0.06 },   // s de crossfade de entrada (el rig usa 0.2 s)
+      handLead: 0.015,           // s de adelanto de los puntos de agarre (compensa el filtro del brazo)
+      lead: 0.065,              // s de adelanto de la pose en vault/trepar (compensa el suavizado de aditivos)
+      blend: [1.75, 3.1],       // m/s: Walk puro hasta [0], Run puro desde [1]
+      leanRun: 0.1,             // rad de inclinación extra del tronco a velocidad máxima de carrera
+      // Arranque (inclina hacia delante) y frenada (contrapeso hacia atrás): ∝ (v − v filtrada)
+      lean: { rate: 7, gain: 0.07, maxFwd: 0.2, maxBack: 0.22, headComp: 0.5 },
+      // Inclinación lateral en curvas al correr: ∝ velocidad de giro × velocidad
+      bank: { rate: 9, smooth: 12, gain: 0.032, max: 0.16, minSpeed: 1.6 },
+      // Giro en el sitio con pasos (cuerpo quieto y yaw cambiando)
+      turnSteps: { minRate: 1.3, maxRate: 4, maxSpeed: 0.45, stepSpeed: [0.45, 1.0] },
+      crouch: { depth: -0.4, back: 0.11, lean: 0.32 },
+      air: {
+        stretchTime: 0.14,      // s de extensión al despegar
+        tuckTime: 0.3,          // s hasta recoger las piernas
+        fallRef: 8,             // m/s de caída para la pose de caída completa
+      },
+      land: {
+        fade: 0.05,
+        speeds: [3, 12],        // m/s de caída: aterrizaje suave → fuerte
+        minImpact: 0.25,
+        dip: [0.1, 0.4],        // m de bajada de cadera (suave, fuerte)
+        down: 0.05,             // s hasta el punto más bajo
+        recover: [0.14, 0.34],  // s totales de recuperación (suave, fuerte)
+      },
+      vault: { coverHeight: 1.0, span: 2.0, legLead: 0.1, handAhead: 0.62, hipsClear: 0.46, pitch: 1.15, tuckThigh: 2.0, tuckShin: -2.5 },
+      climb: { height: 2.2, span: 0.9, reachHips: 0.22, bentHips: 0.42, handAhead: 0.5, handSide: 0.23 },
+      evade: {
+        delay: 0.0,             // fracción inicial antes de empezar a encogerse
+        anticipate: 0.16,       // fracción de la maroma agachándose antes de girar
+        roll: [0.2, 0.84],      // fracción de maroma en la que gira (de, a)
+        hipsDrop: 0.42,         // m bajada de cadera en el giro
+        extraTurns: 0,          // vueltas extra
+        fwdLean: 0.35,          // rad de inclinación al salir
+      },
+      // Esqueleto Xbot medido en reposo (espacio de personaje, m): para llevar las manos a un punto.
+      arm: {
+        upper: 0.278, fore: 0.283, hipsY: 1.025, shoulderX: 0.152, shoulderY: 0.381,
+        spineSeg: [0.101, 0.101, 0.092, 0.087],   // cadera→spine→spine1→spine2→hombro (alturas)
+        pole: [0.55, -0.6, 0.45],                 // hacia dónde se dobla el codo (x hacia fuera)
+        restU: { l: [-0.234, -0.972, 0.004], r: [0.202, -0.979, -0.022] },
+        restF: { l: [-0.117, -0.975, -0.187], r: [0.167, -0.975, -0.145] },
+      },
+    },
   },
 
   // ── classes (gameplay-programmer; color: character-artist) — GDD §3 ──────
