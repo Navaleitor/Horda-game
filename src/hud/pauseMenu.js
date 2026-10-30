@@ -163,7 +163,12 @@ export function createPauseMenu(parent, { onResume, onControls, onQuit }) {
     handle,
     setDevice,
     setInfo(text) { info.textContent = text; },
-    show() { state.index = 0; state.confirming = false; refresh(); el.classList.add('on'); },
+    /** reset: al entrar en pausa desde la partida (no al volver del panel de controles). */
+    show(reset) {
+      if (reset) { state.index = 0; state.confirming = false; }
+      refresh();
+      el.classList.add('on');
+    },
     hide() { el.classList.remove('on'); },
     get itemId() { return state.confirming ? (state.confirmIndex ? 'confirmQuit' : 'confirmCancel') : ITEMS[state.index].id; },
   };

@@ -45,14 +45,11 @@ export default function create() {
 
   function setScreen(s) {
     if (s === screen) return;
+    const prev = screen;
     screen = s;
-    const st = game.state;
     if (s === 'menu') startMenu.show(); else startMenu.hide();
-    if (s === 'pause') pauseMenu.show(); else pauseMenu.hide();
+    if (s === 'pause') pauseMenu.show(prev !== 'pauseControls'); else pauseMenu.hide();
     if (s === 'menuControls' || s === 'pauseControls') controls.show(); else controls.hide();
-    const inGame = st === 'playing' || st === 'paused';
-    if (inGame) gameHud.show(); else gameHud.hide();
-    prompts.el.style.display = st === 'playing' ? '' : 'none';
   }
 
   function onState({ state }) {
@@ -61,7 +58,6 @@ export default function create() {
     else if (state === 'playing') setScreen('hud');
     else if (state === 'paused') setScreen('pause');
     else setScreen('loading');
-    // setScreen no repite si la sub-pantalla no cambia; forzamos visibilidad del HUD de juego.
     const inGame = state === 'playing' || state === 'paused';
     if (inGame) gameHud.show(); else gameHud.hide();
     prompts.el.style.display = state === 'playing' ? '' : 'none';
