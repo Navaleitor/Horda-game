@@ -21,7 +21,7 @@ Fase de referencia: **1a** (base jugable: menú, movimiento, cobertura, armas, d
 | A (0) | Cobertura alta | frente a caja `high` + `press('A')` → `cover.height='high'` | auto | 1a | pendiente |
 | A (0) + dirección | SWAT turn (hueco ≤ 1,5 m) | en borde de cobertura con hueco ≤ 1,5 m, LS lateral + A → evento `cover:swat`, acaba en la otra cobertura | auto (TODO posiciones) | 1a | pendiente |
 | A (0) + dirección | Deslizar a cobertura contigua (hueco > 1,5 m) | en el extremo con hueco > 1,5 m, LS lateral + A → evento `cover:slide` | auto (TODO posiciones) | 1a | pendiente |
-| A (0) en movimiento sin cobertura | Maroma | LS + `press('A')` sin cobertura a tiro → `mode='evade'` (maroma en la dirección del stick); quieto → nada | auto (humo 1a.1) | 1a.2 | ✅ |
+| A (0) sin cobertura | Maroma | LS + `press('A')` sin cobertura a tiro → `mode='evade'` en la dirección del stick; quieto → `evade` hacia delante (a donde mira) | auto (humo 1a.1) | 1a.2 | ✅ |
 | A (0) ×2 | Maroma (alias) | `doubleTap('A',120)` con LS lateral → `player:moveMode` con `mode='evade'` | auto (humo 1a.1) | 1a.2 | ✅ |
 | A (0) con cobertura a tiro | Entrar corriendo, sin slide | a ≤ `cover.snapDistance` + `press('A')` → `coverSlide` a 4,14 m/s → `cover` | auto | 1a.2 | ✅ |
 | LT (6) | Apuntar | `trigger('LT',1)` → `player.aiming=true`, zoom de cámara | auto+manual | 1a | pendiente |

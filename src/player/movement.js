@@ -108,8 +108,8 @@ export function createMovement(ctx) {
     const I = ctx.input;
     const mag = ctx.stickMag;
 
-    // A: cobertura a tiro = entrar (corriendo a velocidad normal) · sin cobertura y moviéndote = maroma
-    // en la dirección del stick · doble toque = maroma (alias).
+    // A: cobertura a tiro = entrar (corriendo a velocidad normal) · sin cobertura = maroma en la
+    // dirección del stick (quieto: hacia donde mira el personaje) · doble toque = maroma (alias).
     if (I.pressed('cover')) {
       const dbl = I.doubleTap('cover') && !st.aUsedForCover;
       st.aUsedForCover = false;
@@ -117,7 +117,7 @@ export function createMovement(ctx) {
         if (dbl && st.evadeCD <= 0) { startEvade(); return; }
         queryDir(ctx.camFwd, _dir);
         if (ctx.cover.tryEnter(_dir, CC.snapDistance, CC.snapSpeed)) { st.aUsedForCover = true; return; }
-        if (mag > P.queryStickMin && st.evadeCD <= 0) { startEvade(); return; }
+        if (st.evadeCD <= 0) { startEvade(); return; }
       }
     }
 

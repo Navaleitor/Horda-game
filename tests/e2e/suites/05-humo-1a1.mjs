@@ -124,7 +124,7 @@ export default {
       },
     },
     {
-      name: 'A en movimiento sin cobertura = maroma; doble A = maroma; quieto no hace nada',
+      name: 'A sin cobertura = maroma (stick o, quieto, hacia delante); doble A = maroma',
       async run() {
         await tp(-5, 5, Math.PI / 2); await clearEv();
         await stick('LS', 0, 1); await adv(150);
@@ -137,9 +137,14 @@ export default {
         assert.ok((await events('player:moveMode')).includes('evade'), 'doble A = maroma');
         assert.ok(!(await events('player:moveMode')).includes('slide'), 'sin slide');
         await stick('LS', 0, 0); await adv(900);
-        await tp(-5, 5, 0); await clearEv();
-        await press('A'); await adv(300);
-        assert.ok(!(await events('player:moveMode')).includes('evade'), 'A quieto sin cobertura no rueda');
+        await tp(-5, 5, Math.PI / 2); await clearEv();
+        const a = await st();
+        await press('A'); await adv(500);
+        assert.ok((await events('player:moveMode')).includes('evade'), 'A quieto = maroma');
+        const b = await st();
+        // yaw π/2 → delante = −X
+        assert.lt(b.pos[0] - a.pos[0], -1.5, `maroma hacia delante (Δx=${(b.pos[0] - a.pos[0]).toFixed(2)})`);
+        await adv(400);
       },
     },
     {

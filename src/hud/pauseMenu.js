@@ -10,7 +10,7 @@ const CONTROLS = [
   [['RS'], 'Cámara', '—'],
   [['L3'], 'Sin función', '—'],
   [['R3'], 'Cambiar de hombro', '—'],
-  [['A'], 'Cobertura · A + dirección en cobertura = SWAT / deslizar a la contigua · sin cobertura a tiro y moviéndote = maroma · doble toque = maroma', 'Seleccionar / comprar'],
+  [['A'], 'Cobertura · A + dirección en cobertura = SWAT / deslizar a la contigua · sin cobertura a tiro = maroma (quieto: hacia delante) · doble toque = maroma', 'Seleccionar / comprar'],
   [['Y'], 'Saltar · trepar · saltar sobre cobertura', '—'],
   [['B'], 'Golpe cuerpo a cuerpo · cargando pieza: soltarla', 'Atrás / cerrar'],
   [['X'], 'Interactuar · mantener sobre aliado derribado = revivir · toque sobre fortificación = radial', '—'],

@@ -11,7 +11,7 @@
 | RS (ejes 2,3) | Cámara | Cámara / apuntar el lugar | — (en el radial ↑: elegir) |
 | L3 (10) | Sin función | — | — |
 | R3 (11) | Cambiar hombro | — | — |
-| A (0) | Cobertura a tiro = entrar (corre a velocidad normal y se pega; sin slide) · **sin cobertura a tiro y moviéndote = maroma** en la dirección del stick · doble toque = maroma (alias) · A+dirección en cobertura = SWAT turn / deslizar a la cobertura contigua | — | Seleccionar / comprar |
+| A (0) | Cobertura a tiro = entrar (corre a velocidad normal y se pega; sin slide) · **sin cobertura a tiro = maroma** en la dirección del stick (quieto: hacia delante, a donde mira el personaje) · doble toque = maroma (alias) · A+dirección en cobertura = SWAT turn / deslizar a la cobertura contigua | — | Seleccionar / comprar |
 | Y (3) | Saltar · trepar · saltar sobre cobertura | — | — |
 | B (1) | Golpe cuerpo a cuerpo | **Soltar** la pieza en el suelo | Atrás / cerrar |
 | X (2) | Interactuar: fabricador, montar torreta, recoger, **mantener sobre aliado derribado = revivir**. **Toque sobre fortificación** → radial de fortificación (§12) | — | — |
@@ -25,7 +25,7 @@
 | View (8) | Mantener = marcador | — | — |
 | Menu (9) | Pausa | Pausa | Pausa |
 
-- **A sin cobertura**: quieto no hace nada; moviéndote, maroma (rodar) en la dirección del stick. No existe deslizamiento (slide) ni sprint.
+- **A sin cobertura**: maroma (rodar, 7,5 m/s durante 0,45 s ≈ 2,6 m, 0,3 s de enfriamiento) en la dirección del stick; con el stick suelto, hacia delante (a donde mira el personaje). La cobertura se toma con A a ≤ 2,5 m, corriendo a 4,14 m/s. No existe deslizamiento (slide) ni sprint.
 - **A + dirección en el extremo de una cobertura**: si el hueco hasta la siguiente cobertura es de **≤1,5 m** → **SWAT turn**; si es **mayor** → **deslizar a la cobertura contigua**.
 - **Tac-Com** (mantener LB): resalta a través de paredes a aliados, fabricador y fortificaciones (con su salud), dibuja rutas de spawn, enemigos restantes y composición de la siguiente oleada.
 - **Pistola de reparación**: RT mantenido, haz sobre fortificación (≤6 m).

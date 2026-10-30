@@ -27,7 +27,7 @@ export const E_DAY_DEFAULT = Object.freeze({
   name: 'E-Day Default',
   pad: {
     // Combate
-    cover: [PAD.A],          // cobertura · A+dir en cobertura = SWAT/deslizar · sin cobertura y en movimiento = maroma · doble toque = maroma
+    cover: [PAD.A],          // cobertura · A+dir en cobertura = SWAT/deslizar · sin cobertura = maroma (quieto: hacia delante) · doble toque = maroma
     melee: [PAD.B],          // golpe cuerpo a cuerpo (con pieza en manos: soltar — Fase 1b)
     interact: [PAD.X],       // interactuar (Fase 1b+)
     jump: [PAD.Y],           // saltar · trepar · saltar sobre cobertura
