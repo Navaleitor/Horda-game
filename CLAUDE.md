@@ -23,3 +23,11 @@ Modo Horda inspirado en Gears of War, en un solo HTML autocontenido. Responde y 
 - Animación: `animation-engineer` posee `src/anim/core/`; cada animador especialista posee su subcarpeta (`locomotion/`, `cover/`, `weapons/`, `abilities/`, `enemies/`). Todo cambio de animación lo revisa `animation-reviewer` antes de cerrar la fase.
 - Cierre de fase: lo firman `game-architect` (contratos), `qa-tester` (suite, FPS, consola) y `animation-reviewer` (si hubo animación nueva).
 - Nada de identificadores de modelo de IA en commits ni código.
+
+## Ahorro de tokens
+- Máximo **3 subagentes por fase** (como mucho 2 en paralelo). El chat de la fase hace él mismo el trabajo pequeño.
+- Confía en el «Formato de respuesta» del subagente; no releas su trabajo. Se verifica en el cierre.
+- No leas documentos completos: Grep o Read por rango de la sección que necesites.
+- Capturas y Playwright visual **solo en el cierre** de cada sub-fase.
+- Cada sub-fase en un **chat nuevo**, empezando por un resumen corto del estado (no el historial).
+- Subagentes en `sonnet`, salvo `game-architect` y `controls-camera-engineer`.

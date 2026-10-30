@@ -25,15 +25,20 @@ Formato: frontmatter `name`, `description`, `tools`, `model: inherit`; cuerpo co
 | `ui-hud-designer` | `hud/`, DOM/CSS del HUD — HUD, tienda por pestañas, radiales (comodines y fortificación), Tac-Com, marcador, inicio |
 | `qa-tester` | `tests/e2e/`, `docs/qa/` — Playwright + mando simulado, checklist de controles, FPS, bugs |
 
+**Modelos**: `game-architect` y `controls-camera-engineer` usan el modelo de la sesión (Opus); los otros 17 usan `sonnet`. Reglas de ahorro de tokens en `CLAUDE.md`.
+
 ## Fases (cada una termina jugable con control)
 
 **Fase 0 — Cimientos** ✅: agentes, docs, CLAUDE.md, decisiones de diseño.
 
-**Fase 1a — Base jugable**
-- architect: `package.json` (three, esbuild, playwright dev), `build.js`, `template.html`, `core/`.
-- En paralelo: controls-camera (input E-Day, cámara, movimiento, cobertura) · physics (cápsula/AABB/raycast) · level (blockout) · animation-engineer (rig) → locomotion-animator + cover-animator · weapon-animator (rifle: apuntar/disparar/recargar) · ui (menú de inicio: clase + dificultad, placeholder) · qa (harness).
-- Revisión: animation-reviewer (locomoción y cobertura) + qa-tester.
-- **Prueba con tu control**: moverte, sprint L3, cobertura media/alta con A, SWAT turn, evadir, deslizar, saltar/vault Y, apuntar/disparar a dianas, recarga activa RB, cambio de hombro R3.
+**Fase 1a — Base jugable** (partida en 3 sub-fases, cada una en un chat nuevo)
+- Ya hecho (rama `fase-1a-base-jugable`): núcleo y build, arnés e2e con mando simulado, Soldier por clase, combate (hitscan, recarga activa, melee), físicas, blockout del nivel con dianas, props.
+- **1a.1 — Moverse y disparar**: controls-camera-engineer (input E-Day, cámara, movimiento, cobertura funcional con Soldier en Idle/Walk/Run sin poses finas) + HUD mínimo (vida, arma, munición, recarga activa) + test e2e de humo.
+  - **Prueba con tu control**: moverte, sprint L3, cobertura A, SWAT turn, evadir, deslizar, saltar/vault Y, apuntar/disparar a dianas, recarga activa RB, cambio de hombro R3.
+- **1a.2 — Animación**: animation-engineer (rig) → locomotion-animator + cover-animator → weapon-animator (máx. 3 a la vez).
+  - **Prueba**: lo mismo, con poses de cobertura, agachado, vault, evadir y recargas animadas.
+- **1a.3 — Menú, HUD y cierre**: ui-hud-designer (menú de inicio con clase y dificultad, HUD completo) + qa-tester (suite de controles) + animation-reviewer (capturas). Firmas de cierre.
+  - **Prueba**: elegir clase y dificultad y jugar el campo de tiro completo.
 
 **Fase 1b — Horda mínima**
 - gameplay: armas, daño, `hordeMode`, oleadas 1–5 (sin jefe aún), bolsa de puntos.

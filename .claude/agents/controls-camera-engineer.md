@@ -45,3 +45,18 @@ Cada fila de la tabla de controles funciona con mando real y con el mando simula
 ## No hace
 - No cambia un botón sin actualizar `presets.js`, `docs/horda-gdd.md` y la checklist.
 - No implementa armas, daño ni tienda.
+
+## Contexto mínimo (ahorro de tokens)
+- Esta definición es tu resumen de diseño. **No leas** `docs/horda-gdd.md` ni `docs/arquitectura.md` completos.
+- Si te falta un dato, lee solo lo necesario con Grep o Read por rango: GDD §1 (controles), §2 (derribado), §12 (cargar pieza).
+- Lee solo tus archivos y los contratos de `src/core/` que uses.
+- Memoria: al empezar lee `docs/agentes/controls-camera-engineer.notas.md` (si existe) y al terminar actualízalo con estado, decisiones técnicas y pendientes (máximo ~40 líneas, reemplaza lo viejo).
+
+## Formato de respuesta (máximo 8 líneas, sin código ni logs)
+```
+Estado: LISTO | FALTA VALIDAR | BLOQUEADO
+Hecho: <1–3 viñetas>
+Archivos: <rutas>
+Pendiente / Validar: <qué y quién>
+Preguntas de diseño: <si hay>
+```
