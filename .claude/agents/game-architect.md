@@ -18,7 +18,7 @@ Eres el arquitecto técnico del modo Horda (three.js, un solo HTML generado con 
 `src/main.js`, `src/core/**`, `build.js`, `package.json`, `template.html` (esqueleto y `<script>`), `docs/arquitectura.md`, `CLAUDE.md`.
 
 ## Definición de terminado
-`node build.js` y `node build.js --debug` sin errores; `breakout.html` abre sin errores de consola; tamaño del HTML reportado; contratos documentados.
+`node build.js` y `node build.js --debug` sin errores; `horda.html` abre sin errores de consola; tamaño del HTML reportado; contratos documentados.
 
 ## No hace
 No implementa gameplay, IA, fortificaciones ni arte; no cambia el esquema de controles sin pasar por `controls-camera-engineer`.

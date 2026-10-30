@@ -1,89 +1,189 @@
 # GDD — Modo Horda
 
-> Todas las cifras viven en `src/core/config.js`; este documento es la referencia de diseño. Valores iniciales, se ajustan con telemetría de QA.
+> Todas las cifras viven en `src/core/config.js`; este documento es la referencia de diseño. Valores marcados *(prov.)* son provisionales y se ajustan con pruebas/telemetría de QA.
 
-## 1. Controles (E-Day Default, 3ª persona fija)
+## 1. Controles (E-Day Default adaptado, 3ª persona fija)
 Índices de la API Gamepad (standard mapping) entre paréntesis.
 
-| Botón | Combate | Modo construcción (con fantasma) | Menú de construcción |
+| Botón | Combate | Cargando fortificación | Menús (fabricador, mini-menú) |
 |---|---|---|---|
-| LS (ejes 0,1) | Mover | Mover | Navegar |
-| RS (ejes 2,3) | Cámara | Cámara/apuntar slot | — |
-| L3 (10) | Sprint (hold; opción toggle) | — | — |
+| LS (ejes 0,1) | Mover | Mover (más lento) | Navegar |
+| RS (ejes 2,3) | Cámara | Cámara / apuntar el lugar | — (en el radial ↑: elegir) |
+| L3 (10) | Sprint **toggle** (se corta al soltar el stick, apuntar o disparar) | — | — |
 | R3 (11) | Cambiar hombro | — | — |
-| A (0) | Cobertura · A+dirección en cobertura = SWAT turn/deslizar a cobertura contigua · doble-tap A = evadir/rodar · A en sprint = slide | — | Seleccionar |
+| A (0) | Cobertura · A+dirección en cobertura = SWAT turn / deslizar a la cobertura contigua · doble toque = evadir/rodar · A en sprint = deslizar | — | Seleccionar / comprar |
 | Y (3) | Saltar · trepar · saltar sobre cobertura | — | — |
-| B (1) | Golpe cuerpo a cuerpo | **Cancelar** (reembolso 100%) | Atrás/cerrar |
-| X (2) | Interactuar (fabricador, montar torreta, recoger) · **mantener X** sobre fortificación = mejorar | — | — |
-| RB (5) | Recargar (tap de nuevo = recarga activa) | Rotar +45° | Pestaña → |
-| LB (4) | Tac-Com (hold: rutas de spawn, salud de fortificaciones, enemigos restantes) | Rotar −45° | Pestaña ← |
+| B (1) | Golpe cuerpo a cuerpo | **Soltar** la pieza en el suelo | Atrás / cerrar |
+| X (2) | Interactuar: fabricador, montar torreta, recoger, **mantener sobre aliado derribado = revivir**. **Toque sobre fortificación** → mini-menú: Mejorar (A) · Mover (Y, solo en preparación) · Cerrar (B) | — | — |
+| RB (5) | Recargar (toque de nuevo = recarga activa) | Rotar +45° | Pestaña → |
+| LB (4) | **Toque = granada rápida** (al punto de mira) · **mantener = Tac-Com** | Rotar −45° | Pestaña ← |
 | LT (6) | Apuntar | — | — |
-| RT (7) | Disparar / lanzar | **Confirmar colocación** | — |
-| D-pad ↑ (12) | Equipo (granada) | — | — |
-| D-pad ←/→ (14/15) | Cambiar arma (rifle / pistola / **pistola de reparación**) | — | — |
-| D-pad ↓ (13) | Abrir menú de construcción (ver duda D1) | — | — |
-| View (8) | Marcador de horda (puntos, bajas, oleada) | — | — |
+| RT (7) | Disparar | **Colocar** (válido = fantasma verde) | — |
+| D-pad ←/→ (14/15) | Armas principales: rifle de asalto / arma comprada | — | Navegar |
+| D-pad ↓ (13) | Pistola, o **pistola de reparación** si la compraste (la reemplaza) | — | Navegar |
+| D-pad ↑ (12) | **Mantener** = radial de comodines místicos; elegir con RS; **soltar = activar** (tiempo al 50% con el radial abierto) | — | Navegar |
+| View (8) | Mantener = marcador | — | — |
 | Menu (9) | Pausa | Pausa | Pausa |
 
-Pistola de reparación: RT mantenido con haz sobre fortificación (≤6 m).
-Montado en torreta manual: LT/RT apuntar/disparar, B o X desmontar.
+- **Tac-Com** (mantener LB): resalta a través de paredes a aliados, fabricador y fortificaciones (con su salud), dibuja rutas de spawn, enemigos restantes y composición de la siguiente oleada.
+- **Pistola de reparación**: RT mantenido, haz sobre fortificación (≤6 m).
+- **Torreta manual**: X para montar; LT/RT apuntar/disparar; RB cohete (Nv4); B o X desmontar.
 
-## 2. Flujo de Horda (máquina de estados)
-`Preparación (30 s, saltable con Menu→"Listo")` → `Oleada N` → `Recompensa (+bono)` → repetir. Muerte del jugador = fin (o reaparición si hay aliados; ver D3). Cada 5 oleadas = **jefe**. Cada set de 5 sube modificadores: HP ×1.20, daño ×1.15, presupuesto ×1.25.
+## 2. Flujo de partida
+1. **Menú de inicio**: elegir **clase** (obligatorio) y **dificultad**. Los 3 bots toman las otras 3 clases.
+2. `Preparación (30 s, saltable desde pausa → "Listo")` → `Oleada N` → `Recompensa (+bono)` → repetir.
+3. **25 oleadas** en 5 sets de 5. Jefe en 5, 10, 15, 20; la 25 es doble jefe → **victoria**.
+4. Cada set sube modificadores enemigos: HP ×1.20, daño ×1.15, presupuesto ×1.25.
 
-## 3. Enemigos (nombres originales, modelos: RobotExpressive.glb de three.js + geometría)
+**Dificultad**
+| | Casual | Normal | Locura |
+|---|---|---|---|
+| HP enemigo | ×0.75 | ×1 | ×1.4 |
+| Daño enemigo | ×0.6 | ×1 | ×1.6 |
+| Puntos | ×0.8 | ×1 | ×1.3 |
+
+**Derribado, muerte y reaparición**
+- Vida a 0 → **derribado** 15 s (te arrastras despacio, sin disparar). Un aliado lo revive manteniendo X 3 s → vuelves con 30% de vida.
+- Si nadie llega → **mueres** y reapareces en el fabricador al terminar la oleada.
+- Al morir **pierdes**: armas compradas, granadas, pistola de reparación, cargas de comodines y la fortificación que cargabas (cae al suelo, cualquiera la recoge). **Conservas** las pasivas de clase.
+- Si los 4 están derribados/muertos a la vez → **fin de partida**.
+- Bots: mismas reglas de derribado, pero **no pierden** sus cargas de comodines ni su arma de clase.
+
+## 3. Clases y pasivas
+Clase obligatoria al inicio: **Médico, Apoyo, Ingeniero, Reconocimiento**. Las pasivas se compran en el fabricador (pestaña Clase), **rangos 1–5**, y son **permanentes** (no se pierden al morir). Coste por rango *(prov.)*: 300 / 600 / 1000 / 1500 / 2200.
+
+Cada clase tiene 4 pasivas en ranuras P1–P4. La ranura sirve para el reflejo en los bots (§6).
+
+| Ranura | Médico | Apoyo | Ingeniero | Reconocimiento |
+|---|---|---|---|---|
+| P1 | **Revivir rápido**: −10% tiempo de revivir/rango; R5 revive a 3 m | **+Munición**: +10% capacidad/rango | **Reparación experta**: +15% velocidad y −5% coste de reparar/rango | **Tiro a la cabeza**: +8% daño headshot/rango |
+| P2 | **Vitalidad**: +5% salud máx. del escuadrón/rango | **Recarga incendiaria**: recarga activa perfecta prende balas (DoT 5/s × rango, 3 s) | **Blindaje**: +6% HP de fortificaciones/rango | **Ojo marcador**: apuntar marca enemigos 2 s × rango (visibles a través de paredes) |
+| P3 | **Regeneración**: +10% velocidad de regeneración y −0.3 s de espera/rango | **Granadero**: +1 granada máx. en R1, R3, R5 | **Cargador**: +10% velocidad al cargar fortificaciones/rango | **Ágil**: +3% velocidad de movimiento/rango |
+| P4 | **Dardos curativos**: la pistola cura a aliados 5 HP × rango por impacto | **Aura de daño**: +3% daño a aliados en 8 m/rango | **Descuento**: −4% coste de construir y mejorar/rango | **Cazarrecompensas**: +4% puntos por baja/rango |
+
+## 4. Comodines místicos (radial D-pad ↑)
+- Se compran **cargas** en el fabricador (pestaña Místicas), **máx. 2 por comodín**. Usar uno gasta una carga. **Cooldown global de 10 s** entre comodines.
+- **Se pierden al morir** (los bots no los pierden).
+- El radial muestra solo los comodines con carga; los que están en cooldown salen en gris.
+
+| Comodín | Tipo | Efecto | Precio/carga *(prov.)* |
+|---|---|---|---|
+| **Llamado del Vínculo** | Compartido | Revive al instante a todos los aliados derribados y cura 30% al escuadrón | 1500 |
+| **Escudo Espectral** | Compartido | Domo de 4 m que bloquea proyectiles enemigos 6 s; se puede disparar desde dentro | 1000 |
+| **Granada Arcana** | Compartido | Te da 1 granada arcana (la siguiente que lanzas con LB): aturde 3 s en r5, **incluidos jefes** (2 s) | 800 |
+| **Aura de Resurrección** | Exclusivo Médico | 10 s: los aliados que caigan a ≤8 m se levantan solos con 50% de vida | 1200 |
+| **Lluvia de Suministros** | Exclusivo Apoyo | Rellena munición y granadas del escuadrón + munición infinita 10 s | 1000 |
+| **Fortaleza Arcana** | Exclusivo Ingeniero | Todas las fortificaciones se reparan 40% y son invulnerables 8 s | 1500 |
+| **Velo de Sombras** | Exclusivo Reconocimiento | Invisible para enemigos 8 s; el primer disparo al salir hace ×3 y revela a todos los enemigos 6 s | 1000 |
+
+Solo puedes comprar el exclusivo de tu clase.
+
+## 5. Fabricador y tienda
+Único lugar donde se compra. X para abrir. Menú con pestañas (LB/RB); LS/D-pad navegan, A compra, B sale. Muestra coste, nivel actual y si alcanza la bolsa (gris si no).
+
+| Pestaña | Contenido |
+|---|---|
+| **Fortificaciones** | Barrera, torreta manual, centinela, señuelo. **Siempre salen en Nv1** a su precio base. Al comprar, la pieza pasa a tus manos. |
+| **Desbloqueos** | Por tipo de fortificación: desbloquear Nv2, Nv3, Nv4 (en orden). Habilita mejorar las piezas de ese tipo hasta ese nivel. Precios *(prov., se ajustan con pruebas)*: Nv2 1000 · Nv3 2500 · Nv4 5000. |
+| **Armas** | Escopeta, rifle de francotirador, lanzacohetes, ametralladora pesada (ocupan la 2ª ranura principal; comprar otra reemplaza). Pistola de reparación (reemplaza la pistola). |
+| **Munición / Granadas** | Rellenar munición; granadas de fragmentación, incendiarias o aturdidoras. |
+| **Clase** | Pasivas de tu clase, rangos 1–5. |
+| **Místicas** | Cargas de comodines. |
+
+**Precios de equipo** *(prov.)*: escopeta 800 · francotirador 1200 · ametralladora pesada 1800 · lanzacohetes 2000 · pistola de reparación 400 · rellenar munición 200 · granada frag 150 c/u · incendiaria 200 c/u · aturdidora 200 c/u.
+
+**Granadas**: un tipo a la vez, máx. 4 (más con la pasiva Granadero). Comprar otro tipo reemplaza al anterior.
+
+## 6. Escuadrón: bots espejo
+- 3 bots con las 3 clases que no elegiste. **Progresan contigo**:
+  - Compras rango N de tu pasiva en ranura Pk → cada bot sube a rango N la pasiva Pk de **su** clase.
+  - Compras 1 carga de comodín **compartido** → cada bot recibe 1 carga del mismo.
+  - Compras 1 carga de tu comodín **exclusivo** → cada bot recibe 1 carga del exclusivo de **su** clase.
+  - La IA decide cuándo usarlos (p. ej. Llamado del Vínculo con ≥2 aliados derribados; Escudo Espectral bajo fuego intenso; Fortaleza Arcana con fortificaciones <40%).
+- **No usan la tienda.** Armas fijas de clase:
+
+| Clase del bot | Arma |
+|---|---|
+| Médico | Ametralladora básica |
+| Apoyo | Ametralladora ligera |
+| Ingeniero | Subfusil |
+| Reconocimiento | Rifle de francotirador |
+
+- Comportamiento: siguen al jugador o defienden la base, se cubren, reviven a derribados.
+- *Pendiente de confirmar*: el bot Ingeniero repara fortificaciones con una herramienta de clase.
+
+## 7. Armas (stats base *(prov.)*)
+| Arma | Daño | Cadencia | Cargador | Notas |
+|---|---|---|---|---|
+| Rifle de asalto (inicial) | 20 | 10/s | 60 | — |
+| Pistola (inicial) | 35 | semi | 12 | — |
+| Escopeta | 15 × 8 perdigones | 1.2/s | 6 | Daño cae >8 m |
+| Rifle de francotirador | 150 (headshot ×2.5) | 0.8/s | 4 | Zoom con LT |
+| Lanzacohetes | 300 en r3 | 0.5/s | 1 (4 de reserva) | Ideal contra jefes y Brutos |
+| Ametralladora pesada | 18 | 15/s | 150 | −30% velocidad, sin cobertura |
+| Pistola de reparación | 80 HP/s a fortificaciones | haz | — | 1 punto por cada 4 HP |
+| *Bot* Ametralladora básica | 18 | 10/s | 60 | — |
+| *Bot* Ametralladora ligera | 16 | 13/s | 100 | — |
+| *Bot* Subfusil | 12 | 14/s | 40 | — |
+
+- **Recarga activa**: perfecta = +10% daño 5 s (con Recarga incendiaria, además DoT); fallida = encasquillada 1.5 s.
+- **Granadas**: fragmentación 150 de daño en r4 · incendiaria con zona de fuego de 6 s (20/s) · aturdidora aturde 2 s en r5 (no a jefes).
+
+## 8. Enemigos (robots, `RobotExpressive.glb` + geometría)
 | Tipo | HP | Vel. | Daño | Rol / IA | Puntos |
 |---|---|---|---|---|---|
-| Rasero (soldado) | 150 | 3.5 m/s | 8×rifle | Avanza de cobertura en cobertura, flanquea | 50 |
+| Rasero (soldado) | 150 | 3.5 m/s | 8 × rifle | Avanza de cobertura en cobertura, flanquea | 50 |
 | Corredor | 60 | 6 | 15 melee | Rush directo; muy frenado por barreras | 30 |
-| Tirador | 120 | 3 | 45 (cada 2.5 s, láser de aviso) | Se queda lejos, prioriza al jugador expuesto | 80 |
+| Tirador | 120 | 3 | 45 (cada 2.5 s, láser de aviso) | Se queda lejos, prioriza objetivos expuestos | 80 |
 | Bruto | 700 | 2.5 | 40 melee / escopeta | Prioriza fortificaciones; daño ×3 a barreras | 200 |
-| Explosivo | 40 | 5 | 120 radio 3 m | Busca señuelos/barreras/torretas y se inmola | 40 |
-| **Jefe: Coloso** (oleada 5, 15, 25) | 5000 | 2 | Pisotón AoE + cañón | Punto débil en espalda; destruye barreras al pasar | 1000 |
-| **Jefe: Matriarca** (oleada 10, 20) | 4000 | 2.5 | Invoca Corredores | Se protege tras escudo; vulnerable al invocar | 1000 |
+| Explosivo | 40 | 5 | 120 en r3 | Busca señuelos/barreras/torretas y se inmola | 40 |
+| **Jefe: Coloso** (oleadas 5, 15, 25) | 5000 | 2 | Pisotón AoE + cañón | Punto débil en la espalda; destruye barreras al pasar | 1000 |
+| **Jefe: Matriarca** (oleadas 10, 20, 25) | 4000 | 2.5 | Invoca Corredores | Se protege tras escudo; vulnerable al invocar | 1000 |
 
-## 4. IA: selección de objetivo (utilidad, re-evaluación cada 0.5 s, histéresis +20% al objetivo actual)
+## 9. IA: selección de objetivo
+Utilidad, re-evaluación cada 0.5 s, histéresis +20% al objetivo actual.
 ```
 score(t) = base[tipoEnemigo][tipoObjetivo] × aggroWeight(t) × visibilidad(t)
            × 1/(1 + dist/10) × (1 + 0.5·meDañóRecientemente(t))
 ```
-- Candidatos: jugador, aliados, señuelos, torretas/centinelas, barreras.
-- **Señuelo**: dentro de su radio, `aggroWeight` alto (Nv1 ×3 … Nv4 ×6) → atrae a casi todos salvo Tirador (resiste) y quien recibió daño del jugador en los últimos 2 s.
-- **Barreras** no son objetivo preferente salvo para Bruto/Explosivo; son **obstáculos**: el navGrid les asigna costo alto. Si la ruta más barata cruza la barrera, el enemigo se detiene y la ataca (y sufre su daño/ralentización).
-- Movimiento: A* sobre grilla 1 m del mapa, flow-field por ruta de spawn para muchos enemigos (barato), separación local entre agentes.
+- Candidatos: jugador, bots, señuelos, torretas/centinelas, barreras. Objetivos invisibles (Velo de Sombras) se excluyen.
+- **Señuelo**: dentro de su radio, `aggroWeight` alto (Nv1 ×3 … Nv4 ×6) → atrae a casi todos salvo Tirador (resiste) y quien recibió daño en los últimos 2 s.
+- **Barreras** no son objetivo preferente salvo para Bruto/Explosivo; son **obstáculos** con costo alto en el navGrid. Si la ruta más barata cruza la barrera, el enemigo se detiene y la ataca (y sufre su daño/ralentización).
+- Movimiento: A* sobre grilla de 1 m, flow-field por ruta de spawn, separación local entre agentes.
 
-## 5. Economía
-- Bajas: tabla anterior; **headshot +50%**, **ejecución/melee +25%**.
+## 10. Economía
+- **Bolsa de equipo**: las bajas del jugador y de los bots suman a una bolsa común que gasta el jugador.
+- Bajas: tabla §8; **headshot +50%**, **melee +25%**; × multiplicador de dificultad.
 - Bono fin de oleada: `200 + 50·N`; +25% si ninguna fortificación fue destruida. Puntos iniciales: **600**.
-- Coste de colocar / mejorar a Nv2 / Nv3 / Nv4:
+- **Fortificaciones**: comprar (siempre Nv1) y mejorar **por pieza, en sitio** (X → Mejorar), solo hasta el nivel desbloqueado para su tipo en el fabricador.
 
-| Fortificación | Nv1 | →Nv2 | →Nv3 | →Nv4 |
+| Fortificación | Comprar (Nv1) | Mejorar →Nv2 | →Nv3 | →Nv4 |
 |---|---|---|---|---|
 | Barrera | 300 | 450 | 800 | 1200 |
 | Torreta manual | 700 | 600 | 1000 | 1500 |
 | Centinela | 1000 | 800 | 1300 | 2000 |
 | Señuelo | 400 | 400 | 700 | 1000 |
 
-- Reparar: **1 punto por cada 4 HP** (reparar un daño total cuesta ≈ 35–50% del valor invertido). Destruida = reconstruir al 50% del coste acumulado, conserva nivel.
-- Vender (opcional, D5): reembolso 50%.
+- **Reparar**: 1 punto por cada 4 HP (pistola de reparación).
+- **Destruida**: queda un armazón; X → Reconstruir al 50% del coste acumulado, conserva nivel.
+- **Mover**: gratis, solo en preparación, conserva nivel. **No se vende.** **Sin límite** de piezas.
 
-## 6. Fortificaciones por nivel (máx. 4)
-**Barreras** (frenan + dañan + se desgastan con cada contacto)
+## 11. Fortificaciones por nivel (máx. 4)
+**Barreras** (frenan, dañan y se desgastan con cada contacto)
 | Nv | Forma | HP | Ralentiza | DPS contacto | Especial |
 |---|---|---|---|---|---|
 | 1 | Pinchos | 400 | 30% | 10 | — |
 | 2 | Concertina (alambre redondo) | 700 | 50% | 20 | Enganche 0.5 s |
 | 3 | Láser rojo | 1000 | 40% | 60 | Corredores no pueden cruzar |
-| 4 | Láser azul **o** púrpura | 1500 | — | — | Elección al subir a Nv4 |
-- **Propuesta láser púrpura**: Nv4 se ramifica (se respeta el máximo de 4): **Azul = Control** (ralentiza 60%, congela 1.5 s, DPS 80) vs **Púrpura = Daño** (DPS 140, perfora armadura −30% al cruzar, ralentiza 30%). Se puede cambiar de rama pagando 50% del coste de Nv4.
+| 4 | Láser azul (control) | 1500 | 60% | 80 | Congela 1.5 s al cruzar |
 
-**Torreta manual** (el jugador la monta con X; sobrecalentamiento en vez de munición)
+**Torreta manual** (sobrecalentamiento en vez de munición)
 | Nv | Daño/bala | Cadencia | Calor máx | HP | Especial |
 |---|---|---|---|---|---|
 | 1 | 25 | 8/s | 4 s | 600 | — |
 | 2 | 32 | 10/s | 6 s | 800 | Escudo frontal |
 | 3 | 40 | 12/s | 8 s | 1100 | Ralentiza 15% al impactar |
-| 4 | 40 + explosivo r1.5 | 12/s | 10 s | 1500 | Disparo alterno: cohete (RB) |
+| 4 | 40 + explosivo r1.5 | 12/s | 10 s | 1500 | Cohete alterno (RB) |
 
 **Centinela** (automática)
 | Nv | Alcance | Arco | Daño | Cadencia | HP | Especial |
@@ -91,35 +191,35 @@ score(t) = base[tipoEnemigo][tipoObjetivo] × aggroWeight(t) × visibilidad(t)
 | 1 | 15 m | 120° | 8 | 4/s | 400 | — |
 | 2 | 20 m | 180° | 12 | 5/s | 600 | Prioriza Explosivos |
 | 3 | 22 m | 360° | 15 | 6/s | 900 | Blindaje (−25% daño recibido) |
-| 4 | 25 m | 360° | 18 | 8/s | 1200 | Balas incendiarias (DoT 10/s 3 s) |
+| 4 | 25 m | 360° | 18 | 8/s | 1200 | Balas incendiarias (DoT 10/s, 3 s) |
 
 **Señuelo / maniquí**
 | Nv | HP | Radio aggro | Peso | Especial |
 |---|---|---|---|---|
 | 1 | 500 | 8 m | ×3 | — |
 | 2 | 900 | 12 m | ×4 | — |
-| 3 | 1400 | 15 m | ×5 | Explota al destruirse (150 dmg r4) |
-| 4 | 2000 | 18 m | ×6 | Pulso de choque cada 8 s (aturde 1 s r5) |
+| 3 | 1400 | 15 m | ×5 | Explota al destruirse (150 de daño, r4) |
+| 4 | 2000 | 18 m | ×6 | Pulso de choque cada 8 s (aturde 1 s, r5) |
 
-**Desgaste**: barreras pierden HP al dañar/frenar; láseres consumen "energía" (mismo HP). Torretas/centinelas/señuelos solo pierden HP por daño enemigo.
+**Desgaste**: las barreras pierden HP al dañar/frenar (los láseres consumen "energía" = HP). Torretas, centinelas y señuelos solo pierden HP por daño enemigo.
 
-## 7. Construcción con control
-1. **Abrir**: X en el fabricador (siempre) o D-pad ↓ durante Preparación (ver D1).
-2. **Menú radial** con pestañas (LB/RB): Barreras · Torretas · Centinelas · Señuelos. LS/D-pad elige, muestra coste, nivel y si hay puntos (gris si no). A compra → pasas a **modo construcción** con el fantasma.
-3. **Fantasma**: se proyecta 3 m delante, hace *snap* al slot/área válido más cercano en la mira. Verde = válido, rojo = inválido (sin slot, colisión, sin puntos). Barreras hacen *snap* a **slots de barrera** predefinidos (líneas en los cuellos de botella); centinelas/señuelos a **zonas de construcción** (rejilla 1 m); torretas manuales a **plataformas** fijas.
-4. **Rotar** LB/RB ±45°. **Confirmar** RT (se cobran puntos). **Cancelar** B.
-5. **Mejorar**: apuntar a una fortificación (≤3 m) → prompt "Mantén X · Nv2 · 450". En Nv3→4 de barrera, prompt con elección Azul (A) / Púrpura (Y).
-6. **Reparar**: pistola de reparación, RT mantenido; HUD muestra HP y coste/seg.
+## 12. Construcción con control
+1. **Comprar**: en el fabricador (X) → pestaña Fortificaciones → A. La pieza (Nv1) pasa a **tus manos**: caminas más lento y no puedes disparar.
+2. **Fantasma**: al acercarte a un lugar válido aparece el fantasma con *snap*: barreras a **slots de barrera** (cuellos de botella), centinelas y señuelos a **zonas de construcción** (rejilla de 1 m), torretas manuales a **plataformas**. Verde = válido, rojo = inválido.
+3. **Rotar** LB/RB ±45°. **Colocar** RT. **Soltar** B (la pieza queda en el suelo; X para recogerla).
+4. **Mejorar**: toque X sobre la pieza → mini-menú → Mejorar (A). Requiere el desbloqueo del nivel para ese tipo; si falta, el prompt dice "Desbloquéalo en el fabricador".
+5. **Mover** (solo preparación): mini-menú → Mover (Y) → la pieza vuelve a tus manos con su nivel.
+6. **Reparar**: pistola de reparación, RT mantenido; el HUD muestra HP y coste/s.
 
-## 8. Mapa fijo: "Puesto Avanzado" (~90×90 m)
-- Base central elevada con **fabricador**, 2 plataformas de torreta manual, 3 zonas de construcción.
-- **3 entradas** de enemigos (Norte: patio abierto; Este: callejón estrecho; Oeste: rampa/puente) con rutas que convergen en 2 cuellos de botella → 6 slots de barrera.
-- Coberturas bajas (1 m, para el sistema de cobertura) y altas (2.2 m), pilares, contenedores; una torre para Tiradores enemigos.
+## 13. Mapa fijo: "Puesto Avanzado" (~90×90 m)
+- Base central elevada con **fabricador**, 2 plataformas de torreta manual y 3 zonas de construcción.
+- **3 entradas** enemigas (Norte: patio abierto; Este: callejón estrecho; Oeste: rampa/puente) con rutas que convergen en 2 cuellos de botella → 6 slots de barrera.
+- Coberturas **medias (1 m)** y **altas (2.2 m)**, pilares, contenedores; una torre para Tiradores enemigos.
 - Iluminación: HemisphereLight + DirectionalLight con sombras (mapa 2048), niebla, focos en el fabricador, emisivos en láseres. Atardecer industrial.
 - Datos en `level/maps/outpost.js`: `boxes[]`, `coverEdges[]` (generado), `spawns[]`, `routes[]`, `barrierSlots[]`, `buildZones[]`, `turretPads[]`, `fabricator`, `playerStart`.
 
-## 9. Tabla de oleadas (presupuesto del director)
-Coste por enemigo: Rasero 1 · Corredor 0.6 · Tirador 2 · Bruto 4 · Explosivo 1.2. Presupuesto `B(N) = 8 + 3·N` ×1.25 por set. Simultáneos máx. `10 + N` (tope 30).
+## 14. Tabla de oleadas (presupuesto del director)
+Coste por enemigo: Rasero 1 · Corredor 0.6 · Tirador 2 · Bruto 4 · Explosivo 1.2. Presupuesto `B(N) = 8 + 3·N`, ×1.25 por set. Simultáneos máx. `10 + N` (tope 30).
 | Oleada | Disponibles | Notas |
 |---|---|---|
 | 1–2 | Rasero, Corredor | Solo Norte |
@@ -127,13 +227,13 @@ Coste por enemigo: Rasero 1 · Corredor 0.6 · Tirador 2 · Bruto 4 · Explosivo
 | 5 | **Coloso** + escolta pequeña | Jefe |
 | 6–9 | + Bruto, + Explosivo (8+) | 3 entradas |
 | 10 | **Matriarca** + Corredores | Jefe |
-| 11–25 | Todos, modificadores por set | Jefes en 15/20/25; 25 = doble jefe y fin |
+| 11–24 | Todos, modificadores por set | Jefes en 15 y 20 |
+| 25 | **Coloso + Matriarca** | Final → victoria |
 
-## 10. Personajes y modelos (ligeros, ejemplos de three.js)
-- Jugador/aliados: `Soldier.glb` (Idle/Walk/Run) + poses procedurales (agachado en cobertura, apuntado, evade, slide, salto, muerte) vía rotación de huesos + IK de brazos.
-- Enemigos: `RobotExpressive.glb` (Idle, Walking, Running, Death, Jump, Punch…) teñido/escalado por tipo; Bruto ×1.4, jefes ×2.5 con piezas de geometría añadidas.
-- Armas, torretas, barreras (pinchos, concertina con TubeGeometry helicoidal), láseres (planos emisivos + shader aditivo), señuelo (maniquí de cápsulas), fabricador: **geometría procedural**.
-
+## 15. Personajes y modelos (ligeros, ejemplos de three.js)
+- Jugador y bots: `Soldier.glb` (Idle/Walk/Run) + poses procedurales, IK de brazos; color/accesorio por clase.
+- Enemigos: `RobotExpressive.glb` (Idle, Walking, Running, Death, Jump, Punch…) teñido/escalado por tipo; Bruto ×1.4, jefes ×2.5 con piezas añadidas.
+- Armas, torretas, barreras (pinchos, concertina con TubeGeometry helicoidal), láseres (shader aditivo), señuelo (maniquí de cápsulas), fabricador: **geometría procedural**.
 
 ## Fuentes del esquema de control (E-Day)
 Guías de terceros, no oficiales; verificar en Ajustes > Controles del juego:

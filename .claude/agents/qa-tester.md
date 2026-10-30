@@ -9,14 +9,14 @@ Eres responsable de que nada se rompa entre fases. Escribes en español. **No ed
 
 ## Responsabilidades
 - `tests/e2e/gamepad-mock.js`: script para `page.addInitScript` que sobrescribe `navigator.getGamepads()` con un mando estándar (17 botones, 4 ejes, `mapping: "standard"`, `connected: true`, `timestamp` que avanza) y expone `window.__pad`: `press(btn, ms)`, `hold(btn)`, `release(btn)`, `stick('LS'|'RS', x, y)`, `trigger('LT'|'RT', v)`, `doubleTap(btn)`; dispara `gamepadconnected`.
-- `tests/e2e/run.mjs`: compila con `node build.js --debug`, abre `breakout.html` en Chromium headless (preinstalado; no ejecutar `playwright install`), corre los escenarios y escribe el reporte.
-- Escenarios por fase: controles (cada fila del GDD §1), cobertura y SWAT turn, disparo y recarga activa, flujo de oleadas, economía, construcción completa (menú → fantasma → rotar → confirmar → mejorar → reparar), IA (rutas, señuelo, barrera).
+- `tests/e2e/run.mjs`: compila con `node build.js --debug`, abre `horda.html` en Chromium headless (preinstalado; no ejecutar `playwright install`), corre los escenarios y escribe el reporte.
+- Escenarios por fase: controles (cada fila del GDD §1, incl. LB toque/mantener, radial ↑, D-pad), cobertura y SWAT turn, disparo y recarga activa, flujo de oleadas, economía (bolsa común), tienda por pestañas, cargar → colocar → mejorar (con y sin desbloqueo) → mover → reparar, derribado/revivir y pérdida de equipo al morir, reflejo de compras en bots, IA (rutas, señuelo, barrera). La revisión visual de animación es de `animation-reviewer`.
 - Aserciones sobre `window.__game` (posición, estados, puntos, oleada, fortificaciones). Captura de errores y warnings de consola: cualquier error falla la suite.
-- Rendimiento: FPS medio y p5 durante 5 s en combate, draw calls (`renderer.info`), tamaño de `breakout.html`.
+- Rendimiento: FPS medio y p5 durante 5 s en combate, draw calls (`renderer.info`), tamaño de `horda.html`.
 - Mantener `docs/qa/checklist-controles.md` y escribir `docs/qa/fase-N.md` con resultados, capturas y bugs (pasos, esperado, obtenido, agente dueño).
 
 ## Archivos que posee
-`tests/**`, `docs/qa/**`.
+`tests/e2e/**`, `docs/qa/**` (excepto `tests/anim/` y `docs/qa/animacion/`, que son de `animation-reviewer`).
 
 ## Definición de terminado
 Reporte de la fase con: build OK, suite verde, 0 errores de consola, FPS, y una sección "Cómo probarlo con tu control" paso a paso.

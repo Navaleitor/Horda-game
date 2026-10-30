@@ -1,70 +1,101 @@
 # Plan por fases
 
-## Subagentes (`.claude/agents/*.md`)
-Formato: frontmatter `name`, `description`, `tools` (+ `model: inherit`); cuerpo con **Responsabilidades**, **Archivos que posee**, **Contratos que respeta**, **Definición de terminado** (build OK + test e2e propio verde + 0 errores de consola), **No hace**. Todos escriben en español.
+## Subagentes (`.claude/agents/*.md`) — 19
+Formato: frontmatter `name`, `description`, `tools`, `model: inherit`; cuerpo con **Responsabilidades**, **Archivos que posee**, **Contratos**, **Definición de terminado**, **No hace**. Todos escriben en español.
 
-| Agente | Dueño de | Herramientas |
-|---|---|---|
-| `game-architect` | `core/`, `main.js`, `build.js`, `template.html` (estructura), `docs/arquitectura.md`; contratos y eventos; revisa todos los PRs | Read, Grep, Glob, Bash, Edit, Write |
-| `controls-camera-engineer` | `input/`, `camera/`, `player/` — esquema E-Day, cobertura, sprint/slide/evade/vault, sensación de control | Read, Grep, Glob, Bash, Edit, Write |
-| `gameplay-programmer` | `combat/`, `waves/`, `economy/`, `modes/` — armas, daño, oleadas, puntos, flujo de horda | idem |
-| `ai-engineer` | `ai/` — navGrid, flow-fields, selección de objetivo, comportamientos y jefes | idem |
-| `fortifications-engineer` | `fortifications/` — barreras, torretas, centinelas, señuelos, reparación, niveles, buildSystem | idem |
-| `physics-engineer` | `physics/` — cápsula cinemática, AABB/hash espacial, raycasts, proyectiles, explosiones, ragdoll-lite | idem |
-| `animation-engineer` | `anim/` — AnimationMixer, capas/blending, IK, poses procedurales, sincronía con estados del jugador/enemigos | idem |
-| `character-artist` | `assets/models.js`, variantes de Soldier/RobotExpressive, materiales, LOD, jefes | idem |
-| `weapons-props-artist` | `assets/props/` — armas, torretas, centinelas, barreras Nv1–4, señuelos, fabricador (geometría procedural) | idem |
-| `vfx-artist` | `fx/` — trazadoras, fogonazos, láseres, impactos, explosiones, fantasma de construcción (shader) | idem |
-| `level-designer` | `level/` — Puesto Avanzado, rutas, slots/zonas, iluminación, coberturas | idem |
-| `ui-hud-designer` | `hud/`, CSS/DOM del HUD en `template.html` — HUD de horda, menú radial, prompts, Tac-Com, marcador | idem |
-| `qa-tester` | `tests/`, `docs/qa/` — Playwright + gamepad simulado, checklist de controles, reportes de bugs y FPS | Read, Grep, Glob, Bash, Write (no edita `src/`) |
+| Agente | Dueño de |
+|---|---|
+| `game-architect` | `core/`, `main.js`, `build.js`, `template.html` (esqueleto), `docs/arquitectura.md`; contratos y eventos; revisa todo antes de cerrar fase |
+| `controls-camera-engineer` | `input/`, `camera/`, `player/` (incl. `inventory.js`, `downed.js`) — esquema E-Day, cobertura, sprint, radial ↑, LB toque/mantener |
+| `gameplay-programmer` | `combat/`, `waves/`, `economy/` (incl. `shop.js`, `unlocks.js`), `modes/`, `classes/` (pasivas, comodines, reflejo en bots), dificultad, reglas de muerte |
+| `ai-engineer` | `ai/` — navGrid, flow-fields, objetivos, comportamientos, jefes, `squad.js` (bots espejo) |
+| `fortifications-engineer` | `fortifications/` — barreras, torretas, centinelas, señuelos, reparación, cargar/colocar, desbloqueo + mejora por pieza, mover |
+| `physics-engineer` | `physics/` — cápsula cinemática, AABB/hash, raycasts, proyectiles, explosiones, ragdoll-lite |
+| `animation-engineer` | `anim/core/` — **líder de animación**: rig, mixer, capas, IK, máquina de estados, API `setState`; integra a los animadores |
+| `locomotion-animator` | `anim/locomotion/` — caminar, trotar, correr, sprint, agacharse, salto, escalar, vault, slide, evadir, cargar pieza |
+| `cover-animator` | `anim/cover/` — entrar/salir, cobertura media y alta, borde, asomarse, disparo a ciegas, SWAT turn, cambio de hombro |
+| `weapon-animator` | `anim/weapons/` — postura/apuntado por arma, retroceso, recargas, cambio de arma, granada, melee, reparación, torreta |
+| `abilities-animator` | `anim/abilities/` — gestos de comodines, radial, derribado/arrastrarse, revivir, muerte |
+| `enemy-animator` | `anim/enemies/` — robots por tipo, ataques, aturdido/congelado, jefes; animación de bots por clase |
+| `animation-reviewer` | `tests/anim/`, `docs/qa/animacion/` — revisión visual de animaciones (solo lectura de `src/`) |
+| `character-artist` | `assets/models.js`, `assets/*.glb` — Soldier por clase, robots por tipo, jefes |
+| `weapons-props-artist` | `assets/props/` — armas (tienda, iniciales, de clase), granadas, fortificaciones Nv1–4, fabricador |
+| `vfx-artist` | `fx/` — trazadoras, impactos, láseres, explosiones, fantasma, efectos de comodines |
+| `level-designer` | `level/` — Puesto Avanzado, rutas, slots/zonas, iluminación, coberturas |
+| `ui-hud-designer` | `hud/`, DOM/CSS del HUD — HUD, tienda por pestañas, radial, mini-menú, Tac-Com, marcador, inicio |
+| `qa-tester` | `tests/e2e/`, `docs/qa/` — Playwright + mando simulado, checklist de controles, FPS, bugs |
 
+## Fases (cada una termina jugable con control)
 
-## 5. Plan por fases (cada fase termina jugable con control)
-
-**Fase 0 — Cimientos (esta aprobación)**: agentes, docs, CLAUDE.md. Sin código.
+**Fase 0 — Cimientos** ✅: agentes, docs, CLAUDE.md, decisiones de diseño.
 
 **Fase 1a — Base jugable**
-- architect: `package.json` (three, esbuild, playwright dev), `build.js`, `template.html`, `core/` (loop fijo, eventos, debug hooks).
-- en paralelo: controls-camera (input E-Day + cámara + movimiento + cobertura) · physics (cápsula/AABB/raycast) · level (blockout Puesto Avanzado) · animation (Soldier con Idle/Walk/Run + IK + pose cobertura) · qa (harness gamepad simulado).
-- **Prueba con tu control**: moverte, sprint L3, cobertura A, SWAT turn, evadir, slide, saltar/vault Y, apuntar/disparar a dianas, recarga activa RB, cambio de hombro R3.
+- architect: `package.json` (three, esbuild, playwright dev), `build.js`, `template.html`, `core/`.
+- En paralelo: controls-camera (input E-Day, cámara, movimiento, cobertura) · physics (cápsula/AABB/raycast) · level (blockout) · animation-engineer (rig) → locomotion-animator + cover-animator · weapon-animator (rifle: apuntar/disparar/recargar) · ui (menú de inicio: clase + dificultad, placeholder) · qa (harness).
+- Revisión: animation-reviewer (locomoción y cobertura) + qa-tester.
+- **Prueba con tu control**: moverte, sprint L3, cobertura media/alta con A, SWAT turn, evadir, deslizar, saltar/vault Y, apuntar/disparar a dianas, recarga activa RB, cambio de hombro R3.
 
-**Fase 1b — Horda mínima** (= tu Fase 1)
-- gameplay: armas/daño, `hordeMode` (Preparación/Oleada/Recompensa), director oleadas 1–5 (sin jefe aún: oleada 5 = grande), economía.
-- ai: Rasero y Corredor (flow-field + objetivo jugador/barrera).
-- fortifications + weapons-props: barrera de pinchos Nv1, fabricador, fantasma/rotar/confirmar/cancelar.
-- ui: HUD (puntos, oleada, enemigos restantes, vida), menú radial básico, prompts.
-- character-artist: enemigos RobotExpressive.
-- **Prueba**: sobrevivir 5 oleadas, ganar puntos, comprar y colocar pinchos con el control.
+**Fase 1b — Horda mínima**
+- gameplay: armas, daño, `hordeMode`, oleadas 1–5 (sin jefe aún), bolsa de puntos.
+- ai: Rasero y Corredor.
+- fortifications + weapons-props: fabricador, pestaña Fortificaciones, **cargar en manos** y colocar pinchos Nv1 (fantasma, rotar, colocar, soltar).
+- ui: HUD (puntos, oleada, enemigos, vida), tienda (pestaña Fortificaciones), prompts.
+- character-artist + enemy-animator: robots Rasero/Corredor.
+- locomotion-animator: caminar cargando pieza.
+- **Prueba**: sobrevivir 5 oleadas, ganar puntos, comprar en el fabricador, cargar y colocar pinchos.
 
-**Fase 2 — Barreras completas + reparación**: barreras Nv2–4 (rama azul/púrpura), mejora con X mantenido, pistola de reparación, desgaste, Bruto, Tac-Com (LB). vfx: láseres. Paralelo: fortifications · ai (Bruto/obstáculos) · vfx · weapons-props · ui.
+**Fase 2 — Barreras completas, reparación y derribado**
+- fortifications: barreras Nv2–4 (pinchos → concertina → láser rojo → láser azul), desbloqueos por tipo, mini-menú X (mejorar/mover), pistola de reparación, desgaste, reconstruir.
+- gameplay: pestaña Desbloqueos, reglas de derribado/muerte/reaparición.
+- controls: LB toque = granada / mantener = Tac-Com; D-pad ↓ pistola de reparación.
+- ai: Bruto; barreras como obstáculos.
+- vfx: láseres, haz de reparación. ui: mini-menú, Tac-Com, barras de salud de piezas.
+- weapon-animator: haz de reparación, granada; abilities-animator: derribado/arrastrarse/revivir.
+- **Prueba**: desbloquear y mejorar barreras hasta láser azul, reparar, ser derribado y revivir.
 
-**Fase 3 — Torretas y centinelas**: torreta manual Nv1–4 (montar/desmontar), centinela Nv1–4, Tirador, IA de objetivos por utilidad completa. Paralelo: fortifications · ai · weapons-props · animation (pose montado).
+**Fase 3 — Torretas, centinelas, armas de tienda y bots espejo**
+- fortifications: torreta manual Nv1–4 (montar/desmontar), centinela Nv1–4.
+- gameplay: pestañas Armas y Munición/Granadas (escopeta, francotirador, lanzacohetes, ametralladora pesada; 3 tipos de granada).
+- ai: Tirador, IA de objetivos completa, **bots espejo** con clase y arma de clase (seguir, cubrirse, revivir).
+- weapons-props: armas de tienda y de clase, granadas. weapon-animator: posturas por arma, torreta.
+- enemy-animator: bots por clase. character-artist: Soldier por clase.
+- **Prueba**: comprar armas y granadas, montar torreta, ver a los 3 bots pelear y revivirte.
 
-**Fase 4 — Señuelos, jefes y campaña de 25 oleadas**: señuelo Nv1–4, Explosivo, Coloso y Matriarca, tabla completa + modificadores, pantalla de resultados. Paralelo: ai+character-artist (jefes) · fortifications (señuelo) · gameplay (tabla) · ui.
+**Fase 4 — Señuelos, jefes, campaña de 25 oleadas, clases y comodines**
+- fortifications: señuelo Nv1–4. ai: Explosivo, Coloso, Matriarca, uso de comodines por bots.
+- gameplay: tabla completa + modificadores + dificultades + victoria; pestañas Clase y Místicas; pasivas P1–P4; comodines con cargas/cooldown; **reflejo en bots**.
+- controls + ui: radial D-pad ↑ con RS y cámara lenta; marcador (View); pantalla de resultados.
+- vfx + abilities-animator: los 7 comodines sincronizados (`anim:cast:impact`).
+- enemy-animator + character-artist: jefes.
+- **Prueba**: partida completa de 25 oleadas con clase, pasivas y comodines.
 
-**Fase 5 — Pulido**: animaciones procedurales finas (evade, slide, muerte, golpes), VFX/audio sintetizado (WebAudio), aliados bot (si D3), rendimiento (InstancedMesh, pools), balance con telemetría de QA.
+**Fase 5 — Pulido**
+- Todos los animadores: transiciones, pies, IK fino; animation-reviewer pasada completa.
+- vfx + audio sintetizado (WebAudio); rendimiento (InstancedMesh, pools); balance con telemetría de QA.
 
-Revisión: `game-architect` revisa cada fase antes de merge; `qa-tester` corre la suite al final de cada fase.
+**Revisión por fase**: `game-architect` (contratos y ownership) + `qa-tester` (suite, FPS, consola) + `animation-reviewer` (cuando hay animación nueva).
 
-## 6. Dudas de diseño para decidir antes de la Fase 1a
-- **D1** ¿Construir solo en el fabricador (estilo Gears 5) o también en cualquier lugar con D-pad ↓ durante la Preparación? (Propuesta: ambas; durante la oleada solo fabricador.)
-- **D2** Esquema E-Day: las guías no oficiales difieren (algunas ponen B = melee + cambio de hombro). Propongo B = melee y R3 = hombro. ¿OK? ¿Sprint mantenido o toggle por defecto?
-- **D3** ¿Solo, o con 3 aliados bot (heredando los bots del 4v4)? Afecta revivir (X), dificultad y si la muerte es fin de partida.
-- **D4** ¿25 oleadas con fin, o infinita tras la 25?
-- **D5** ¿Se puede vender/reubicar fortificaciones?
-- **D6** Láser púrpura como rama de Nv4 (Control vs Daño): ¿de acuerdo?
-- **D7** ¿Puntos de equipo compartidos o por jugador (pensando en coop futuro)?
-- **D8** ¿Estética de enemigos: robots (RobotExpressive) está bien?
-- **D9** ¿Nombre del HTML final: mantener `breakout.html` o `horda.html`?
+## Decisiones tomadas
+Resumen; el detalle está en `docs/horda-gdd.md`.
+- Construcción **solo en el fabricador**; la pieza se **carga en las manos** y se coloca con RT.
+- Mejora: **desbloqueo por tipo** en el fabricador + **mejora por pieza** en sitio; las piezas nuevas siempre salen en Nv1.
+- **Mover sí** (en preparación), **vender no**, **sin límite** de piezas. Láser Nv4 **azul**, sin púrpura.
+- **25 oleadas** con final; **3 dificultades**; **bolsa de equipo**.
+- **4 clases** obligatorias (Médico, Apoyo, Ingeniero, Reconocimiento) con pasivas permanentes rango 1–5.
+- **7 comodines místicos** en el radial ↑ (3 compartidos + 1 exclusivo por clase), con cargas que se pierden al morir.
+- **3 bots espejo** que reflejan tus compras en su clase, con arma fija de clase; no pierden cargas al morir.
+- Controles: sprint **toggle** L3, B melee, R3 hombro, LB toque granada / mantener Tac-Com, View marcador, D-pad ←/→ armas, ↓ pistola o reparación, ↑ radial.
+- Enemigos **robots**; archivo final **`horda.html`**.
+
+### Pendiente de confirmar
+- ¿El bot Ingeniero repara fortificaciones solo (herramienta de clase)?
+- Precios de desbloqueo y de pasivas/comodines: se ajustan jugando.
 
 ## Verificación (cada fase)
-1. `npm install && node build.js` → `breakout.html` sin errores.
-2. `node tests/e2e/run.mjs`: Playwright (chromium preinstalado) carga el HTML con `addInitScript` que sobrescribe `navigator.getGamepads` con un mando virtual controlado vía `window.__pad.press('A')`, `.stick('LS', x, y)`, `.hold('RT', ms)`; aserciones sobre `window.__game` (posición, estado de cobertura, puntos, oleada, fortificaciones).
-3. 0 errores/warnings de consola; muestreo de FPS (5 s) y nº de draw calls en el reporte; capturas en `docs/qa/fase-N/`.
-4. Checklist de regresión de controles (cada fila de §3.1) en `docs/qa/checklist-controles.md`.
-5. Resumen al usuario de "cómo probarlo con tu control".
+1. `npm install && node build.js` → `horda.html` sin errores.
+2. `node tests/e2e/run.mjs`: Playwright (Chromium preinstalado) carga el HTML con `addInitScript`, que sobrescribe `navigator.getGamepads` con un mando virtual (`window.__pad.press('A')`, `.stick('LS', x, y)`, `.hold('RT', ms)`); aserciones sobre `window.__game`.
+3. 0 errores de consola; FPS (5 s) y draw calls en el reporte; capturas en `docs/qa/fase-N/`.
+4. Checklist de regresión de controles en `docs/qa/checklist-controles.md`; checklist de poses en `docs/qa/animacion/`.
+5. Resumen de "cómo probarlo con tu control".
 
-Para esta Fase 0: verificar que los 13 `.md` de agentes tienen frontmatter válido (`name`, `description`, `tools`) y que se ven con `/agents`; commit + push.
-
-Fuentes de controles E-Day: Wikipedia, keymap.io, game8, G2A, Magic Game World, thegameswiki (guías de terceros; verificar en el menú del juego).
+Fuentes de controles E-Day: ver `docs/horda-gdd.md`.
