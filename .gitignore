@@ -1,0 +1,6 @@
+node_modules/
+horda-debug.html
+test-results/
+playwright-report/
+*.log
+.DS_Store
