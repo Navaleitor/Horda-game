@@ -2,11 +2,13 @@
 // - Al pulsar: emite `melee:swing`, fija la dirección del golpe (la de la mira, horizontal).
 // - A los `hitTime` s: busca el objetivo dañable más cercano en un arco corto delante,
 //   con línea de visión (physics.raycast sin entidades); aplica `melee.damage` y emite `melee:hit`.
-// - No se puede golpear recargando ni cambiando de arma. Bloqueo total = duration + cooldown.
+// - B cancela la recarga en curso (también en la ventana activa o encasquillada): el golpe sale
+//   al instante y la recarga se pierde (weapon:reloadCancel reason 'melee').
+// - No se puede golpear cambiando de arma. Bloqueo total = duration + cooldown.
 
 import * as THREE from 'three';
 import { canDamage, dealDamage } from './damage.js';
-import { getAimRay } from './weapons.js';
+import { getAimRay, abortReload } from './weapons.js';
 
 const _origin = new THREE.Vector3();
 const _center = new THREE.Vector3();
@@ -83,7 +85,8 @@ export function stepMelee(game, entity, dt, ctx) {
       resolveHit(game, entity, ctx);
     }
   }
-  if (!entity.intent.meleePressed || w.meleeT > 0 || w.reloading || w.swapT > 0) return;
+  if (!entity.intent.meleePressed || w.meleeT > 0 || w.swapT > 0) return;
+  abortReload(game, entity, 'melee');
 
   // Dirección del golpe: la de la mira proyectada en horizontal (o el frente del cuerpo).
   const aim = getAimRay(game, entity, ctx.camera);

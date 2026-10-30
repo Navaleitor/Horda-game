@@ -46,6 +46,7 @@ const pReloadStart = { who: null, weaponId: null, duration: 0, activeWindow: nul
 const pActive = { who: null, weaponId: null, result: null };
 const pReloaded = { who: null, weaponId: null };
 const pSwitched = { who: null, weaponId: null, slot: 0 };
+const pCancel = { who: null, weaponId: null, reason: null };
 
 /** Estado `entity.weapon` (contrato §3.6 + campos extra documentados). */
 export function createWeaponState() {
@@ -62,7 +63,7 @@ export function createWeaponState() {
     activeTried: false,   // ya se usó el único intento de recarga activa
     activeResult: null,   // 'perfect' | 'good' | 'failed' | null (última recarga)
     jammedT: 0,           // s de encasquillado restantes (pausa la recarga)
-    buffT: 0,             // s restantes del +daño de la recarga perfecta
+    buffT: 0,             // espejo de ammo[id].buffT del arma actual (+daño de recarga perfecta; para el HUD)
     swapT: 0,             // s restantes del cambio de arma
     swapTo: null,         // arma que se está sacando
     swapSlot: -1,
@@ -84,7 +85,7 @@ function ensureAmmo(game, entity, id) {
   let a = entity.ammo[id];
   if (!a) {
     const c = weaponCfg(game, id);
-    a = entity.ammo[id] = { mag: c.magSize, reserve: c.reserve };
+    a = entity.ammo[id] = { mag: c.magSize, reserve: c.reserve, buffT: 0 };
   }
   return a;
 }
@@ -114,6 +115,7 @@ function equip(game, entity, id, slot) {
   w.magSize = c.magSize;
   w.mag = a.mag;
   w.reserve = a.reserve;
+  w.buffT = a.buffT || 0;
   w.activeWindow[0] = c.activeWindow[0]; w.activeWindow[1] = c.activeWindow[1];
   w.goodWindow[0] = c.goodWindow[0]; w.goodWindow[1] = c.goodWindow[1];
   w.reloadDur = c.reloadTime;
@@ -151,6 +153,21 @@ function cancelReload(w) {
 }
 
 /**
+ * Cancela la recarga en curso (melee o cambio de arma): se pierde, la munición no se transfiere
+ * y hay que volver a pulsar RB. Emite weapon:reloadCancel { who, weaponId, reason }.
+ */
+export function abortReload(game, entity, reason) {
+  const w = entity.weapon;
+  if (!w || !w.reloading) return false;
+  cancelReload(w);
+  pCancel.who = entity;
+  pCancel.weaponId = w.id;
+  pCancel.reason = reason;
+  game.events.emit('weapon:reloadCancel', pCancel);
+  return true;
+}
+
+/**
  * weapon:switchRequest. La ranura manda (inventory.slots[slot]); si está vacía, se ignora
  * (el arma no cambia). Cancela la recarga en curso.
  */
@@ -165,7 +182,7 @@ export function requestSwitch(game, entity, slot, weaponId) {
   } else if (id === w.id) {
     return false;
   }
-  if (w.reloading) cancelReload(w);
+  abortReload(game, entity, 'swap');
   ensureAmmo(game, entity, id);
   w.swapTo = id;
   w.swapSlot = slot;
@@ -207,6 +224,8 @@ function tryActiveReload(game, entity) {
   const result = classifyActiveReload(w.reloadT / w.reloadDur, w.activeWindow, w.goodWindow);
   if (result === 'perfect') {
     w.reloadRate = 1 / ar.perfectSpeedMult;
+    // El bonus va con el arma recargada (corre aunque se cambie de arma).
+    entity.ammo[w.id].buffT = ar.perfectBuffDuration;
     w.buffT = ar.perfectBuffDuration;
   } else if (result === 'good') {
     w.reloadRate = 1 / ar.goodSpeedMult;
@@ -376,7 +395,13 @@ export function stepWeapon(game, entity, dt, ctx) {
   const w = entity.weapon;
   if (!w || !w.id) return;
   const intent = entity.intent;
-  if (w.buffT > 0) w.buffT = Math.max(0, w.buffT - dt);
+  // Bonus de recarga perfecta por arma: corre para todas, esté equipada o no.
+  const ammo = entity.ammo;
+  for (const id in ammo) {
+    const a = ammo[id];
+    if (a.buffT > 0) a.buffT = Math.max(0, a.buffT - dt);
+  }
+  w.buffT = ammo[w.id] ? ammo[w.id].buffT : 0;
   w.fireT -= dt;
   if (!intent.fire) w.emptyLatch = false;
 

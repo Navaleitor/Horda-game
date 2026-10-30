@@ -57,7 +57,14 @@ export default function create() {
     },
     infiniteAmmo(on = true) { ctx.infiniteAmmo = !!on; return ctx.infiniteAmmo; },
     reload(e) { e = who(e); return !!(e && e.weapon && startReload(game, e)); },
-    setBuff(seconds, e) { e = who(e); if (e && e.weapon) e.weapon.buffT = seconds; },
+    /** Bonus de recarga perfecta del arma (por defecto la equipada). */
+    setBuff(seconds, weaponId, e) {
+      e = who(e);
+      if (!e || !e.weapon) return;
+      const id = weaponId || e.weapon.id;
+      if (e.ammo[id]) e.ammo[id].buffT = seconds;
+      if (id === e.weapon.id) e.weapon.buffT = seconds;
+    },
     jam(seconds, e) { e = who(e); if (e && e.weapon) e.weapon.jammedT = seconds; },
   };
 

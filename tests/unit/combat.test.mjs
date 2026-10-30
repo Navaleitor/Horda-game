@@ -42,7 +42,7 @@ function setup({ target = null, part = 'body', wall = null } = {}) {
   const log = [];
   const record = (type) => events.on(type, (p) => log.push({ type, ...p, dir: undefined, origin: undefined }));
   for (const t of ['weapon:fired', 'weapon:ammo', 'weapon:empty', 'weapon:reloadStart', 'weapon:activeReload',
-    'weapon:reloaded', 'weapon:switched', 'melee:swing', 'melee:hit', 'damage:dealt', 'fx:spawn', 'enemy:killed']) {
+    'weapon:reloaded', 'weapon:reloadCancel', 'weapon:switched', 'melee:swing', 'melee:hit', 'damage:dealt', 'fx:spawn', 'enemy:killed']) {
     record(t);
   }
   const hitPoint = new THREE.Vector3(0, 1.6, -10);
@@ -115,7 +115,7 @@ test('player:spawned inicializa weapon y ammo por arma', () => {
   assert.equal(player.weapon.id, 'assaultRifle');
   assert.equal(player.weapon.mag, RIFLE.magSize);
   assert.equal(player.weapon.reserve, RIFLE.reserve);
-  assert.deepEqual(player.ammo.pistol, { mag: PISTOL.magSize, reserve: PISTOL.reserve });
+  assert.deepEqual(player.ammo.pistol, { mag: PISTOL.magSize, reserve: PISTOL.reserve, buffT: 0 });
   assert.equal(last('weapon:ammo').mag, RIFLE.magSize);
 });
 
@@ -419,6 +419,9 @@ test('cambiar de arma cancela la recarga', () => {
   assert.equal(s.player.weapon.reloading, false);
   assert.equal(s.count('weapon:reloaded'), 0);
   assert.equal(s.player.ammo.assaultRifle.mag, 10);
+  const c = s.last('weapon:reloadCancel');
+  assert.ok(c && c.reason === 'swap' && c.weaponId === 'assaultRifle');
+  assert.equal(s.count('weapon:reloadCancel'), 1);
 });
 
 // ── melee ──────────────────────────────────────────────────────────────────
@@ -459,4 +462,71 @@ test('melee: no golpea fuera del arco ni del alcance', () => {
   s2.press('meleePressed');
   s2.step(steps(config.melee.hitTime) + 1);
   assert.equal(s2.count('melee:hit'), 0);
+});
+
+// ── bonus por arma y cancelación por melee ──────────────────────────────────────
+test('el bonus de recarga perfecta va solo con el arma recargada y corre aunque se cambie', () => {
+  const t = makeTarget();
+  const s = setup({ target: t });
+  s.debug.setAmmo(10, 100);
+  s.press('reloadPressed');
+  const f = (RIFLE.activeWindow[0] + RIFLE.activeWindow[1]) / 2;
+  s.step(Math.round((f * RIFLE.reloadTime) / DT) - 1);
+  s.press('reloadPressed');
+  assert.equal(s.last('weapon:activeReload').result, 'perfect');
+  while (s.count('weapon:reloaded') === 0) s.step(1);
+  assert.ok(s.player.ammo.assaultRifle.buffT > 0);
+  assert.equal(s.player.weapon.buffT, s.player.ammo.assaultRifle.buffT);
+
+  s.switchTo(2);
+  s.step(steps(PISTOL.swapTime) + 1);
+  assert.equal(s.player.weapon.id, 'pistol');
+  assert.equal(s.player.weapon.buffT, 0, 'la pistola no hereda el bonus');
+  s.player.intent.firePressed = true; s.step(1);
+  assert.equal(t.damage.at(-1).amount, PISTOL.damage);
+
+  const before = s.player.ammo.assaultRifle.buffT;
+  s.switchTo(0);
+  s.step(steps(RIFLE.swapTime) + 1);
+  const after = s.player.ammo.assaultRifle.buffT;
+  assert.ok(after > 0 && after < before, 'el tiempo corre con el arma guardada');
+  assert.equal(s.player.weapon.buffT, after);
+  s.player.intent.fire = true; s.step(1); s.player.intent.fire = false;
+  assert.ok(Math.abs(t.damage.at(-1).amount - RIFLE.damage * AR.perfectDamageMult) < 1e-9);
+
+  s.step(steps(AR.perfectBuffDuration));
+  assert.equal(s.player.weapon.buffT, 0);
+  s.player.intent.fire = true; s.step(1);
+  assert.equal(t.damage.at(-1).amount, RIFLE.damage);
+});
+
+test('B cancela la recarga (también en la ventana activa): golpe inmediato, sin transferir munición', () => {
+  const s = reloadSetup();
+  s.press('reloadPressed');
+  s.step(Math.round(((RIFLE.activeWindow[0] + RIFLE.activeWindow[1]) / 2) * RIFLE.reloadTime / DT) - 1);
+  s.press('meleePressed');
+  assert.equal(s.count('melee:swing'), 1, 'el golpe sale al instante');
+  const c = s.last('weapon:reloadCancel');
+  assert.ok(c && c.reason === 'melee' && c.weaponId === 'assaultRifle');
+  assert.equal(s.player.weapon.reloading, false);
+  assert.equal(s.player.weapon.mag, 10);
+  assert.equal(s.player.weapon.reserve, 100);
+  s.step(steps(RIFLE.reloadTime) + 10);
+  assert.equal(s.count('weapon:reloaded'), 0, 'hay que volver a pulsar RB');
+  assert.equal(s.count('weapon:activeReload'), 0);
+  s.press('reloadPressed');
+  assert.equal(s.count('weapon:reloadStart'), 2);
+});
+
+test('B también cancela una recarga encasquillada', () => {
+  const s = reloadSetup();
+  s.press('reloadPressed');
+  s.step(3);
+  s.press('reloadPressed');
+  assert.equal(s.last('weapon:activeReload').result, 'failed');
+  s.press('meleePressed');
+  assert.equal(s.count('melee:swing'), 1);
+  assert.equal(s.player.weapon.reloading, false);
+  assert.equal(s.player.weapon.jammedT, 0);
+  assert.equal(s.last('weapon:reloadCancel').reason, 'melee');
 });
