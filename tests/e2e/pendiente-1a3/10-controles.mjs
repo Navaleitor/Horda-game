@@ -1,3 +1,4 @@
+// PENDIENTE (Fase 1a.3): suite completa de controles; no la ejecuta run.mjs. La 1a.1 la cubre suites/05-humo-1a1.mjs.
 // Suite 10 — Controles E-Day Default (GDD §1, contrato Fase 1a). Dueño: qa-tester.
 //
 // ESQUELETO: los casos ya contienen la secuencia de mando y las aserciones previstas, pero se

@@ -1,6 +1,6 @@
 {
   "fase": "fase-1a",
-  "fecha": "2026-10-30T20:32:50.662Z",
+  "fecha": "2026-10-30T20:39:32.540Z",
   "chromiumArgs": [
     "--use-gl=angle",
     "--use-angle=swiftshader",
@@ -10,12 +10,16 @@
   ],
   "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
   "build": {
-    "ok": "omitido (--no-build)",
-    "release": null,
-    "debug": null,
+    "ok": true,
+    "release": {
+      "ms": 429
+    },
+    "debug": {
+      "ms": 418
+    },
     "sizes": {
-      "horda.html": 3672214,
-      "horda-debug.html": 4378989
+      "horda.html": 3672749,
+      "horda-debug.html": 4379067
     }
   },
   "suites": [
@@ -26,55 +30,55 @@
         {
           "name": "window.__game existe",
           "status": "PASS",
-          "ms": 1499,
+          "ms": 8,
           "error": null
         },
         {
           "name": "estado inicial 'menu'",
           "status": "PASS",
-          "ms": 39,
+          "ms": 7,
           "error": null
         },
         {
           "name": "canvas WebGL en la página",
           "status": "PASS",
-          "ms": 57,
+          "ms": 8,
           "error": null
         },
         {
           "name": "el loop avanza (frames y ticks)",
           "status": "PASS",
-          "ms": 713,
+          "ms": 1123,
           "error": null
         },
         {
           "name": "stats() responde con fpsAvg/fpsP5/drawCalls/triangles",
           "status": "PASS",
-          "ms": 13,
+          "ms": 11,
           "error": null
         },
         {
           "name": "mando simulado visible para la página",
           "status": "PASS",
-          "ms": 6,
+          "ms": 19,
           "error": null
         },
         {
           "name": "input lee el mando (device, down('cover'), axis('move'))",
           "status": "PASS",
-          "ms": 335,
+          "ms": 324,
           "error": null
         },
         {
           "name": "captura del menú",
           "status": "PASS",
-          "ms": 6459,
+          "ms": 1216,
           "error": null
         },
         {
           "name": "horda.html (release) carga sin errores y sin __game",
           "status": "PASS",
-          "ms": 22190,
+          "ms": 7323,
           "error": null
         },
         {
@@ -86,109 +90,85 @@
       ]
     },
     {
-      "file": "10-controles.mjs",
-      "name": "Controles (E-Day Default)",
+      "file": "05-humo-1a1.mjs",
+      "name": "Humo 1a.1",
       "cases": [
         {
-          "name": "menú: navegar con D-pad/LS y empezar con A",
+          "name": "(setup)",
           "status": "PASS",
-          "ms": 16376,
+          "ms": 2847,
           "error": null
         },
         {
-          "name": "LS mueve al jugador (walk/jog/run)",
-          "status": "FAIL",
-          "ms": 6782,
-          "error": "distancia recorrida en 0,6 s: 0.42666666666666764 <= 0.5"
+          "name": "LS mueve (run) y al soltar vuelve a idle",
+          "status": "PASS",
+          "ms": 84,
+          "error": null
         },
         {
-          "name": "L3 sprint toggle; se corta al soltar el stick",
+          "name": "L3 sprint toggle; LT lo corta",
           "status": "PASS",
-          "ms": 886,
+          "ms": 103,
           "error": null
         },
         {
           "name": "R3 cambia de hombro",
-          "status": "FAIL",
-          "ms": 6400,
-          "error": "shoulder tras R3: esperado -1, obtenido 1"
-        },
-        {
-          "name": "A entra en cobertura media (low)",
-          "status": "FAIL",
-          "ms": 6298,
-          "error": "cover.height: esperado \"low\", obtenido \"high\""
-        },
-        {
-          "name": "A entra en cobertura alta (high)",
-          "status": "FAIL",
-          "ms": 10364,
-          "error": "timeout 2000 ms esperando move.mode ∈ cover (state=playing)"
-        },
-        {
-          "name": "LT en cobertura: asomarse/apuntar por encima",
-          "status": "SKIP",
-          "ms": 10,
-          "error": "requiere el caso anterior en cobertura"
-        },
-        {
-          "name": "A + dirección: SWAT turn y deslizar a la contigua",
-          "status": "SKIP",
-          "ms": 4,
-          "error": "TODO: faltan posiciones de prueba de SWAT/deslizar en el nivel"
-        },
-        {
-          "name": "doble toque A: evadir/rodar",
-          "status": "FAIL",
-          "ms": 9292,
-          "error": "no se vio move.mode 'evade' tras doble toque A"
-        },
-        {
-          "name": "A en sprint: deslizar",
-          "status": "FAIL",
-          "ms": 8691,
-          "error": "timeout 1500 ms esperando move.mode ∈ slide,coverSlide (state=playing)"
-        },
-        {
-          "name": "Y salta / vault sobre cobertura baja",
           "status": "PASS",
-          "ms": 1325,
+          "ms": 51,
           "error": null
         },
         {
-          "name": "LT+RT dispara a una diana (hp baja)",
-          "status": "FAIL",
-          "ms": 8140,
-          "error": "hp de la diana no bajó: 100 >= 100"
+          "name": "A cobertura media + LT asomarse + SWAT turn",
+          "status": "PASS",
+          "ms": 269,
+          "error": null
         },
         {
-          "name": "RB recarga y recarga activa (perfect)",
-          "status": "FAIL",
-          "ms": 12983,
-          "error": "resultado de la recarga activa: esperado \"perfect\", obtenido null"
+          "name": "A cobertura alta y LT asoma desde el borde",
+          "status": "PASS",
+          "ms": 122,
+          "error": null
         },
         {
-          "name": "B golpe cuerpo a cuerpo",
-          "status": "FAIL",
-          "ms": 7416,
-          "error": "no se emitió melee:swing"
+          "name": "doble toque A evade; A en sprint desliza",
+          "status": "PASS",
+          "ms": 177,
+          "error": null
         },
         {
-          "name": "D-pad ←/→ rifle/arma comprada, ↓ pistola",
-          "status": "FAIL",
-          "ms": 7629,
-          "error": "slot tras D-pad ←: esperado 0, obtenido 2"
+          "name": "Y salta, vault sobre la barra y trepa el bloque",
+          "status": "PASS",
+          "ms": 549,
+          "error": null
+        },
+        {
+          "name": "LT+RT a una diana baja su vida",
+          "status": "PASS",
+          "ms": 121,
+          "error": null
+        },
+        {
+          "name": "RB recarga y 2º RB en la zona perfecta → perfect",
+          "status": "PASS",
+          "ms": 306,
+          "error": null
+        },
+        {
+          "name": "B golpe cuerpo a cuerpo cancela la recarga",
+          "status": "PASS",
+          "ms": 80,
+          "error": null
+        },
+        {
+          "name": "D-pad: ↓ pistola, → vacía (no cambia), ← rifle",
+          "status": "PASS",
+          "ms": 81,
+          "error": null
         },
         {
           "name": "Menu pausa y reanuda",
-          "status": "FAIL",
-          "ms": 15852,
-          "error": "timeout 5000 ms esperando state 'paused' (state=playing)"
-        },
-        {
-          "name": "sin entradas: el jugador queda en idle",
           "status": "PASS",
-          "ms": 824,
+          "ms": 46,
           "error": null
         },
         {
@@ -206,13 +186,13 @@
         {
           "name": "entrar en partida (si el menú lo permite)",
           "status": "PASS",
-          "ms": 3724,
+          "ms": 1892,
           "error": null
         },
         {
           "name": "FPS 5 s + draw calls",
           "status": "PASS",
-          "ms": 17136,
+          "ms": 14319,
           "error": null
         },
         {
@@ -232,42 +212,42 @@
     "escena": "combate",
     "ms": 5000,
     "raf": {
-      "frames": 8,
-      "fpsAvg": 1.6,
-      "fpsP5": 0.9
+      "frames": 13,
+      "fpsAvg": 2.5,
+      "fpsP5": 1.4
     },
     "stats": {
-      "fpsAvg": 4.2,
-      "fpsP5": 0.9,
-      "drawCalls": 50,
-      "triangles": 17240,
+      "fpsAvg": 5.7,
+      "fpsP5": 1.6,
+      "drawCalls": 45,
+      "triangles": 16778,
       "geometries": 31,
       "textures": 10,
-      "frames": 42,
-      "tick": 95,
-      "samples": 41,
+      "frames": 46,
+      "tick": 113,
+      "samples": 45,
       "state": "playing"
     }
   },
   "resumen": {
-    "pass": 18,
-    "fail": 11,
-    "skip": 2,
+    "pass": 27,
+    "fail": 0,
+    "skip": 0,
     "erroresConsola": 0,
     "avisosConsola": 0,
-    "ok": false
+    "ok": true
   },
   "arranque": {
     "statsMenu": {
-      "fpsAvg": 10.8,
-      "fpsP5": 2.3,
+      "fpsAvg": 6.6,
+      "fpsP5": 0.9,
       "drawCalls": 58,
       "triangles": 7212,
       "geometries": 18,
-      "textures": 2,
-      "frames": 32,
-      "tick": 51,
-      "samples": 31,
+      "textures": 1,
+      "frames": 12,
+      "tick": 21,
+      "samples": 11,
       "state": "menu"
     }
   },

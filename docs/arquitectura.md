@@ -256,9 +256,11 @@ El sistema de animación escucha `weapon:*` / `melee:*` filtrando por `who === e
 | `weapon:activeReload` | `{ who, result:'perfect'\|'good'\|'failed' }` | combat → hud, anim, fx |
 | `weapon:reloaded` | `{ who, weaponId }` | combat → hud, anim |
 | `weapon:empty` | `{ who, weaponId }` | combat → hud |
+| `weapon:reloadCancel` | `{ who, weaponId, reason:'melee'\|'swap' }` | combat → hud, anim |
+| `target:down` / `target:up` | `{ target, by?, part?, weaponId? }` | level → hud, qa |
 | `melee:swing` / `melee:hit` | `{ who, target?, point? }` | combat → anim, fx |
 | `damage:dealt` | `{ source, target, amount, part, point, killed }` | combat → hud (hitmarker), level (dianas) |
-| `fx:spawn` | `{ type:'tracer'\|'muzzle'\|'impact'\|'spark', pos, dir, end, color? }` | cualquiera → fx |
+| `fx:spawn` | `{ type:'tracer'\|'muzzle'\|'impact'\|'spark', pos, dir (en impact: normal), end, color?, decal? }` | cualquiera → fx |
 | `prompt:show` / `prompt:hide` | `{ id, button:'A'\|'B'\|'X'\|'Y'\|'LB'\|'RB'\|'LT'\|'RT'\|'L3'\|'R3'\|…, text }` | player → hud |
 | `anim:footstep` / `anim:reload:insert` | `{ who }` | anim → fx/audio |
 
