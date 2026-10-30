@@ -70,18 +70,28 @@ export default {
       },
     },
     {
-      name: "input detecta el mando (input.device = 'gamepad')",
+      name: "input lee el mando (device, down('cover'), axis('move'))",
       async run({ page }) {
-        const r = await page.evaluate(() => {
-          const g = window.__game;
-          const input = g.service && (() => { try { return g.service('input'); } catch (_) { return null; } })();
-          return input ? { device: input.device, stub: !('device' in input) } : null;
+        const has = await page.evaluate(() => { try { return !!window.__game.service('input'); } catch (_) { return false; } });
+        assert.ok(has, "no existe el servicio 'input'");
+        // Mantener A y LS arriba y muestrear durante ~300 ms (varios pasos fijos).
+        const r = await page.evaluate(async () => {
+          const input = window.__game.service('input');
+          window.__pad.down('A'); window.__pad.stick('LS', 0, 1);
+          let down = false, ay = 0;
+          for (let i = 0; i < 15; i++) {
+            await new Promise((res) => setTimeout(res, 20));
+            down = down || !!input.down('cover');
+            ay = Math.max(ay, input.axis('move').y);
+          }
+          const device = input.device;
+          window.__pad.reset();
+          return { device, down, ay };
         });
-        if (!r || r.stub) skip('servicio input aún es stub');
-        await page.evaluate(() => window.__pad.press('A', 80));
-        await sleep(150);
-        const d = await page.evaluate(() => window.__game.service('input').device);
-        assert.eq(d, 'gamepad', 'input.device tras pulsar A');
+        if (r.device !== 'gamepad' && !r.down && r.ay === 0) skip("input no reacciona al mando (servicio aún stub)");
+        assert.eq(r.device, 'gamepad', 'input.device');
+        assert.ok(r.down, "input.down('cover') con A pulsado");
+        assert.gt(r.ay, 0.5, "input.axis('move').y con LS arriba (y+ = adelante)");
       },
     },
     {

@@ -1,0 +1,279 @@
+{
+  "fase": "fase-1a",
+  "fecha": "2026-10-30T16:50:01.092Z",
+  "chromiumArgs": [
+    "--use-gl=angle",
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader",
+    "--ignore-gpu-blocklist",
+    "--autoplay-policy=no-user-gesture-required"
+  ],
+  "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "build": {
+    "ok": true,
+    "release": {
+      "ms": 243
+    },
+    "debug": {
+      "ms": 222
+    },
+    "sizes": {
+      "horda.html": 509702,
+      "horda-debug.html": 941889
+    }
+  },
+  "suites": [
+    {
+      "file": "00-arranque.mjs",
+      "name": "Arranque",
+      "cases": [
+        {
+          "name": "window.__game existe",
+          "status": "PASS",
+          "ms": 4,
+          "error": null
+        },
+        {
+          "name": "estado inicial 'menu'",
+          "status": "PASS",
+          "ms": 3,
+          "error": null
+        },
+        {
+          "name": "canvas WebGL en la página",
+          "status": "PASS",
+          "ms": 5,
+          "error": null
+        },
+        {
+          "name": "el loop avanza (frames y ticks)",
+          "status": "PASS",
+          "ms": 710,
+          "error": null
+        },
+        {
+          "name": "stats() responde con fpsAvg/fpsP5/drawCalls/triangles",
+          "status": "PASS",
+          "ms": 13,
+          "error": null
+        },
+        {
+          "name": "mando simulado visible para la página",
+          "status": "PASS",
+          "ms": 20,
+          "error": null
+        },
+        {
+          "name": "input lee el mando (device, down('cover'), axis('move'))",
+          "status": "SKIP",
+          "ms": 1051,
+          "error": "input no reacciona al mando (servicio aún stub)"
+        },
+        {
+          "name": "captura del menú",
+          "status": "PASS",
+          "ms": 487,
+          "error": null
+        },
+        {
+          "name": "horda.html (release) carga sin errores y sin __game",
+          "status": "PASS",
+          "ms": 4789,
+          "error": null
+        },
+        {
+          "name": "consola sin errores",
+          "status": "PASS",
+          "ms": 0,
+          "error": null
+        }
+      ]
+    },
+    {
+      "file": "10-controles.mjs",
+      "name": "Controles (E-Day Default)",
+      "cases": [
+        {
+          "name": "menú: navegar con D-pad/LS y empezar con A",
+          "status": "SKIP",
+          "ms": 3628,
+          "error": "A no saca del menú (hud aún no implementado)"
+        },
+        {
+          "name": "LS mueve al jugador (walk/jog/run)",
+          "status": "SKIP",
+          "ms": 2,
+          "error": "no hay jugador en playing (player/hud aún no implementados)"
+        },
+        {
+          "name": "L3 sprint toggle; se corta al soltar el stick",
+          "status": "SKIP",
+          "ms": 2,
+          "error": "no hay jugador en playing (player/hud aún no implementados)"
+        },
+        {
+          "name": "R3 cambia de hombro",
+          "status": "SKIP",
+          "ms": 5,
+          "error": "no hay jugador en playing (player/hud aún no implementados)"
+        },
+        {
+          "name": "A entra en cobertura media (low)",
+          "status": "SKIP",
+          "ms": 7,
+          "error": "no hay jugador en playing (player/hud aún no implementados)"
+        },
+        {
+          "name": "A entra en cobertura alta (high)",
+          "status": "SKIP",
+          "ms": 5,
+          "error": "no hay jugador en playing (player/hud aún no implementados)"
+        },
+        {
+          "name": "LT en cobertura: asomarse/apuntar por encima",
+          "status": "SKIP",
+          "ms": 3,
+          "error": "no hay jugador en playing (player/hud aún no implementados)"
+        },
+        {
+          "name": "A + dirección: SWAT turn y deslizar a la contigua",
+          "status": "SKIP",
+          "ms": 2,
+          "error": "no hay jugador en playing (player/hud aún no implementados)"
+        },
+        {
+          "name": "doble toque A: evadir/rodar",
+          "status": "SKIP",
+          "ms": 3,
+          "error": "no hay jugador en playing (player/hud aún no implementados)"
+        },
+        {
+          "name": "A en sprint: deslizar",
+          "status": "SKIP",
+          "ms": 4,
+          "error": "no hay jugador en playing (player/hud aún no implementados)"
+        },
+        {
+          "name": "Y salta / vault sobre cobertura baja",
+          "status": "SKIP",
+          "ms": 3,
+          "error": "no hay jugador en playing (player/hud aún no implementados)"
+        },
+        {
+          "name": "LT+RT dispara a una diana (hp baja)",
+          "status": "SKIP",
+          "ms": 3,
+          "error": "no hay jugador en playing (player/hud aún no implementados)"
+        },
+        {
+          "name": "RB recarga y recarga activa (perfect)",
+          "status": "SKIP",
+          "ms": 3,
+          "error": "no hay jugador en playing (player/hud aún no implementados)"
+        },
+        {
+          "name": "B golpe cuerpo a cuerpo",
+          "status": "SKIP",
+          "ms": 3,
+          "error": "no hay jugador en playing (player/hud aún no implementados)"
+        },
+        {
+          "name": "D-pad ←/→ rifle/arma comprada, ↓ pistola",
+          "status": "SKIP",
+          "ms": 3,
+          "error": "no hay jugador en playing (player/hud aún no implementados)"
+        },
+        {
+          "name": "Menu pausa y reanuda",
+          "status": "SKIP",
+          "ms": 3,
+          "error": "no hay jugador en playing (player/hud aún no implementados)"
+        },
+        {
+          "name": "sin entradas: el jugador queda en idle",
+          "status": "SKIP",
+          "ms": 3,
+          "error": "no hay jugador en playing (player/hud aún no implementados)"
+        },
+        {
+          "name": "consola sin errores",
+          "status": "PASS",
+          "ms": 0,
+          "error": null
+        }
+      ]
+    },
+    {
+      "file": "90-rendimiento.mjs",
+      "name": "Rendimiento",
+      "cases": [
+        {
+          "name": "entrar en partida (si el menú lo permite)",
+          "status": "PASS",
+          "ms": 2599,
+          "error": null
+        },
+        {
+          "name": "FPS 5 s + draw calls",
+          "status": "PASS",
+          "ms": 6514,
+          "error": null
+        },
+        {
+          "name": "consola sin errores",
+          "status": "PASS",
+          "ms": 0,
+          "error": null
+        }
+      ]
+    }
+  ],
+  "consola": {
+    "errores": [],
+    "avisos": []
+  },
+  "perf": {
+    "escena": "menu",
+    "ms": 5000,
+    "raf": {
+      "frames": 158,
+      "fpsAvg": 31.5,
+      "fpsP5": 20
+    },
+    "stats": {
+      "fpsAvg": 34.2,
+      "fpsP5": 25,
+      "drawCalls": 2,
+      "triangles": 2,
+      "geometries": 2,
+      "textures": 0,
+      "frames": 281,
+      "tick": 444,
+      "samples": 280,
+      "state": "menu"
+    }
+  },
+  "resumen": {
+    "pass": 13,
+    "fail": 0,
+    "skip": 18,
+    "erroresConsola": 0,
+    "avisosConsola": 0,
+    "ok": true
+  },
+  "arranque": {
+    "statsMenu": {
+      "fpsAvg": 58.2,
+      "fpsP5": 46.3,
+      "drawCalls": 2,
+      "triangles": 2,
+      "geometries": 2,
+      "textures": 0,
+      "frames": 47,
+      "tick": 48,
+      "samples": 46,
+      "state": "menu"
+    }
+  },
+  "estricto": false
+}

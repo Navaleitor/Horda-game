@@ -3,6 +3,7 @@
 //
 //   node tests/e2e/run.mjs                 compila (release + --debug) y corre todas las suites
 //   node tests/e2e/run.mjs --no-build      usa los HTML ya generados
+//   node tests/e2e/run.mjs --strict        los SKIP cuentan como fallo (usar al cerrar fase; o HORDA_STRICT=1)
 //   node tests/e2e/run.mjs 10 20           solo suites cuyo nombre de archivo contiene "10" o "20"
 //   HORDA_PHASE=fase-1b node tests/e2e/run.mjs   cambia la carpeta de salida docs/qa/<fase>/
 //
@@ -27,6 +28,9 @@ const here = dirname(fileURLToPath(import.meta.url));
 const argv = process.argv.slice(2);
 const noBuild = argv.includes('--no-build');
 const filters = argv.filter((a) => !a.startsWith('--'));
+// Modo estricto (cierre de fase): los SKIP cuentan como fallo para que un sistema que deja de
+// responder no quede oculto como "pendiente".
+const strict = argv.includes('--strict') || process.env.HORDA_STRICT === '1';
 
 const report = {
   fase: lib.PHASE,
@@ -131,7 +135,7 @@ async function main() {
   }
 
   const all = report.suites.flatMap((s) => s.cases);
-  const fail = all.filter((c) => c.status === 'FAIL').length;
+  const fail = all.filter((c) => c.status === 'FAIL' || (strict && c.status === 'SKIP')).length;
   finish(fail || !files.length ? 1 : 0);
 }
 
@@ -153,6 +157,7 @@ function withTimeout(p, ms, name) {
 function finish(code) {
   const all = report.suites.flatMap((s) => s.cases);
   const count = (st) => all.filter((c) => c.status === st).length;
+  report.estricto = strict;
   report.resumen = { pass: count('PASS'), fail: count('FAIL'), skip: count('SKIP'), erroresConsola: report.consola.errores.length, avisosConsola: report.consola.avisos.length, ok: code === 0 };
 
   console.log('\n══════════════════════════ RESULTADOS ══════════════════════════');

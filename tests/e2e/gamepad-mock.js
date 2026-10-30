@@ -40,8 +40,8 @@
   const NBUTTONS = 17;
   const NAXES = 4;
 
-  const values = new Float32Array(NBUTTONS); // 0..1
-  const axes = new Float32Array(NAXES);      // -1..1 (convención Gamepad API)
+  const values = new Array(NBUTTONS).fill(0); // 0..1
+  const axes = new Array(NAXES).fill(0);      // -1..1 (convención Gamepad API)
   let connected = true;
   let timestamp = performance.now();
   const timers = new Set();
@@ -92,7 +92,7 @@
       connected,
       mapping: 'standard',
       timestamp,
-      axes: Array.from(axes),
+      axes: axes.slice(),
       buttons,
       vibrationActuator,
       hapticActuators: [],
