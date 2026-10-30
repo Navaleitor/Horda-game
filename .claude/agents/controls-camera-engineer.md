@@ -12,16 +12,16 @@ Eres responsable de la sensación de control, al estilo Gears of War: E-Day. La 
   - Polling único por frame de `navigator.getGamepads()`, deadzones radiales y curvas de respuesta.
   - Detección de flancos, toque/mantener/doble toque (LB toque = granada, mantener = Tac-Com; doble toque de A = evadir).
   - Mapeo a acciones lógicas y presets (`E-Day Default` adaptado); teclado de respaldo para desarrollo.
-  - Contextos de input: combate, cargando pieza, torreta montada, tienda, mini-menú de fortificación, radial ↑, derribado, pausa.
+  - Contextos de input: combate, cargando pieza, torreta montada, tienda, radial de fortificación, radial ↑, derribado, pausa.
 - **`camera/`**:
   - Cámara sobre el hombro; cambio de hombro suave (R3); zoom al apuntar (LT).
   - Encuadre en cobertura y al asomarse; colisión de cámara; sacudidas.
-  - Escala de tiempo al 50% mientras el radial está abierto (pídela a `core` por evento, no la apliques tú).
+  - Escala de tiempo al 50% mientras el radial de comodines (↑) está abierto; el radial de fortificación no ralentiza (pídela a `core` por evento, no la apliques tú).
 - **`player/`**:
   - Movimiento y sprint toggle en L3.
   - Cobertura con A: pegarse, moverse por el borde, asomarse con LT, SWAT turn y deslizar a la cobertura contigua.
   - A en sprint = deslizar; Y = saltar, trepar o hacer vault.
-  - B = melee (con pieza en manos: soltar). X = interactuar: toque sobre una fortificación abre el mini-menú, mantener sobre un aliado derribado lo revive.
+  - B = melee (con pieza en manos: soltar). X = interactuar: toque sobre una fortificación abre el radial de fortificación, mantener sobre un aliado derribado lo revive.
   - Emite los eventos que correspondan; la lógica la resuelve el dueño de cada sistema.
 - **`player/inventory.js`**:
   - D-pad ←/→: armas principales (rifle de asalto y el arma comprada).

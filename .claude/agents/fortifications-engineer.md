@@ -19,9 +19,12 @@ Eres responsable de todo lo que el jugador construye. Escribes en español. La r
   - Fantasma con snap a `barrierSlots`, `buildZones` y `turretPads`, en verde si es válido y en rojo si no.
   - Rotar con LB/RB ±45°, colocar con RT y soltar con B (la pieza queda en el suelo y se recoge con X).
   - Al morir, la pieza cae en el sitio.
-- **`buildSystem.js`**: mini-menú al tocar X sobre una pieza.
-  - Mejorar (A): solo hasta el nivel desbloqueado para ese tipo en `economy/unlocks`; si no está desbloqueado, el prompt lo indica.
-  - Mover (Y): solo en preparación; la pieza vuelve a las manos conservando su nivel.
+- **`buildSystem.js`**: lógica del **radial de fortificación** (toque X sobre una pieza; la tabla está en `docs/horda-gdd.md` §12).
+  - Mejorar: solo hasta el nivel desbloqueado para ese tipo en `economy/unlocks`.
+  - Reparar al 100% (×1.5 coste), Mover y Rotar 90°: solo en preparación.
+  - Opción de tipo: Montar (torreta), Prioridad (centinela), Provocar (señuelo) e Info de desgaste (barrera).
+  - Reconstruir cuando la pieza está destruida.
+  - Emite `build:radialOptions` con la disponibilidad y el coste de cada opción para que `ui-hud-designer` lo dibuje.
   - **Sin límite** de piezas y **sin venta**.
 - Aplicar las pasivas del Ingeniero (+HP, descuento, reparación) y la Fortaleza Arcana. Los modificadores los recibes por eventos desde `classes/`.
 - Exponer en `window.__game.forts` el tipo, nivel, hp, posición y si está cargada.
@@ -46,4 +49,4 @@ Eres responsable de todo lo que el jugador construye. Escribes en español. La r
 
 ## No hace
 - No define precios fuera de `config.js`.
-- No cambia botones fuera del contexto de cargar pieza o mini-menú.
+- No cambia botones fuera del contexto de cargar pieza o radial de fortificación.

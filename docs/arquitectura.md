@@ -30,10 +30,10 @@ src/
   combat/    weapons.js (hitscan, recarga activa), grenades.js, damage.js, melee.js
   classes/   classes.js (4 clases), passives.js (P1–P4, rangos 1–5), mystics.js (comodines, cargas, cooldown), mirror.js (reflejo en bots)
   fortifications/ fortification.js (base: hp, nivel, desgaste, coste), barrier.js, mannedTurret.js, sentry.js, decoy.js, repairTool.js,
-             carry.js (cargar/soltar/colocar), buildSystem.js (fantasma/slots, mini-menú mejorar/mover)
+             carry.js (cargar/soltar/colocar), buildSystem.js (fantasma/slots, opciones del radial de fortificación)
   waves/     waveTable.js, director.js (presupuesto y spawns), spawner.js
   economy/   wallet.js (bolsa de equipo), prices.js, shop.js (pestañas del fabricador), unlocks.js (desbloqueo de nivel por tipo)
-  hud/       hud.js, shopMenu.js (pestañas), radial.js (comodines ↑), fortMenu.js (mini-menú X), prompts.js, tacCom.js, scoreboard.js, startMenu.js (clase + dificultad)
+  hud/       hud.js, shopMenu.js (pestañas), radial.js (comodines ↑), fortRadial.js (radial de fortificación X), prompts.js, tacCom.js, scoreboard.js, startMenu.js (clase + dificultad)
   fx/        tracers.js, muzzle.js, lasers.js (shader emisivo), explosions.js, decals.js
   level/     levelLoader.js, maps/outpost.js (datos del mapa a mano), lighting.js
   assets/    models.js (glb embebidos), props/ (geometría procedural: armas, torretas, barreras, señuelo, fabricador)
@@ -61,6 +61,7 @@ Contratos clave (documentados en `docs/arquitectura.md`, dueño: game-architect)
 | `mystic:used` | `{ id, who, pos }` | classes → fx, anim, ai, hud |
 | `fort:pickedUp` / `fort:placed` / `fort:dropped` | `{ fort, who, pos, rot }` | fortifications → hud, ai (navGrid) |
 | `fort:damaged` / `fort:destroyed` / `fort:upgraded` | `{ fort, hp, level }` | fortifications → hud, ai, fx |
+| `build:radialOptions` | `{ fort, options: [{ id, enabled, reason, cost }] }` | fortifications → hud |
 | `anim:cast:impact` | `{ id, who }` | anim → fx, classes (sincroniza efecto con el gesto) |
 | `fx:spawn` | `{ type, pos, dir }` | cualquiera → fx |
 

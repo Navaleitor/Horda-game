@@ -22,7 +22,7 @@ Formato: frontmatter `name`, `description`, `tools`, `model: inherit`; cuerpo co
 | `weapons-props-artist` | `assets/props/` — armas (tienda, iniciales, de clase), granadas, fortificaciones Nv1–4, fabricador |
 | `vfx-artist` | `fx/` — trazadoras, impactos, láseres, explosiones, fantasma, efectos de comodines |
 | `level-designer` | `level/` — Puesto Avanzado, rutas, slots/zonas, iluminación, coberturas |
-| `ui-hud-designer` | `hud/`, DOM/CSS del HUD — HUD, tienda por pestañas, radial, mini-menú, Tac-Com, marcador, inicio |
+| `ui-hud-designer` | `hud/`, DOM/CSS del HUD — HUD, tienda por pestañas, radiales (comodines y fortificación), Tac-Com, marcador, inicio |
 | `qa-tester` | `tests/e2e/`, `docs/qa/` — Playwright + mando simulado, checklist de controles, FPS, bugs |
 
 ## Fases (cada una termina jugable con control)
@@ -45,11 +45,11 @@ Formato: frontmatter `name`, `description`, `tools`, `model: inherit`; cuerpo co
 - **Prueba**: sobrevivir 5 oleadas, ganar puntos, comprar en el fabricador, cargar y colocar pinchos.
 
 **Fase 2 — Barreras completas, reparación y derribado**
-- fortifications: barreras Nv2–4 (pinchos → concertina → láser rojo → láser azul), desbloqueos por tipo, mini-menú X (mejorar/mover), pistola de reparación, desgaste, reconstruir.
+- fortifications: barreras Nv2–4 (pinchos → concertina → láser rojo → láser azul), desbloqueos por tipo, radial de fortificación (X), pistola de reparación, desgaste, reconstruir.
 - gameplay: pestaña Desbloqueos, reglas de derribado/muerte/reaparición.
 - controls: LB toque = granada / mantener = Tac-Com; D-pad ↓ pistola de reparación.
 - ai: Bruto; barreras como obstáculos.
-- vfx: láseres, haz de reparación. ui: mini-menú, Tac-Com, barras de salud de piezas.
+- vfx: láseres, haz de reparación. ui: radial de fortificación, Tac-Com, barras de salud de piezas.
 - weapon-animator: haz de reparación, granada; abilities-animator: derribado/arrastrarse/revivir.
 - **Prueba**: desbloquear y mejorar barreras hasta láser azul, reparar, ser derribado y revivir.
 

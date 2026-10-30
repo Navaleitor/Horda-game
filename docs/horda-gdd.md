@@ -5,7 +5,7 @@
 ## 1. Controles (E-Day Default adaptado, 3ª persona fija)
 Índices de la API Gamepad (standard mapping) entre paréntesis.
 
-| Botón | Combate | Cargando fortificación | Menús (fabricador, mini-menú) |
+| Botón | Combate | Cargando fortificación | Menús (fabricador, radiales) |
 |---|---|---|---|
 | LS (ejes 0,1) | Mover | Mover (más lento) | Navegar |
 | RS (ejes 2,3) | Cámara | Cámara / apuntar el lugar | — (en el radial ↑: elegir) |
@@ -14,7 +14,7 @@
 | A (0) | Cobertura · A+dirección en cobertura = SWAT turn / deslizar a la cobertura contigua · doble toque = evadir/rodar · A en sprint = deslizar | — | Seleccionar / comprar |
 | Y (3) | Saltar · trepar · saltar sobre cobertura | — | — |
 | B (1) | Golpe cuerpo a cuerpo | **Soltar** la pieza en el suelo | Atrás / cerrar |
-| X (2) | Interactuar: fabricador, montar torreta, recoger, **mantener sobre aliado derribado = revivir**. **Toque sobre fortificación** → mini-menú: Mejorar (A) · Mover (Y, solo en preparación) · Cerrar (B) | — | — |
+| X (2) | Interactuar: fabricador, montar torreta, recoger, **mantener sobre aliado derribado = revivir**. **Toque sobre fortificación** → radial de fortificación (§12) | — | — |
 | RB (5) | Recargar (toque de nuevo = recarga activa) | Rotar +45° | Pestaña → |
 | LB (4) | **Toque = granada rápida** (al punto de mira) · **mantener = Tac-Com** | Rotar −45° | Pestaña ← |
 | LT (6) | Apuntar | — | — |
@@ -164,7 +164,7 @@ score(t) = base[tipoEnemigo][tipoObjetivo] × aggroWeight(t) × visibilidad(t)
 | Centinela | 1000 | 800 | 1300 | 2000 |
 | Señuelo | 400 | 400 | 700 | 1000 |
 
-- **Reparar**: 1 punto por cada 4 HP (pistola de reparación).
+- **Reparar**: 1 punto por cada 4 HP con la pistola de reparación; en preparación también desde el radial de fortificación (reparación instantánea a ×1.5).
 - **Destruida**: queda un armazón; X → Reconstruir al 50% del coste acumulado, conserva nivel.
 - **Mover**: gratis, solo en preparación, conserva nivel. **No se vende.** **Sin límite** de piezas.
 
@@ -207,9 +207,18 @@ score(t) = base[tipoEnemigo][tipoObjetivo] × aggroWeight(t) × visibilidad(t)
 1. **Comprar**: en el fabricador (X) → pestaña Fortificaciones → A. La pieza (Nv1) pasa a **tus manos**: caminas más lento y no puedes disparar.
 2. **Fantasma**: al acercarte a un lugar válido aparece el fantasma con *snap*: barreras a **slots de barrera** (cuellos de botella), centinelas y señuelos a **zonas de construcción** (rejilla de 1 m), torretas manuales a **plataformas**. Verde = válido, rojo = inválido.
 3. **Rotar** LB/RB ±45°. **Colocar** RT. **Soltar** B (la pieza queda en el suelo; X para recogerla).
-4. **Mejorar**: toque X sobre la pieza → mini-menú → Mejorar (A). Requiere el desbloqueo del nivel para ese tipo; si falta, el prompt dice "Desbloquéalo en el fabricador".
-5. **Mover** (solo preparación): mini-menú → Mover (Y) → la pieza vuelve a tus manos con su nivel.
-6. **Reparar**: pistola de reparación, RT mantenido; el HUD muestra HP y coste/s.
+4. **Radial de fortificación**: toque X sobre una pieza (≤3 m) → radial. Apuntas con RS (o LS), **A confirma**, **B cierra**. El tiempo **no** se ralentiza (no sirve de pausa en plena oleada) y el jugador queda quieto mientras está abierto. El **centro** muestra nombre, nivel, HP y la comparación de stats con el siguiente nivel.
+
+| Opción | Disponible | Efecto |
+|---|---|---|
+| **Mejorar** | Siempre, si el siguiente nivel está desbloqueado para el tipo | Sube un nivel pagando el coste de la tabla §10. Si no está desbloqueado: gris con "Desbloquéalo en el fabricador". |
+| **Reparar** | Solo en preparación | Repara al 100% al instante a **×1.5** el coste de la pistola de reparación (la pistola sigue siendo la opción barata y la única durante la oleada). |
+| **Mover** | Solo en preparación | La pieza vuelve a tus manos con su nivel. |
+| **Rotar 90°** | Solo en preparación | Gira la pieza en sitio, si la nueva orientación es válida. |
+| **Opción de tipo** | Siempre | Torreta manual: **Montar**. Centinela: **Prioridad** (más cercano → más fuerte → Explosivos primero, cíclico). Señuelo: **Provocar** (Nv2+: duplica su radio de aggro 5 s; cooldown 30 s). Barrera: **Info de desgaste** (HP/s perdido en la última oleada). |
+| **Reconstruir** | Solo si está destruida (sustituye a todas las demás) | Reconstruye al 50% del coste acumulado, conserva nivel. |
+
+5. **Reparar en oleada**: pistola de reparación, RT mantenido; el HUD muestra HP y coste/s.
 
 ## 13. Mapa fijo: "Puesto Avanzado" (~90×90 m)
 - Base central elevada con **fabricador**, 2 plataformas de torreta manual y 3 zonas de construcción.
