@@ -3,14 +3,14 @@
 //
 // ── API ────────────────────────────────────────────────────────────────────────────────────────
 //   const models = await loadModels();
-//   models.ok                    → true si Soldier.glb cargó; false = marcador de cápsula (ver models.error)
+//   models.ok                    → true si Xbot.glb cargó; false = marcador de cápsula (ver models.error)
 //   models.error                 → null | Error
 //   models.height                → altura del soldado en metros (≈1.8)
 //   models.createSoldier(classId) → {
 //     root,        // Group sin transformar; el consumidor lo posiciona (pies en y=0) y lo gira (yaw 0 = −Z).
-//                  //   Por dentro: root → 'soldier:inner' (solo escala; el glb ya mira a −Z) → escena del glb.
-//     skinned,     // SkinnedMesh[] ('vanguard_Mesh' cuerpo, 'vanguard_visor' visor). Comparten un Skeleton.
-//     animations,  // AnimationClip[] del glb (compartidos entre instancias; no mutarlos)
+//                  //   Por dentro: root → 'soldier:inner' (escala + giro de π: el Xbot mira a +Z) → escena del glb.
+//     skinned,     // SkinnedMesh[] ('Beta_Surface' carcasa, 'Beta_Joints' articulaciones). Comparten un Skeleton.
+//     animations,  // AnimationClip[] del glb (compartidos; no mutarlos). Renombrados a 'Idle'/'Walk'/'Run'
 //     bones,       // Map<nombre, Bone> con los nombres saneados por GLTFLoader (sin ':')
 //     anchors: { rightHand, leftHand, head, spine, back,   // contrato
 //                leftArm, hips },                          // extra (accesorios de clase)
@@ -19,15 +19,21 @@
 //   Cada llamada devuelve una instancia nueva (SkeletonUtils.clone). Geometría, texturas y clips se
 //   comparten; el material se clona UNA vez por clase y se cachea (no por instancia).
 //
-// ── Soldier.glb (three.js r170, examples/models/gltf/Soldier.glb, 2.1 MB) ──────────────────────
-//   Clips: 'Idle' (1.97 s), 'Run' (0.70 s), 'TPose' (0.03 s), 'Walk' (1.03 s); 156 pistas c/u
-//          (pos/rot/escala de 52 huesos; las pistas usan los mismos nombres saneados).
-//   Mallas: 'vanguard_Mesh' (VanguardBodyMat), 'vanguard_visor' (Vanguard_VisorMat); 2 JPEG.
-//   Nodo 'Character' (rotX −90°, escala 0.01: el original es Z-arriba en cm) → 1.83 m de alto.
-//   Huesos (52, jerarquía Mixamo; en el glb 'mixamorig:X', en three 'mixamorigX'):
+// ── Xbot.glb (three.js r170, examples/models/gltf/Xbot.glb, 2.9 MB, sin texturas) ────────────
+//   Maniquí estilizado. Clips originales: 'idle' (2.50 s), 'walk' (0.97 s), 'run' (0.70 s) — se
+//   renombran a 'Idle'/'Walk'/'Run' (contrato del rig) — y poses sueltas 'agree', 'headShake',
+//   'sad_pose', 'sneak_pose' (se conservan con su nombre). 201 pistas (pos/rot/escala de 67 huesos).
+//   Clips in situ (sin root motion: la cadera no avanza).
+//   Mallas: 'Beta_Surface' (carcasa) y 'Beta_Joints' (articulaciones), MeshStandardMaterial lisos.
+//   Nodo 'Armature' (escala 0.01: el original está en cm) → 1.806 m de alto en la pose de reposo
+//   (T-pose de los nodos). Mira a +Z (mano derecha en −X) → inner gira π.
+//   OJO: skeleton.pose() con este glb deforma la escala (inverse bind matrices); la pose de reposo
+//   se mide con las TRS de los nodos tal como las deja GLTFLoader.
+//   Huesos (67, jerarquía Mixamo; en el glb 'mixamorig:X', en three 'mixamorigX'), como Soldier.glb
+//   más 'mixamorigLeftEye' / 'mixamorigRightEye' bajo Head:
 //     mixamorigHips
 //       mixamorigSpine → Spine1 → Spine2
-//         Spine2 → Neck → Head → HeadTop_End
+//         Spine2 → Neck → Head → HeadTop_End (+ LeftEye, RightEye)
 //         Spine2 → LeftShoulder  → LeftArm  → LeftForeArm  → LeftHand
 //         Spine2 → RightShoulder → RightArm → RightForeArm → RightHand
 //           (Left|Right)Hand → (Thumb|Index|Middle|Ring|Pinky)1..4
@@ -59,7 +65,8 @@
 //   hips       (extra) hueso mixamorigHips, a la altura del cinturón.
 //
 // ── Variante por clase (config.classes[id].color / .accessory) ─────────────────────────────────
-//   Cuerpo: textura desaturada y teñida al color de clase (tintShader); visor emisivo del color de clase (legible a 30 m).
+//   Carcasa (Beta_Surface): gris claro mezclado con el color de clase (BODY_TINT). Articulaciones
+//   (Beta_Joints) = placas: color de clase con brillo emisivo suave (legible a 30 m).
 //   medic     'medpack'  mochila médica blanca con cruz verde + brazalete blanco/verde.
 //   support   'ammo'     mochila de munición + bandolera cruzada al pecho, naranja.
 //   engineer  'hardhat'  casco de obra con visera oscura + caja de herramientas a la cadera, amarillo.
@@ -72,14 +79,15 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import config from '../core/config.js';
 import { box, cylY, part, merge } from './props/geometry.js';
-import soldierUrl from '../../assets/Soldier.glb';
+import soldierUrl from '../../assets/Xbot.glb';
 
 const TARGET_HEIGHT = 1.8;      // m
-const SOURCE_HEIGHT = 1.8318;   // m (bbox del vanguard_Mesh × 0.01)
+const SOURCE_HEIGHT = 1.806;    // m (bbox de Beta_Surface en reposo × 0.01)
 const BACK_OFFSET = 0.13;       // m detrás de Spine2 hasta la superficie de la espalda
-const BODY_TINT = 0.85;         // 0 = textura original, 1 = color de clase puro
-const BODY_DESAT = 0.9;         // desaturación de la textura antes de teñir (la original es marrón)
-const BODY_GAIN = 1.5;          // compensa el oscurecimiento del tinte multiplicativo
+const BODY_BASE = 0xc9ccd1;     // gris maniquí de la carcasa
+const BODY_TINT = 0.35;         // 0 = gris maniquí, 1 = color de clase puro
+const JOINT_EMISSIVE = 0.25;    // brillo de las placas (articulaciones) del color de clase
+const CLIP_RENAME = { idle: 'Idle', walk: 'Walk', run: 'Run' };
 
 const BONE = {
   rightHand: 'mixamorigRightHand',
@@ -126,9 +134,8 @@ function buildTemplate(gltf) {
   root.name = 'soldier';
   const inner = new THREE.Group();
   inner.name = 'soldier:inner';
-  // El Soldier.glb de three.js ya mira a −Z (verificado: mano derecha en +X), así que inner
-  // no necesita girar; se deja el contenedor para escalar y por si cambia el asset.
-  inner.rotation.y = 0;
+  // El Xbot.glb mira a +Z (mano derecha en −X): se gira π para cumplir −Z = delante.
+  inner.rotation.y = Math.PI;
   inner.scale.setScalar(TARGET_HEIGHT / SOURCE_HEIGHT);
   inner.add(gltf.scene);
   root.add(inner);
@@ -139,14 +146,13 @@ function buildTemplate(gltf) {
     m.receiveShadow = true;
     m.frustumCulled = false;   // la bbox de bind pose no cubre las animaciones
   }
-  // Bind pose (T-pose) para medir y colocar anchors.
-  if (skinned[0]) skinned[0].skeleton.pose();
+  // Pose de reposo de los nodos (T-pose) para medir y colocar anchors. No usar skeleton.pose().
   root.updateMatrixWorld(true);
 
   const bones = collectBones(root);
   const need = (n) => {
     const b = bones.get(n) || root.getObjectByName(n);   // *_End no son Bone (no están en el skin)
-    if (!b) throw new Error(`Soldier.glb: falta el hueso '${n}'`);
+    if (!b) throw new Error(`Xbot.glb: falta el hueso '${n}'`);
     return b;
   };
   const wp = (n, out = new THREE.Vector3()) => need(n).getWorldPosition(out);
@@ -191,21 +197,6 @@ function findAnchors(root) {
     if (o.name.startsWith('anchor:')) anchors[o.name.slice(7)] = o;
   });
   return anchors;
-}
-
-// Desatura la textura difusa antes de multiplicar por material.color, para que el color de clase
-// se lea limpio (la textura del Soldier es marrón/tostada y teñirla sin más da tonos sucios).
-function tintShader(mat, key) {
-  mat.onBeforeCompile = (shader) => {
-    shader.fragmentShader = shader.fragmentShader.replace('#include <map_fragment>', `
-#ifdef USE_MAP
-  vec4 sampledDiffuseColor = texture2D( map, vMapUv );
-  float lum = dot( sampledDiffuseColor.rgb, vec3( 0.299, 0.587, 0.114 ) );
-  sampledDiffuseColor.rgb = mix( sampledDiffuseColor.rgb, vec3( lum ), ${BODY_DESAT.toFixed(3)} ) * ${BODY_GAIN.toFixed(3)};
-  diffuseColor *= sampledDiffuseColor;
-#endif`);
-  };
-  mat.customProgramCacheKey = () => key; // mismo shader para todas las clases
 }
 
 // ── Materiales por clase (cacheados) ─────────────────────────────────────────────────────────────
@@ -324,26 +315,29 @@ export async function loadModels() {
     const gltf = await loader.parseAsync(dataUrlToArrayBuffer(soldierUrl), '');
     template = buildTemplate(gltf);
     clips = gltf.animations;
+    for (const c of clips) if (CLIP_RENAME[c.name]) c.name = CLIP_RENAME[c.name];
   } catch (e) {
     error = e;
-    console.error('[models] No se pudo cargar Soldier.glb; se usan cápsulas de marcador:', e);
+    console.error('[models] No se pudo cargar Xbot.glb; se usan cápsulas de marcador:', e);
   }
 
-  // Material por clase: cuerpo teñido + visor emisivo. Cacheado.
+  // Material por clase: carcasa gris maniquí teñida + placas (articulaciones) del color de clase. Cacheado.
   const classMats = new Map();
-  function materialsFor(classId, srcBody, srcVisor) {
+  function materialsFor(classId, srcBody, srcJoints) {
     let m = classMats.get(classId);
     if (m) return m;
     const cls = config.classes[classId];
-    const color = new THREE.Color(cls ? cls.color : 0xffffff);
+    const color = new THREE.Color(cls ? cls.color : 0x5a5f66);
     const body = srcBody.clone();
     body.name = `soldier:body:${classId}`;
-    body.color.setRGB(1, 1, 1).lerp(color, cls ? BODY_TINT : 0);
-    if (cls) tintShader(body, 'soldier-tint');
-    const visor = srcVisor.clone();
-    visor.name = `soldier:visor:${classId}`;
-    if (cls) { visor.emissive = color.clone(); visor.emissiveIntensity = 0.9; }
-    m = { body, visor };
+    body.color.set(BODY_BASE).lerp(color, cls ? BODY_TINT : 0);
+    body.roughness = 0.55; body.metalness = 0.1;
+    const joints = srcJoints.clone();
+    joints.name = `soldier:joints:${classId}`;
+    joints.color.copy(color);
+    joints.roughness = 0.4; joints.metalness = 0.2;
+    if (cls) { joints.emissive = color.clone(); joints.emissiveIntensity = JOINT_EMISSIVE; }
+    m = { body, joints };
     classMats.set(classId, m);
     return m;
   }
@@ -374,11 +368,11 @@ export async function loadModels() {
       m.frustumCulled = false;
     }
     if (skinned.length) {
-      const body = skinned.find((m) => m.name === 'vanguard_Mesh') || skinned[0];
-      const visor = skinned.find((m) => m.name === 'vanguard_visor');
-      const mats = materialsFor(classId, body.material, (visor || body).material);
+      const body = skinned.find((m) => m.name === 'Beta_Surface') || skinned[0];
+      const joints = skinned.find((m) => m.name === 'Beta_Joints');
+      const mats = materialsFor(classId, body.material, (joints || body).material);
       body.material = mats.body;
-      if (visor) visor.material = mats.visor;
+      if (joints) joints.material = mats.joints;
     }
     const anchors = findAnchors(root);
     const acc = accessoriesFor(classId);

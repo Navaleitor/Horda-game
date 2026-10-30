@@ -1,6 +1,6 @@
 {
   "fase": "fase-1a",
-  "fecha": "2026-10-30T21:46:04.741Z",
+  "fecha": "2026-10-30T21:48:50.265Z",
   "chromiumArgs": [
     "--use-gl=angle",
     "--use-angle=swiftshader",
@@ -12,14 +12,14 @@
   "build": {
     "ok": true,
     "release": {
-      "ms": 523
+      "ms": 343
     },
     "debug": {
-      "ms": 381
+      "ms": 355
     },
     "sizes": {
-      "horda.html": 3670493,
-      "horda-debug.html": 4375149
+      "horda.html": 4696255,
+      "horda-debug.html": 5400918
     }
   },
   "suites": [
@@ -30,55 +30,55 @@
         {
           "name": "window.__game existe",
           "status": "PASS",
-          "ms": 17,
+          "ms": 5,
           "error": null
         },
         {
           "name": "estado inicial 'menu'",
           "status": "PASS",
-          "ms": 9,
+          "ms": 6,
           "error": null
         },
         {
           "name": "canvas WebGL en la página",
           "status": "PASS",
-          "ms": 12,
+          "ms": 7,
           "error": null
         },
         {
           "name": "el loop avanza (frames y ticks)",
           "status": "PASS",
-          "ms": 709,
+          "ms": 1222,
           "error": null
         },
         {
           "name": "stats() responde con fpsAvg/fpsP5/drawCalls/triangles",
           "status": "PASS",
-          "ms": 8,
+          "ms": 7,
           "error": null
         },
         {
           "name": "mando simulado visible para la página",
           "status": "PASS",
-          "ms": 8,
+          "ms": 10,
           "error": null
         },
         {
           "name": "input lee el mando (device, down('cover'), axis('move'))",
           "status": "PASS",
-          "ms": 311,
+          "ms": 312,
           "error": null
         },
         {
           "name": "captura del menú",
           "status": "PASS",
-          "ms": 1573,
+          "ms": 1098,
           "error": null
         },
         {
           "name": "horda.html (release) carga sin errores y sin __game",
           "status": "PASS",
-          "ms": 6912,
+          "ms": 9901,
           "error": null
         },
         {
@@ -96,79 +96,79 @@
         {
           "name": "(setup)",
           "status": "PASS",
-          "ms": 2833,
+          "ms": 2828,
           "error": null
         },
         {
           "name": "LS mueve (run) y al soltar vuelve a idle",
           "status": "PASS",
-          "ms": 64,
+          "ms": 51,
           "error": null
         },
         {
           "name": "L3 sin función; velocidad máxima 4,14 m/s",
           "status": "PASS",
-          "ms": 58,
+          "ms": 49,
           "error": null
         },
         {
           "name": "R3 cambia de hombro",
           "status": "PASS",
-          "ms": 54,
+          "ms": 47,
           "error": null
         },
         {
           "name": "A cobertura media + LT asomarse + SWAT turn",
           "status": "PASS",
-          "ms": 272,
+          "ms": 214,
           "error": null
         },
         {
           "name": "A cobertura alta y LT asoma desde el borde",
           "status": "PASS",
-          "ms": 108,
+          "ms": 85,
           "error": null
         },
         {
           "name": "A en movimiento sin cobertura = maroma; doble A = maroma; quieto no hace nada",
           "status": "PASS",
-          "ms": 104,
+          "ms": 118,
           "error": null
         },
         {
           "name": "Y salta, vault sobre la barra y trepa el bloque",
           "status": "PASS",
-          "ms": 353,
+          "ms": 449,
           "error": null
         },
         {
           "name": "LT+RT a una diana baja su vida",
           "status": "PASS",
-          "ms": 60,
+          "ms": 94,
           "error": null
         },
         {
           "name": "RB recarga y 2º RB en la zona perfecta → perfect",
           "status": "PASS",
-          "ms": 191,
+          "ms": 211,
           "error": null
         },
         {
           "name": "B golpe cuerpo a cuerpo cancela la recarga",
           "status": "PASS",
-          "ms": 42,
+          "ms": 43,
           "error": null
         },
         {
           "name": "D-pad: ↓ pistola, → vacía (no cambia), ← rifle",
           "status": "PASS",
-          "ms": 42,
+          "ms": 58,
           "error": null
         },
         {
           "name": "Menu pausa y reanuda",
           "status": "PASS",
-          "ms": 34,
+          "ms": 36,
           "error": null
         },
         {
@@ -186,13 +186,13 @@
         {
           "name": "entrar en partida (si el menú lo permite)",
           "status": "PASS",
-          "ms": 4656,
+          "ms": 6122,
           "error": null
         },
         {
           "name": "FPS 5 s + draw calls",
           "status": "PASS",
-          "ms": 9672,
+          "ms": 9419,
           "error": null
         },
         {
@@ -212,20 +212,20 @@
     "escena": "combate",
     "ms": 5000,
     "raf": {
-      "frames": 48,
-      "fpsAvg": 9.6,
-      "fpsP5": 3.3
+      "frames": 25,
+      "fpsAvg": 4.8,
+      "fpsP5": 2.2
     },
     "stats": {
-      "fpsAvg": 9.1,
-      "fpsP5": 3.3,
+      "fpsAvg": 6,
+      "fpsP5": 2.2,
       "drawCalls": 70,
-      "triangles": 19142,
+      "triangles": 56870,
       "geometries": 31,
-      "textures": 10,
-      "frames": 96,
-      "tick": 211,
-      "samples": 95,
+      "textures": 8,
+      "frames": 73,
+      "tick": 179,
+      "samples": 72,
       "state": "playing"
     }
   },
@@ -239,15 +239,15 @@
   },
   "arranque": {
     "statsMenu": {
-      "fpsAvg": 23.5,
-      "fpsP5": 4.3,
+      "fpsAvg": 11.1,
+      "fpsP5": 1,
       "drawCalls": 58,
       "triangles": 7212,
       "geometries": 18,
       "textures": 1,
-      "frames": 31,
-      "tick": 48,
-      "samples": 30,
+      "frames": 20,
+      "tick": 30,
+      "samples": 19,
       "state": "menu"
     }
   },
