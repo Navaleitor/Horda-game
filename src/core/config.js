@@ -429,7 +429,7 @@ const config = {
       // mide el núcleo subestima la del Run). La cadencia se deduce de aquí: cero patinaje.
       contactSpeed: { walk: 1.54, run: 3.65 },
       fade: { evade: 0.05, vault: 0.07, climb: 0.08, jump: 0.06 },   // s de crossfade de entrada (el rig usa 0.2 s)
-      handLead: 0.015,           // s de adelanto de los puntos de agarre (compensa el filtro del brazo)
+      handLead: 0,              // s de adelanto de los puntos de agarre (0 es lo que menos error da: el hombro ya se filtra)
       lead: 0.065,              // s de adelanto de la pose en vault/trepar (compensa el suavizado de aditivos)
       blend: [1.75, 3.1],       // m/s: Walk puro hasta [0], Run puro desde [1]
       leanRun: 0.1,             // rad de inclinación extra del tronco a velocidad máxima de carrera

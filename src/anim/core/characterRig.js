@@ -88,6 +88,7 @@
 //     lowCarry: 0..1,    // (cuerpo) lleva el arma en posición baja (maroma, vault…). Def. 0
 //     handsFree: 0..1,   // (cuerpo) suelta la mano izquierda del arma (climb, vault…). Def. 0
 //     transient: bool,   // (torso) estado puntual que vuelve a la base
+//     fade: s,           // (cuerpo) crossfade de entrada propio (defecto config.anim.crossfade)
 //   }
 //   En update, usa SOLO las utilidades del rig (sin reservar memoria):
 //     rig.t, rig.w, rig.params        tiempo en el estado (s), peso de mezcla 0..1, params
@@ -545,7 +546,8 @@ export class CharacterRig {
       if (params) cur.params = params;
       return;
     }
-    const fade = params && params.fade !== undefined ? params.fade : this.cfg.crossfade;
+    const fade = params && params.fade !== undefined ? params.fade
+      : prov.fade !== undefined ? prov.fade : this.cfg.crossfade;
     this._switch('body', state, prov, params, fade);
   }
 
