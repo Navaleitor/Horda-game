@@ -116,8 +116,8 @@ const config = {
       magSize: 60,
       reserve: 240,           // (prov.)
       reloadTime: 2.2,        // (prov.)
-      activeWindow: [0.45, 0.6],   // fracción 0..1 de la recarga para "perfecta" (prov.)
-      goodWindow: [0.35, 0.75],    // (prov.)
+      activeWindow: [0.45, 0.6],   // fracción 0..1 de la recarga: "perfecta" (prov.)
+      goodWindow: [0.35, 0.75],    // "buena", contiene a la perfecta (prov.)
       range: 120,
       spread: 1.2 * DEG,
       spreadAim: 0.4 * DEG,
@@ -132,23 +132,31 @@ const config = {
       magSize: 12,
       reserve: 72,            // (prov.)
       reloadTime: 1.5,        // (prov.)
-      activeWindow: [0.4, 0.58],
-      goodWindow: [0.3, 0.72],
+      activeWindow: [0.4, 0.58],   // (prov.)
+      goodWindow: [0.3, 0.72],     // (prov.)
       range: 80,
       spread: 0.8 * DEG,
       spreadAim: 0.25 * DEG,
-      headshotMult: 2.0,
+      headshotMult: 2.0,      // (prov.)
       swapTime: 0.35,
     },
     startSlots: ['assaultRifle', null, 'pistol'],
+    // Boca del cañón en la simulación (no se lee object3d): x lateral según hombro, y altura
+    // desde los pies (yLow agachado / cobertura baja sin asomar), z hacia la mira. (prov.)
+    muzzleOffset: { x: 0.22, y: 1.42, yLow: 1.0, z: 0.7 },
+    spreadCoverPeekMult: 0.75,  // en cobertura asomado / apuntando por encima (prov.)
+    spreadBlindFireMult: 2.5,   // disparo a ciegas desde cobertura (prov.)
+    sameHitTolerance: 0.05,     // m: el rayo desde la boca "llega" al punto de la mira (técnico)
   },
 
   // ── activeReload (gameplay-programmer) — GDD §7 ──────────────────────────
+  // Zonas por arma en weapons.<id>: activeWindow = perfecta (estrecha) DENTRO de goodWindow = buena.
+  // Fuera de goodWindow = fallida. Un solo intento por recarga.
   activeReload: {
     perfectDamageMult: 1.10,  // +10% daño
     perfectBuffDuration: 5,   // s
-    perfectSpeedMult: 0.5,    // la recarga termina antes (fracción del tiempo restante)
-    goodSpeedMult: 0.7,
+    perfectSpeedMult: 0.5,    // perfecta también acelera: tiempo restante × 0.5 (prov.)
+    goodSpeedMult: 0.7,       // buena: tiempo restante × 0.7, sin bonus de daño (prov.)
     failedJamTime: 1.5,       // encasquillada
   },
 
@@ -159,7 +167,10 @@ const config = {
     arc: 70 * DEG,
     duration: 0.6,
     hitTime: 0.2,             // s desde el inicio del golpe
-    cooldown: 0.3,
+    cooldown: 0.3,            // s tras terminar el golpe
+    targetRadius: 0.4,        // radio supuesto del objetivo si no tiene `radius`
+    heightTolerance: 1.2,     // m de diferencia vertical máx. entre pecho y objetivo
+    chestHeight: 1.2,         // m desde los pies (origen del golpe)
   },
 
   // ── targets (level-designer) — dianas de prueba de la Fase 1a ────────────
@@ -192,10 +203,11 @@ const config = {
 
   // ── classes (gameplay-programmer; color: character-artist) — GDD §3 ──────
   classes: {
-    medic:   { id: 'medic',   name: 'Médico',          color: 0x3fbf6f },
-    support: { id: 'support', name: 'Apoyo',           color: 0xe0a030 },
-    engineer:{ id: 'engineer',name: 'Ingeniero',       color: 0x3f8fe0 },
-    recon:   { id: 'recon',   name: 'Reconocimiento',  color: 0xb050d0 },
+    // color/accessory: character-artist (ver cabecera de src/assets/models.js)
+    medic:   { id: 'medic',   name: 'Médico',          color: 0x3fbf6f, accessory: 'medpack' },
+    support: { id: 'support', name: 'Apoyo',           color: 0xf08419, accessory: 'ammo' },
+    engineer:{ id: 'engineer',name: 'Ingeniero',       color: 0xf0c419, accessory: 'hardhat' },
+    recon:   { id: 'recon',   name: 'Reconocimiento',  color: 0x2a4fa0, accessory: 'antenna' },
   },
   classOrder: ['medic', 'support', 'engineer', 'recon'],
 
@@ -225,6 +237,36 @@ const config = {
     impactPool: 64,
     impactLife: 0.4,
     sparkCount: 6,
+    // Trazadoras (cinta orientada a cámara, InstancedMesh)
+    tracerWidth: 0.05,        // m
+    tracerMaxDist: 80,        // m, si el payload no trae `end`
+    tracerColor: 0xffc070,
+    // Fogonazo + destellos (billboards aditivos, InstancedMesh) y luz compartida
+    flashPool: 32,
+    muzzleSize: 0.45,         // m
+    muzzleMinFrames: 2,       // frames visibles como mínimo
+    muzzleColor: 0xffb050,
+    muzzleLightIntensity: 6,
+    muzzleLightDistance: 7,   // m
+    muzzleLightTime: 0.06,    // s
+    impactFlashSize: 0.3,     // m
+    // Chispas (Points, buffer fijo)
+    sparkPool: 256,
+    sparkSize: 0.07,          // m
+    sparkSpeed: 5.5,          // m/s
+    sparkLife: 0.35,          // s (±30 %)
+    sparkGravity: 14,         // m/s²
+    sparkDrag: 3,             // 1/s
+    sparkColor: 0xffd27a,
+    meleeSparkColor: 0xffffff,
+    // Marcas de impacto (pool circular de quads)
+    decalPool: 64,
+    decalSize: 0.16,          // m
+    decalLife: 14,            // s (se encogen el último segundo)
+    // Recarga activa perfecta
+    activeReloadColor: 0x9fd8ff,
+    activeReloadSize: 0.7,    // m
+    activeReloadHeight: 1.3,  // m sobre los pies si el payload no trae pos
   },
 };
 
