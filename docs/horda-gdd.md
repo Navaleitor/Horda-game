@@ -25,6 +25,7 @@
 | View (8) | Mantener = marcador | — | — |
 | Menu (9) | Pausa | Pausa | Pausa |
 
+- **A + dirección en el extremo de una cobertura**: si el hueco hasta la siguiente cobertura es de **≤1,5 m** → **SWAT turn**; si es **mayor** → **deslizar a la cobertura contigua**.
 - **Tac-Com** (mantener LB): resalta a través de paredes a aliados, fabricador y fortificaciones (con su salud), dibuja rutas de spawn, enemigos restantes y composición de la siguiente oleada.
 - **Pistola de reparación**: RT mantenido, haz sobre fortificación (≤6 m).
 - **Torreta manual**: X para montar; LT/RT apuntar/disparar; RB cohete (Nv4); B o X desmontar.
