@@ -36,7 +36,7 @@ export function padGlyph(button) {
   if (FACE[b]) return `<span class="hz-g hz-g-face hz-g-${FACE[b]}">${b}</span>`;
   if (b === 'LB' || b === 'RB') return `<span class="hz-g hz-g-bumper">${b}</span>`;
   if (b === 'LT' || b === 'RT') return `<span class="hz-g hz-g-trigger">${b}</span>`;
-  if (b === 'L3' || b === 'R3') return `<span class="hz-g hz-g-stick hz-g-click">${b === 'L3' ? 'LS' : 'RS'}</span>`;
+  if (b === 'L3' || b === 'R3') return `<span class="hz-g hz-g-stick hz-g-click">${b}</span>`;
   if (b === 'LS' || b === 'RS') return `<span class="hz-g hz-g-stick">${b}</span>`;
   if (DPAD_DIR[b]) return `<span class="hz-g hz-g-dpad hz-d-${DPAD_DIR[b]}"><i></i><i></i><b></b></span>`;
   if (b === 'View') return '<span class="hz-g hz-g-sys" title="View"><i class="hz-g-view"></i></span>';

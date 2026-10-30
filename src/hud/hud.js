@@ -36,8 +36,8 @@ export function createGameHud(parent, game) {
     <div class="hz-toast"></div>
     <div class="hz-wpn">
       <div class="hz-slots">
-        <div class="hz-slot s3">Comodín</div>
-        <div class="hz-slot s0"></div><div class="hz-slot s1"></div><div class="hz-slot s2"></div>
+        <div class="hz-slot s3"><span>Comodín</span></div>
+        <div class="hz-slot s0"><span></span></div><div class="hz-slot s1"><span></span></div><div class="hz-slot s2"><span></span></div>
       </div>
       <div class="hz-wbox hz-panel">
         <div class="hz-wname"></div>
@@ -105,7 +105,7 @@ export function createGameHud(parent, game) {
     for (let i = 0; i < 3; i++) {
       const id = st.slots[i];
       const s = slotEls[i];
-      s.textContent = shortName(id);
+      s.firstChild.textContent = shortName(id);
       s.classList.toggle('empty', !id);
       s.classList.toggle('cur', i === st.slot && !!id);
     }

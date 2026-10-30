@@ -25,11 +25,11 @@ const MATERIAL_OF = {
 };
 
 const MATERIALS = {
-  floor:     { color: 0x6e655c, roughness: 0.95, metalness: 0.0, shadow: false },
-  wall:      { color: 0x8a8079, roughness: 0.9,  metalness: 0.0, shadow: true },
+  floor:     { color: 0x857b70, roughness: 0.95, metalness: 0.0, shadow: false },
+  wall:      { color: 0x9a9089, roughness: 0.9,  metalness: 0.0, shadow: true },
   concrete:  { color: 0xa39a8c, roughness: 0.85, metalness: 0.0, shadow: true },
-  coverLow:  { color: 0xc98b3c, roughness: 0.7,  metalness: 0.1, shadow: true },
-  coverHigh: { color: 0x4f8296, roughness: 0.6,  metalness: 0.2, shadow: true },
+  coverLow:  { color: 0xd8953f, roughness: 0.7,  metalness: 0.1, shadow: true },
+  coverHigh: { color: 0x62a3bd, roughness: 0.6,  metalness: 0.2, shadow: true },
   pillar:    { color: 0x77706a, roughness: 0.8,  metalness: 0.1, shadow: true },
   container: { color: 0x9a3f2c, roughness: 0.6,  metalness: 0.3, shadow: true },
   metal:     { color: 0x4a5056, roughness: 0.5,  metalness: 0.55, shadow: true },

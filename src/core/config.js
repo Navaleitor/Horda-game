@@ -33,6 +33,16 @@ const config = {
     lookSensitivity: 3.2,     // rad/s con el stick a fondo
     lookSensitivityAim: 1.6,
     lookCurve: 1.6,           // exponente de respuesta del stick derecho
+    lookDeadzone: 0.15,       // radial, stick derecho
+    lookInvertY: false,       // inversión opcional del eje vertical (RS y ratón)
+    lookAccel: {              // aceleración horizontal con RS a fondo (giros rápidos; no al apuntar)
+      threshold: 0.92,        // magnitud del stick a partir de la que acelera
+      delay: 0.2,             // s a fondo antes de empezar a acelerar
+      time: 0.35,             // s hasta alcanzar el máximo
+      max: 1.7,               // multiplicador máximo
+    },
+    mouseAimScale: 0.6,       // sensibilidad del ratón al apuntar (fracción)
+    menuStickThreshold: 0.5,  // inclinación de LS que cuenta como dirección en menús
   },
 
   // ── physics (physics-engineer) ───────────────────────────────────────────
@@ -78,11 +88,41 @@ const config = {
     airControl: 0.3,
     turnRate: 12,             // rad/s girando el cuerpo hacia la dirección de movimiento
     jump: { velocity: 6.2, coyoteTime: 0.1 },
-    slide: { speed: 8.5, duration: 0.55, friction: 6 },
-    evade: { speed: 7.5, duration: 0.45, cooldown: 0.3 },
-    vault: { maxHeight: 1.2, duration: 0.45 },
-    climb: { maxHeight: 2.4, duration: 0.8 },
+    slide: { speed: 8.5, duration: 0.55, friction: 6, minSpeed: 2 },
+    evade: { speed: 7.5, duration: 0.45, cooldown: 0.3, endFalloff: 0.5 },
+    vault: { maxHeight: 1.2, duration: 0.45, clearance: 0.25, exitSpeed: 3.4 },
+    climb: { maxHeight: 2.4, duration: 0.8, upFraction: 0.6 },
     sprintStopStick: 0.3,     // si |LS| baja de aquí, se corta el sprint
+    // Umbrales del stick izquierdo para el modo de locomoción
+    stickIdle: 0.05,
+    stickWalkMax: 0.55,       // < → walk
+    stickRunMin: 0.9,         // ≥ → run; entre ambos → jog
+    queryStickMin: 0.3,       // inclinación mínima para usar el stick como dirección de consultas (cobertura/saliente)
+    faceMinSpeed: 0.3,        // m/s para girar el cuerpo hacia la dirección de movimiento
+    aimTurnRate: 25,          // rad/s girando hacia la cámara al apuntar/disparar
+    sprintTurnRate: 6,
+    actionTurnRate: 14,       // evadir, vault, trepar, entrar en cobertura
+    groundStick: 2,           // m/s hacia abajo pegado al suelo
+    landMinSpeed: 4,          // m/s de caída para la pose de aterrizaje
+    hardLandSpeed: 9,         // m/s de caída para sacudida/vibración
+    landTime: 0.18,
+    landShake: { amp: 0.012, dur: 0.2 },
+    moveToSlack: 0.35,        // s extra para llegar al anclaje de cobertura antes de rendirse
+    moveToSnap: 0.6,          // m: si se atasca más cerca que esto, completa la entrada
+    teleportProbeHeight: 20,  // debug teleport: altura desde la que se busca el suelo
+    promptInterval: 0.1,      // s entre consultas de prompts contextuales
+    emptySlotPromptTime: 1.2, // s que se muestra "Vacía"
+    headSize: 0.14,           // semilado de la hitbox de cabeza
+    rumble: {                 // [strong, weak, ms]
+      fire: [0.0, 0.18, 45],
+      reloadPerfect: [0.25, 0.55, 140],
+      reloadGood: [0.1, 0.3, 90],
+      reloadFailed: [0.6, 0.2, 220],
+      meleeHit: [0.55, 0.35, 120],
+      cover: [0.2, 0.1, 70],
+      evade: [0.15, 0.1, 60],
+      land: [0.35, 0.2, 90],
+    },
   },
 
   // ── camera (controls-camera-engineer) ────────────────────────────────────
@@ -103,6 +143,17 @@ const config = {
     lerpSpeed: 12,            // suavizado de offsets (1/s)
     collisionRadius: 0.2,
     shakeDecay: 6,
+    peekLow: { x: 0.65, y: 1.6, z: 1.6 },   // asomarse por encima de cobertura baja
+    peekHigh: { x: 1.05, y: 1.65, z: 1.6 }, // asomarse por el borde de cobertura alta (lado = cover.side)
+    shoulderSwapSpeed: 9,     // 1/s transición de hombro (R3)
+    fovLerpSpeed: 10,
+    collisionReturnSpeed: 5,  // 1/s al alejarse tras una colisión (acercarse es instantáneo)
+    minDistance: 0.35,        // distancia mínima pivote→cámara
+    spawnPitch: -0.12,
+    sprintBob: { amp: 0.035, freq: 2.6 },   // temblor de cámara en sprint (m, Hz)
+    fireShake: { amp: 0.004, dur: 0.08 },
+    meleeShake: { amp: 0.015, dur: 0.18 },
+    menuOrbit: { center: [0, 1, 0], radius: 26, height: 12, speed: 0.06 },
   },
 
   // ── cover (controls-camera-engineer + physics-engineer) ──────────────────
@@ -116,6 +167,19 @@ const config = {
     swatMaxGap: 4.0,
     slideAdjacentMaxGap: 6.0,
     exitStickHold: 0.15,      // s tirando del stick hacia atrás para salir
+    // comportamiento (controls-camera-engineer)
+    slideSnapDistance: 4.5,   // A en sprint: distancia máx. para entrar deslizando en cobertura
+    exitStickAway: 0.6,       // componente del stick alejándose de la cobertura para salir (y A+atrás)
+    exitStickMin: 0.5,
+    transferStickMin: 0.5,    // componente lateral para SWAT / deslizar a la contigua con A
+    moveStickMin: 0.2,        // componente lateral mínima para desplazarse por el borde
+    refreshDistance: 0.6,     // m extra al re-consultar la cobertura mientras te desplazas
+    swatSpeed: 7,             // m/s de la transferencia SWAT
+    swatMinTime: 0.45,
+    swatBulge: 0.35,          // m de abombamiento hacia fuera de la trayectoria
+    adjacentSpeed: 6,
+    adjacentMinTime: 0.35,
+    adjacentBulge: 0.45,
     // clasificación/geometría (physics-engineer)
     coverMinHeight: 0.8,      // sin tag 'cover', una caja es cobertura si su altura sobre los pies ∈ [min, max]
     coverMaxHeight: 2.6,
@@ -216,10 +280,10 @@ const config = {
     showDebugMarkers: true,
     uvTile: 2,                // m por baldosa de la textura de rejilla (UV en espacio de mundo)
     sky: { zenith: 0x24304f, horizon: 0xd9844f, ground: 0x2a2026, sunGlow: 0xffb36b, radius: 320 },
-    hemi: { sky: 0xffc8a0, ground: 0x2b2230, intensity: 1.1 },
+    hemi: { sky: 0xffd6b8, ground: 0x4a3a42, intensity: 1.7 },
     sun: {
-      color: 0xffa860, intensity: 2.6,
-      dir: [-0.82, 0.42, 0.38],   // hacia el sol (oeste, bajo: atardecer)
+      color: 0xffbc80, intensity: 2.8,
+      dir: [-0.74, 0.56, 0.36],   // hacia el sol (oeste, bajo: atardecer)
       shadowExtent: 66,           // semilado de la cámara de sombra (cubre el mapa en diagonal)
       shadowBias: -0.0004, shadowNormalBias: 0.04,
     },
@@ -233,9 +297,60 @@ const config = {
     upperCrossfade: 0.12,
     aimBlendSpeed: 10,
     footstepMinSpeed: 0.5,
-    playbackRef: {            // velocidad (m/s) a la que el clip va a ×1
+    playbackRef: {            // velocidad (m/s) a la que el clip va a ×1 (respaldo: el rig mide la zancada real)
       walk: 1.6,
       run: 4.6,
+    },
+    // núcleo (animation-engineer): rig, capas, IK. Ver cabecera de src/anim/core/characterRig.js
+    core: {
+      locoClips: ['Walk', 'Run'],   // clips calibrados (zancada y contactos) y sincronizados en fase
+      idleToWalk: [0.05, 0.6],  // m/s: mezcla Idle→Walk
+      strafeMaxHips: 70 * DEG,  // giro máx. de caderas hacia la dirección de marcha
+      backpedalAngle: 110 * DEG, // a partir de aquí el ciclo se reproduce hacia atrás
+      poseSmoothing: 30,        // 1/s: suavizado de aditivos por hueso y cadera
+      holdBlendSpeed: 16,       // 1/s: suavizado de la pose del arma
+      ikBlendSpeed: 12,         // 1/s: suavizado de pesos de IK
+      aimYawMax: 85 * DEG,
+      aimPitchMin: -70 * DEG,
+      aimPitchMax: 70 * DEG,
+      aimYawSplit: [0.2, 0.25, 0.25, 0.15, 0.15],   // spine, spine1, spine2, neck, head (suma 1)
+      aimPitchSplit: [0.25, 0.25, 0.25, 0.1, 0.15],
+      headLook: 0.8,            // la cabeza sigue la mira aunque el torso no apunte
+      elbowPole: [0.5, -0.7, 0.35], // polo del codo respecto al hombro (x hacia fuera, m)
+      recoil: { stiffness: 260, damping: 24, back: 0.9, up: 1.6 },   // impulsos (m/s, rad/s) por disparo
+      fingerCurl: { axis: 'z', amount: [0.9, 1.1, 0.8], thumb: 0.5, right: 1, left: 1 },
+      // Pose del arma por id: [px, py, pz, rx, ry, rz] del grip respecto al pecho (spine2), en el marco
+      // de la mira (m, rad; Euler YXZ; −Z delante). stance = giro de columna (rad, − = hombro izq. adelante).
+      hold: {
+        assaultRifle: {
+          aim:   [0.07, -0.04, -0.26, 0, 0, 0],
+          ready: [0.08, -0.2, -0.24, -0.35, 0.3, 0.15],
+          low:   [0.12, -0.36, -0.14, -0.85, 0.55, 0.35],
+          stance: { aim: -0.6, ready: -0.35 },
+        },
+        pistol: {
+          aim:   [0.04, 0.0, -0.42, 0, 0, 0],
+          ready: [0.1, -0.2, -0.3, -0.5, 0.15, 0],
+          low:   [0.2, -0.42, -0.06, -1.2, 0.1, 0],
+          stance: { aim: -0.2, ready: -0.1 },
+        },
+      },
+      // Agarre de cada mano en espacio del arma: wrist = muñeca respecto al anclaje (grip/support),
+      // finger = dirección muñeca→nudillos, palm = normal de la palma.
+      grip: {
+        default: {
+          right: { wrist: [0.03, -0.035, 0.075], finger: [-0.35, 0.3, -1], palm: [-1, -0.2, 0] },
+          left:  { wrist: [-0.03, -0.06, 0.05], finger: [0.3, 0.35, -1], palm: [1, 0, 0] },
+        },
+        pistol: {
+          left:  { wrist: [-0.045, -0.05, 0.05], finger: [0.6, 0.2, -1], palm: [1, 0.3, 0] },
+        },
+      },
+      fireHold: 0.22,           // s que dura el estado 'fire' tras el último disparo
+      reloadInsertPhase: 0.62,  // fracción de la recarga en que se emite anim:reload:insert (por defecto)
+      crouchHips: -0.36,        // m
+      coverLowHips: -0.42,
+      slideHips: -0.55,
     },
   },
 
@@ -262,8 +377,10 @@ const config = {
   hud: {
     hitmarkerTime: 0.15,
     promptFade: 0.15,
-    reloadBarWidth: 220,      // px
+    reloadBarWidth: 220,      // px de referencia a 720p (escala con la ventana)
     ammoLowFraction: 0.25,
+    lowHpFraction: 0.3,       // barra de vida en rojo pulsante por debajo de esta fracción
+    reloadResultHold: 0.45,   // s que sigue visible el resultado de la recarga activa tras terminar
   },
 
   // ── fx (vfx-artist) ──────────────────────────────────────────────────────
