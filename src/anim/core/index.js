@@ -80,7 +80,6 @@ export default function create() {
       activeReload: { result: 'good' },
       swap: { weaponId: null, duration: 0 },
       melee: {},
-      interrupt: { interrupt: true },
     };
   }
 
@@ -90,7 +89,7 @@ export default function create() {
     on('weapon:fired', (e) => {
       const rig = byEntity.get(e.who); if (!rig) return;
       rig._ev.fire.weaponId = e.weaponId;
-      rig.setUpper('fire', rig._ev.fire);
+      rig._setUpper('fire', rig._ev.fire);
     });
     on('weapon:reloadStart', (e) => {
       const rig = byEntity.get(e.who); if (!rig) return;
@@ -98,16 +97,16 @@ export default function create() {
       p.duration = e.duration || 2;
       p.weaponId = e.weaponId;
       if (e.activeWindow) { p.activeWindow[0] = e.activeWindow[0]; p.activeWindow[1] = e.activeWindow[1]; }
-      rig.setUpper('reload', p);
+      rig._setUpper('reload', p);
     });
     on('weapon:activeReload', (e) => {
       const rig = byEntity.get(e.who); if (!rig) return;
       rig._ev.activeReload.result = e.result;
-      rig.setUpper('activeReload', rig._ev.activeReload);
+      rig._setUpper('activeReload', rig._ev.activeReload);
     });
     on('weapon:reloaded', (e) => {
       const rig = byEntity.get(e.who); if (!rig) return;
-      if (rig.upper === 'reload') rig.setUpper(rig.upperBase, rig._ev.interrupt);
+      if (rig.upper === 'reload') rig.endUpper();
     });
     on('weapon:switched', (e) => {
       const rig = byEntity.get(e.who); if (!rig) return;
@@ -115,11 +114,11 @@ export default function create() {
       p.weaponId = e.weaponId;
       const wc = game.config.weapons[e.weaponId];
       p.duration = wc && wc.swapTime ? wc.swapTime : 0.45;
-      rig.setUpper('swap', p);
+      rig._setUpper('swap', p);
     });
     on('melee:swing', (e) => {
       const rig = byEntity.get(e.who); if (!rig) return;
-      rig.setUpper('melee', rig._ev.melee);
+      rig._setUpper('melee', rig._ev.melee);
     });
   }
 
@@ -211,7 +210,7 @@ export default function create() {
           readEntity(rig, e, yaw);
           if (rig.autoState) autoState(rig, e);
           if (rig.autoAim && e === game.player) autoAim(rig, yaw);
-          if (e.aiming !== undefined && rig.autoState) rig.setUpper(e.aiming ? 'aim' : 'none');
+          if (e.aiming !== undefined && rig.autoUpper) rig._setUpper(e.aiming ? 'aim' : 'none');
         }
         rig.update(dt);
       }

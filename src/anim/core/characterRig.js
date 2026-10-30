@@ -230,6 +230,7 @@ export class CharacterRig {
     this.aimYaw = 0; this.aimPitch = 0; this.aimW = 0;
     this.autoAim = true;        // index.js deriva la mira de la cámara hasta que alguien llame a setAim
     this.autoState = true;      // index.js deriva el estado de entity.move hasta que alguien llame a setState
+    this.autoUpper = true;      // index.js deriva aim/none de entity.aiming hasta que alguien llame a setUpper(base)
 
     // Lecturas de movimiento (las rellena index.js o el llamador)
     this.speed = 0; this.moveDir = 0; this.vy = 0;
@@ -279,6 +280,18 @@ export class CharacterRig {
 
   /** Capa de torso/armas. */
   setUpper(state, params) {
+    const prov = this.providers.get(state);
+    if (prov && !prov.transient) this.autoUpper = false;
+    this._setUpper(state, params);
+  }
+
+  /** Termina el estado transitorio de torso actual (si lo hay) y vuelve a la base. */
+  endUpper() {
+    const cur = this.up.provider;
+    if (cur && cur.transient) this._switchUpper(this.upperBase, this.upperBaseParams, false);
+  }
+
+  _setUpper(state, params) {
     const prov = this.providers.get(state);
     if (!prov || this.layers.get(state) !== 'upper') { this._warnMissing(state); return; }
     if (!prov.transient) {
