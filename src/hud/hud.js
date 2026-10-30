@@ -175,11 +175,12 @@ export function createGameHud(parent, game) {
   // ── Recarga activa ──────────────────────────────────────────────────────
   function pct(v) { return (Math.max(0, Math.min(1, v)) * 100).toFixed(2) + '%'; }
 
-  function startReload(weaponId, duration, win) {
+  // goodWin: zona buena (ancha) del payload; si no viene, se toma de config.weapons[id].goodWindow.
+  function startReload(weaponId, duration, win, goodWin) {
     const a = win && win.length > 1 ? win[0] : 0;
     const b = win && win.length > 1 ? win[1] : 0;
     const w = weaponId && cfg.weapons[weaponId];
-    const gw = w && w.goodWindow;
+    const gw = goodWin && goodWin.length > 1 ? goodWin : (w && w.goodWindow);
     rlPerf.style.left = pct(a); rlPerf.style.width = pct(b - a);
     if (gw) { rlGood.style.left = pct(gw[0]); rlGood.style.width = pct(gw[1] - gw[0]); rlGood.style.display = ''; }
     else rlGood.style.display = 'none';
@@ -296,9 +297,11 @@ export function createGameHud(parent, game) {
         setAmmo(mag, reserve, magSize);
       }
     },
-    'weapon:reloadStart': ({ who, weaponId, duration, activeWindow }) => {
-      if (isMe(who)) startReload(weaponId, duration, activeWindow);
+    'weapon:reloadStart': ({ who, weaponId, duration, activeWindow, goodWindow }) => {
+      if (isMe(who)) startReload(weaponId, duration, activeWindow, goodWindow);
     },
+    // B (melee) o cambiar de arma cancela la recarga: se limpia la barra al instante.
+    'weapon:reloadCancel': ({ who }) => { if (isMe(who)) { cancelReload(); renderHint(false); } },
     'weapon:activeReload': ({ who, result }) => { if (isMe(who)) reloadResult(result); },
     'weapon:reloaded': ({ who }) => { if (isMe(who)) endReload(); },
     'weapon:empty': ({ who }) => { if (isMe(who)) renderHint(false); },

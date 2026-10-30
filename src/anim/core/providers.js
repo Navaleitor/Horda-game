@@ -22,6 +22,9 @@ function stance(rig, which, k = 1) {
   rig.rot('spine2', 0, s * 0.35 * k, 0);
   rig.rot('neck', 0, -s * 0.5 * k, 0);   // la cabeza vuelve a mirar al frente
   rig.rot('head', 0, -s * 0.5 * k, 0);
+  // Clavícula izquierda adelantada para alcanzar el guardamanos (y < 0 la lleva hacia −Z).
+  const pr = (tbl.protract && tbl.protract[which]) || 0;
+  if (pr) rig.rot('lShoulder', 0, -pr * k, 0);
 }
 
 /** Pose agachada base: cadera abajo, pies plantados, tronco algo adelantado. */

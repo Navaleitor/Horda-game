@@ -323,16 +323,18 @@ const config = {
       // de la mira (m, rad; Euler YXZ; −Z delante). stance = giro de columna (rad, − = hombro izq. adelante).
       hold: {
         assaultRifle: {
-          aim:   [0.07, -0.04, -0.26, 0, 0, 0],
+          aim:   [0.11, 0.07, -0.27, 0, 0, 0],
           ready: [0.08, -0.2, -0.24, -0.35, 0.3, 0.15],
           low:   [0.12, -0.36, -0.14, -0.85, 0.55, 0.35],
-          stance: { aim: -0.6, ready: -0.35 },
+          stance: { aim: -0.7, ready: -0.35 },
+          protract: { aim: 0.35, ready: 0.2 },   // adelanto de la clavícula izq. (rad)
         },
         pistol: {
           aim:   [0.04, 0.0, -0.42, 0, 0, 0],
           ready: [0.1, -0.2, -0.3, -0.5, 0.15, 0],
           low:   [0.2, -0.42, -0.06, -1.2, 0.1, 0],
           stance: { aim: -0.2, ready: -0.1 },
+          protract: { aim: 0.15, ready: 0.05 },
         },
       },
       // Agarre de cada mano en espacio del arma: wrist = muñeca respecto al anclaje (grip/support),

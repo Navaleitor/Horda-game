@@ -108,6 +108,11 @@ export default function create() {
       const rig = byEntity.get(e.who); if (!rig) return;
       if (rig.upper === 'reload') rig.endUpper();
     });
+    on('weapon:reloadCancel', (e) => {
+      // B (melee) o cambio de arma cancelan la recarga al instante.
+      const rig = byEntity.get(e.who); if (!rig) return;
+      if (rig.upper === 'reload' || rig.upper === 'activeReload') rig.endUpper();
+    });
     on('weapon:switched', (e) => {
       const rig = byEntity.get(e.who); if (!rig) return;
       const p = rig._ev.swap;
