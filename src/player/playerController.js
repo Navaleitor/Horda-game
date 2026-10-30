@@ -118,9 +118,8 @@ export function createPlayerController(game, e) {
       if (_promptCover.swat) { swatOn = true; swatText = 'SWAT'; }
       else if (_promptCover.adjacent) { swatOn = true; swatText = 'Deslizar'; }
     } else if (!busy && e.grounded) {
-      movement.queryDir(movement.sprinting ? ctx.bodyFwd : ctx.camFwd, _q);
-      const dist = movement.sprinting ? CC.slideSnapDistance : CC.snapDistance;
-      if (ph.queryCover(e.pos, _q, dist)) coverOn = true;
+      movement.queryDir(ctx.camFwd, _q);
+      if (ph.queryCover(e.pos, _q, CC.snapDistance)) coverOn = true;
       movement.queryDir(ctx.bodyFwd, _q);
       const L = ph.queryLedge(e.pos, _q);
       if (L && (L.kind === 'vault' || L.kind === 'climb')) { jumpOn = true; jumpText = L.kind === 'vault' ? 'Saltar' : 'Trepar'; }
@@ -134,7 +133,7 @@ export function createPlayerController(game, e) {
   // ── Hitboxes ─────────────────────────────────────────────────────────────
   function updateHitboxes() {
     const m = e.move.mode;
-    const low = m === 'slide' || m === 'evade' || (m === 'cover' && e.cover && e.cover.height === 'low' && !e.cover.peeking);
+    const low = m === 'evade' || (m === 'cover' && e.cover && e.cover.height === 'low' && !e.cover.peeking);
     const h = low ? P.crouchHeight : P.height;
     const r = e.radius;
     const { x, y, z } = e.pos;

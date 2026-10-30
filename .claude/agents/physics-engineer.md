@@ -19,7 +19,7 @@ Eres responsable de una física ligera y determinista, sin motores pesados. Escr
 `src/physics/**`.
 
 ## Definición de terminado
-Tests unitarios/e2e: el jugador no atraviesa paredes a ninguna velocidad (sprint, slide, evade), los headshots se detectan, 200 raycasts/frame sin caída de FPS.
+Tests unitarios/e2e: el jugador no atraviesa paredes a ninguna velocidad (correr, maroma), los headshots se detectan, 200 raycasts/frame sin caída de FPS.
 
 ## No hace
 No decide daño ni reglas (`gameplay-programmer`); no anima.

@@ -1,5 +1,5 @@
 // Respaldo de teclado y ratón para desarrollo. Dueño: controls-camera-engineer.
-// WASD mover · ratón mirar (pointer lock al hacer clic en el lienzo durante la partida) · Shift sprint ·
+// WASD mover · ratón mirar (pointer lock al hacer clic en el lienzo durante la partida) ·
 // Espacio cobertura · C saltar · F melee · R recargar · clic der. apuntar · clic izq. disparar ·
 // Q hombro · 1/2/3 armas · Esc pausa · Enter confirmar. (Extras de desarrollo: E interactuar, G LB, 4 D-pad ↑.)
 //

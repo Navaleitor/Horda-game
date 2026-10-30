@@ -77,8 +77,7 @@ const config = {
     speed: {
       walk: 1.6,
       jog: 3.4,
-      run: 4.6,
-      sprint: 7.0,            // sprint toggle L3 (§1)
+      run: 4.14,              // stick a fondo (§1)
       aim: 2.2,
       crouch: 1.8,
       cover: 2.4,             // desplazamiento lateral en cobertura
@@ -88,11 +87,9 @@ const config = {
     airControl: 0.3,
     turnRate: 12,             // rad/s girando el cuerpo hacia la dirección de movimiento
     jump: { velocity: 6.2, coyoteTime: 0.1 },
-    slide: { speed: 8.5, duration: 0.55, friction: 6, minSpeed: 2 },
-    evade: { speed: 7.5, duration: 0.45, cooldown: 0.3, endFalloff: 0.5 },
+    evade: { speed: 7.5, duration: 0.45, cooldown: 0.3, endFalloff: 0.5 },   // maroma (A en movimiento sin cobertura a tiro / doble A)
     vault: { maxHeight: 1.2, duration: 0.45, clearance: 0.25, exitSpeed: 3.4 },
     climb: { maxHeight: 2.4, duration: 0.8, upFraction: 0.6 },
-    sprintStopStick: 0.3,     // si |LS| baja de aquí, se corta el sprint
     // Umbrales del stick izquierdo para el modo de locomoción
     stickIdle: 0.05,
     stickWalkMax: 0.55,       // < → walk
@@ -100,7 +97,6 @@ const config = {
     queryStickMin: 0.3,       // inclinación mínima para usar el stick como dirección de consultas (cobertura/saliente)
     faceMinSpeed: 0.3,        // m/s para girar el cuerpo hacia la dirección de movimiento
     aimTurnRate: 25,          // rad/s girando hacia la cámara al apuntar/disparar
-    sprintTurnRate: 6,
     actionTurnRate: 14,       // evadir, vault, trepar, entrar en cobertura
     groundStick: 2,           // m/s hacia abajo pegado al suelo
     landMinSpeed: 4,          // m/s de caída para la pose de aterrizaje
@@ -129,7 +125,6 @@ const config = {
   camera: {
     fov: 70,
     fovAim: 50,
-    fovSprint: 76,
     near: 0.1,
     far: 400,
     // offsets relativos al jugador (x = lateral según hombro, y = arriba, z = atrás)
@@ -137,7 +132,6 @@ const config = {
     aim: { x: 0.65, y: 1.6, z: 1.4 },
     coverLow: { x: 0.7, y: 1.25, z: 2.6 },
     coverHigh: { x: 0.9, y: 1.7, z: 2.6 },
-    sprint: { x: 0.35, y: 1.5, z: 3.4 },
     pitchMin: -70 * DEG,
     pitchMax: 60 * DEG,
     lerpSpeed: 12,            // suavizado de offsets (1/s)
@@ -150,7 +144,6 @@ const config = {
     collisionReturnSpeed: 5,  // 1/s al alejarse tras una colisión (acercarse es instantáneo)
     minDistance: 0.35,        // distancia mínima pivote→cámara
     spawnPitch: -0.12,
-    sprintBob: { amp: 0.035, freq: 2.6 },   // temblor de cámara en sprint (m, Hz)
     fireShake: { amp: 0.004, dur: 0.08 },
     meleeShake: { amp: 0.015, dur: 0.18 },
     menuOrbit: { center: [0, 1, 0], radius: 26, height: 12, speed: 0.06 },
@@ -162,13 +155,12 @@ const config = {
     highHeight: 2.2,          // cobertura alta (§13)
     lowMax: 1.4,              // caja con topY <= lowMax cuenta como 'low'
     snapDistance: 2.5,        // distancia máx. para pegarse con A
-    snapSpeed: 9,             // m/s corriendo hacia la cobertura
+    snapSpeed: 4.14,          // m/s corriendo hacia la cobertura (= speed.run, sin slide)
     edgePeekMargin: 0.3,
-    swatMaxGap: 4.0,
+    swatMaxGap: 1.5,          // hueco mayor → deslizar a la contigua (§1)
     slideAdjacentMaxGap: 6.0,
     exitStickHold: 0.15,      // s tirando del stick hacia atrás para salir
     // comportamiento (controls-camera-engineer)
-    slideSnapDistance: 4.5,   // A en sprint: distancia máx. para entrar deslizando en cobertura
     exitStickAway: 0.6,       // componente del stick alejándose de la cobertura para salir (y A+atrás)
     exitStickMin: 0.5,
     transferStickMin: 0.5,    // componente lateral para SWAT / deslizar a la contigua con A
@@ -299,7 +291,7 @@ const config = {
     footstepMinSpeed: 0.5,
     playbackRef: {            // velocidad (m/s) a la que el clip va a ×1 (respaldo: el rig mide la zancada real)
       walk: 1.6,
-      run: 4.6,
+      run: 4.14,
     },
     // núcleo (animation-engineer): rig, capas, IK. Ver cabecera de src/anim/core/characterRig.js
     core: {
@@ -352,7 +344,6 @@ const config = {
       reloadInsertPhase: 0.62,  // fracción de la recarga en que se emite anim:reload:insert (por defecto)
       crouchHips: -0.36,        // m
       coverLowHips: -0.42,
-      slideHips: -0.55,
     },
   },
 

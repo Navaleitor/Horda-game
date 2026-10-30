@@ -71,15 +71,15 @@ export default {
       },
     },
     {
-      name: 'L3 sprint toggle; LT lo corta',
+      name: 'L3 sin función; velocidad máxima 4,14 m/s',
       async run() {
         await tp(-5, 5, Math.PI / 2);
-        await stick('LS', 0, 1); await adv(200);
+        await stick('LS', 0, 1); await adv(500);
         await press('L3'); await adv(300);
-        assert.eq((await st()).mode, 'sprint', 'tras L3');
-        await trigger('LT', 1); await adv(150);
-        assert.ok((await st()).mode !== 'sprint', 'LT corta el sprint');
-        await trigger('LT', 0); await stick('LS', 0, 0); await adv(200);
+        const s = await st();
+        assert.eq(s.mode, 'run', 'L3 no cambia el modo');
+        assert.ok(Math.abs(s.speed - 4.14) < 0.05, `velocidad a fondo: ${s.speed}`);
+        await stick('LS', 0, 0); await adv(300);
       },
     },
     {
@@ -124,19 +124,22 @@ export default {
       },
     },
     {
-      name: 'doble toque A evade; A en sprint desliza',
+      name: 'A en movimiento sin cobertura = maroma; doble A = maroma; quieto no hace nada',
       async run() {
+        await tp(-5, 5, Math.PI / 2); await clearEv();
+        await stick('LS', 0, 1); await adv(150);
+        await press('A');
+        assert.eq((await waitMode(['evade'], 400)).mode, 'evade', 'A en movimiento = maroma');
+        await stick('LS', 0, 0); await adv(900);
         await tp(-5, 5, 0); await clearEv();
         await stick('LS', 1, 0); await adv(150);
         await press('A', 60); await adv(120); await press('A', 60); await adv(200);
-        assert.ok((await events('player:moveMode')).includes('evade'), 'evade');
-        await stick('LS', 0, 0); await adv(600);
-        await tp(-5, 5, Math.PI / 2);
-        await stick('LS', 0, 1); await adv(150); await press('L3'); await adv(400);
-        await press('A');
-        const s = await waitMode(['slide'], 800);
-        assert.eq(s.mode, 'slide', 'slide');
-        await stick('LS', 0, 0); await adv(800);
+        assert.ok((await events('player:moveMode')).includes('evade'), 'doble A = maroma');
+        assert.ok(!(await events('player:moveMode')).includes('slide'), 'sin slide');
+        await stick('LS', 0, 0); await adv(900);
+        await tp(-5, 5, 0); await clearEv();
+        await press('A'); await adv(300);
+        assert.ok(!(await events('player:moveMode')).includes('evade'), 'A quieto sin cobertura no rueda');
       },
     },
     {

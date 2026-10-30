@@ -442,7 +442,6 @@ export function stepWeapon(game, entity, dt, ctx) {
 
   if (intent.reloadPressed && startReload(game, entity)) return;
 
-  if (entity.move && entity.move.mode === 'sprint') return;
   const c = weaponCfg(game, w.id);
   const wants = c.auto ? intent.fire : intent.firePressed;
   if (!wants || w.fireT > EPS) return;

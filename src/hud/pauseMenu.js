@@ -8,9 +8,9 @@ import { glyph, padGlyph } from './glyphs.js';
 const CONTROLS = [
   [['LS'], 'Mover', 'Navegar'],
   [['RS'], 'Cámara', '—'],
-  [['L3'], 'Sprint (alterna; se corta al soltar el stick, apuntar o disparar)', '—'],
+  [['L3'], 'Sin función', '—'],
   [['R3'], 'Cambiar de hombro', '—'],
-  [['A'], 'Cobertura · A + dirección en cobertura = SWAT / deslizar a la contigua · doble toque = evadir · en sprint = deslizar', 'Seleccionar / comprar'],
+  [['A'], 'Cobertura · A + dirección en cobertura = SWAT / deslizar a la contigua · sin cobertura a tiro y moviéndote = maroma · doble toque = maroma', 'Seleccionar / comprar'],
   [['Y'], 'Saltar · trepar · saltar sobre cobertura', '—'],
   [['B'], 'Golpe cuerpo a cuerpo · cargando pieza: soltarla', 'Atrás / cerrar'],
   [['X'], 'Interactuar · mantener sobre aliado derribado = revivir · toque sobre fortificación = radial', '—'],
@@ -25,7 +25,7 @@ const CONTROLS = [
   [['Menu'], 'Pausa', 'Pausa'],
 ];
 
-const KEYBOARD_NOTE = 'Teclado (respaldo): WASD mover · ratón mirar · Shift sprint · Espacio cobertura · C saltar · '
+const KEYBOARD_NOTE = 'Teclado (respaldo): WASD mover · ratón mirar · Espacio cobertura · C saltar · '
   + 'F melee · R recargar · clic der. apuntar · clic izq. disparar · Q hombro · 1/2/3 armas · Esc pausa · Enter confirmar.';
 
 export function createControlsPanel(parent) {

@@ -1,5 +1,5 @@
-// Movimiento del jugador: locomoción relativa a cámara, sprint toggle (L3), salto/vault/trepar (Y),
-// evadir (doble toque de A), deslizar (A en sprint) y las acciones temporizadas que usa la cobertura
+// Movimiento del jugador: locomoción relativa a cámara, salto/vault/trepar (Y), maroma (A en movimiento
+// sin cobertura a tiro, o doble toque de A) y las acciones temporizadas que usa la cobertura
 // (entrar corriendo, SWAT turn, deslizar a la contigua). Dueño: controls-camera-engineer.
 //
 // Todo en paso fijo. La colisión la resuelve physics.moveCapsule; las acciones de transferencia
@@ -13,7 +13,7 @@ const _dir = new THREE.Vector3();
 const _tmp = new THREE.Vector3();
 
 /** Modos de acción: bloquean disparo/apuntado y la locomoción normal. */
-export const ACTION_MODES = new Set(['slide', 'evade', 'vault', 'climb', 'swat', 'coverSlide']);
+export const ACTION_MODES = new Set(['evade', 'vault', 'climb', 'swat', 'coverSlide']);
 
 export const yawFromDir = (x, z) => Math.atan2(-x, -z);
 
@@ -40,7 +40,6 @@ export function createMovement(ctx) {
   const cap = { pos: e.pos, radius: e.radius, height: e.height };
 
   const st = {
-    sprinting: false,
     airT: 0,          // s sin suelo
     jumped: false,    // el último despegue fue un salto (no una caída)
     landT: 0,         // s restantes de la pose de aterrizaje
@@ -51,7 +50,7 @@ export function createMovement(ctx) {
 
   // Acción temporizada en curso.
   const act = {
-    type: null,       // 'evade' | 'slide' | 'vault' | 'climb' | 'moveTo' | 'transfer'
+    type: null,       // 'evade' (maroma) | 'vault' | 'climb' | 'moveTo' | 'transfer'
     mode: null,       // move.mode a mostrar
     t: 0, dur: 0, speed: 0,
     from: new THREE.Vector3(), to: new THREE.Vector3(), ctrl: new THREE.Vector3(), dir: new THREE.Vector3(),
@@ -109,27 +108,16 @@ export function createMovement(ctx) {
     const I = ctx.input;
     const mag = ctx.stickMag;
 
-    // Sprint toggle (L3). Se corta al soltar el stick, apuntar o disparar (GDD §1).
-    if (I.pressed('sprint')) {
-      if (st.sprinting) st.sprinting = false;
-      else if (mag >= P.sprintStopStick && e.grounded && !ctx.aimDown && !ctx.fireDown) st.sprinting = true;
-    }
-    if (st.sprinting && (mag < P.sprintStopStick || ctx.aimDown || ctx.fireDown)) st.sprinting = false;
-
-    // A: doble toque = evadir · en sprint = deslizar (o entrar deslizando en cobertura) · si no = cobertura.
+    // A: cobertura a tiro = entrar (corriendo a velocidad normal) · sin cobertura y moviéndote = maroma
+    // en la dirección del stick · doble toque = maroma (alias).
     if (I.pressed('cover')) {
       const dbl = I.doubleTap('cover') && !st.aUsedForCover;
       st.aUsedForCover = false;
       if (e.grounded) {
         if (dbl && st.evadeCD <= 0) { startEvade(); return; }
-        if (st.sprinting) {
-          queryDir(ctx.bodyFwd, _dir);
-          if (ctx.cover.tryEnter(_dir, CC.slideSnapDistance, P.slide.speed)) { st.aUsedForCover = true; st.sprinting = false; return; }
-          startSlide();
-          return;
-        }
         queryDir(ctx.camFwd, _dir);
         if (ctx.cover.tryEnter(_dir, CC.snapDistance, CC.snapSpeed)) { st.aUsedForCover = true; return; }
+        if (mag > P.queryStickMin && st.evadeCD <= 0) { startEvade(); return; }
       }
     }
 
@@ -148,8 +136,7 @@ export function createMovement(ctx) {
     let target = 0;
     let mode = 'idle';
     if (mag > P.stickIdle) {
-      if (st.sprinting) { target = P.speed.sprint; mode = 'sprint'; }
-      else if (ctx.aimDown) { target = P.speed.aim * Math.min(1, mag / P.stickRunMin); mode = 'walk'; }
+      if (ctx.aimDown) { target = P.speed.aim * Math.min(1, mag / P.stickRunMin); mode = 'walk'; }
       else if (mag < P.stickWalkMax) { target = P.speed.walk * Math.max(0.4, mag / P.stickWalkMax); mode = 'walk'; }
       else if (mag < P.stickRunMin) { target = P.speed.jog; mode = 'jog'; }
       else { target = P.speed.run; mode = 'run'; }
@@ -178,8 +165,7 @@ export function createMovement(ctx) {
     } else {
       const hs = Math.hypot(e.vel.x, e.vel.z);
       if (hs > P.faceMinSpeed && mag > P.stickIdle) {
-        const rate = st.sprinting ? P.sprintTurnRate : P.turnRate;
-        e.yaw = turnToward(e.yaw, yawFromDir(ctx.wish.x, ctx.wish.z), rate * dt);
+        e.yaw = turnToward(e.yaw, yawFromDir(ctx.wish.x, ctx.wish.z), P.turnRate * dt);
       }
     }
   }
@@ -195,17 +181,7 @@ export function createMovement(ctx) {
     act.dir.y = 0; act.dir.normalize();
     begin('evade', 'evade', P.evade.duration);
     act.speed = P.evade.speed;
-    st.sprinting = false;
     ctx.rumble('evade');
-  }
-
-  function startSlide() {
-    _dir.set(e.vel.x, 0, e.vel.z);
-    if (_dir.lengthSq() < 0.01) _dir.copy(ctx.bodyFwd);
-    act.dir.copy(_dir.normalize());
-    begin('slide', 'slide', P.slide.duration);
-    act.speed = P.slide.speed;
-    st.sprinting = false;
   }
 
   /** Y: consulta queryLedge en `dir`. Devuelve true si empieza vault/trepar. */
@@ -222,7 +198,6 @@ export function createMovement(ctx) {
     act.yaw = yawFromDir(act.dir.x, act.dir.z);
     if (L.kind === 'vault') begin('vault', 'vault', P.vault.duration);
     else begin('climb', 'climb', P.climb.duration);
-    st.sprinting = false;
     e.vel.set(0, 0, 0);
     return true;
   }
@@ -236,7 +211,6 @@ export function createMovement(ctx) {
     act.speed = speed;
     act.yaw = faceYaw;
     act.onDone = onDone;
-    st.sprinting = false;
   }
 
   /**
@@ -252,7 +226,6 @@ export function createMovement(ctx) {
     act.yaw0 = e.yaw;
     act.yaw = faceYaw;
     act.onDone = onDone;
-    st.sprinting = false;
   }
 
   function finish() {
@@ -276,14 +249,6 @@ export function createMovement(ctx) {
         physMove(e.vel.x * dt, e.vel.y * dt, e.vel.z * dt);
         e.yaw = turnToward(e.yaw, yawFromDir(act.dir.x, act.dir.z), P.actionTurnRate * dt);
         if (k >= 1) { st.evadeCD = P.evade.cooldown; e.vel.x *= 0.4; e.vel.z *= 0.4; finish(); }
-        break;
-      }
-      case 'slide': {
-        act.speed = Math.max(0, act.speed - P.slide.friction * dt);
-        e.vel.x = act.dir.x * act.speed; e.vel.z = act.dir.z * act.speed;
-        applyGravity(dt);
-        physMove(e.vel.x * dt, e.vel.y * dt, e.vel.z * dt);
-        if (k >= 1 || act.speed < P.slide.minSpeed) finish();
         break;
       }
       case 'vault': {
@@ -374,13 +339,12 @@ export function createMovement(ctx) {
 
   function reset() {
     cancel();
-    st.sprinting = false; st.airT = 0; st.jumped = false; st.landT = 0; st.evadeCD = 0; st.aUsedForCover = false;
+    st.airT = 0; st.jumped = false; st.landT = 0; st.evadeCD = 0; st.aUsedForCover = false;
     e.vel.set(0, 0, 0);
   }
 
   return {
     st, act, step, reset, cancel, tryLedge, startMoveTo, startTransfer, physMove, applyGravity, queryDir,
     get busy() { return act.type !== null; },
-    get sprinting() { return st.sprinting; },
   };
 }

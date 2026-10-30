@@ -4,7 +4,6 @@
 //  - A con cobertura delante (physics.queryCover en la dirección del stick, o de la cámara si el stick
 //    está suelto, ≤ config.cover.snapDistance) → corre hasta el anclaje (move.mode 'coverSlide') y se
 //    pega: 'low' (media 1 m, agachado) o 'high' (alta 2.2 m, de pie). Emite cover:enter al llegar.
-//  - En sprint, A con cobertura ≤ config.cover.slideSnapDistance → entra deslizando ('coverSlide').
 //  - LS lateral = desplazarse por el borde (physics.coverSlide lo limita). cover.side = último sentido.
 //  - LT = asomarse: en 'low' por encima (peeking + aimingOver); en 'high' solo en un extremo, por ese
 //    lado (peeking, cover.side = lado del extremo). En el centro de una alta no se asoma (peeking=false).
@@ -167,7 +166,6 @@ export function createCover(ctx) {
     const sx = ctx.wish.x * ctx.stickMag, sz = ctx.wish.z * ctx.stickMag;
     const lateral = sx * _right.x + sz * _right.z;
     const away = sx * cur.normal.x + sz * cur.normal.z;
-    ctx.movement.st.sprinting = false;
 
     // A en cobertura: A+atrás = salir · A+lateral en el extremo = SWAT / deslizar a la contigua.
     if (I.pressed('cover')) {

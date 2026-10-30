@@ -54,16 +54,6 @@ function loco(extraLean) {
 body.walk = loco(0);
 body.jog = loco(0.05);
 body.run = loco(0.08);
-body.sprint = {
-  aimWeight: 0, lowCarry: 1,
-  update(rig, dt, p) {
-    rig.locomotion(spd(rig, p), mdir(rig, p));
-    rig.rot('spine', -0.18, 0, 0);
-    rig.rot('spine1', -0.08, 0, 0);
-    rig.rot('neck', 0.15, 0, 0);
-  },
-};
-
 body.crouch = {
   update(rig, dt, p) {
     const s = spd(rig, p);
@@ -130,19 +120,6 @@ function traverse(kind) {
 }
 body.climb = traverse('climb');
 body.vault = traverse('vault');
-
-body.slide = {
-  aimWeight: 0.3, lowCarry: 0.7,
-  update(rig, dt, p) {
-    rig.clip('Run', 1, 0.0001);
-    const k = ease.smooth(rig.phase(0.1));
-    rig.hips(0, rig.core.slideHips * k, 0.1 * k);
-    rig.rot('hips', 0.25 * k, 0, 0);
-    rig.rot('spine', 0.15 * k, 0, 0);
-    rig.rot('rUpLeg', 1.1 * k, 0, 0); rig.rot('rLeg', -0.2 * k, 0, 0);
-    rig.rot('lUpLeg', 0.5 * k, 0, 0.3 * k); rig.rot('lLeg', -1.9 * k, 0, 0);
-  },
-};
 
 body.evade = {
   aimWeight: 0, lowCarry: 1, handsFree: 1,

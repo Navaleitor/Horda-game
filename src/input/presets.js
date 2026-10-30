@@ -27,7 +27,7 @@ export const E_DAY_DEFAULT = Object.freeze({
   name: 'E-Day Default',
   pad: {
     // Combate
-    cover: [PAD.A],          // cobertura · A+dir en cobertura = SWAT/deslizar · doble toque = evadir · en sprint = deslizar
+    cover: [PAD.A],          // cobertura · A+dir en cobertura = SWAT/deslizar · sin cobertura y en movimiento = maroma · doble toque = maroma
     melee: [PAD.B],          // golpe cuerpo a cuerpo (con pieza en manos: soltar — Fase 1b)
     interact: [PAD.X],       // interactuar (Fase 1b+)
     jump: [PAD.Y],           // saltar · trepar · saltar sobre cobertura
@@ -37,7 +37,6 @@ export const E_DAY_DEFAULT = Object.freeze({
     fire: [PAD.RT],
     view: [PAD.View],        // mantener = marcador (Fase 4)
     pause: [PAD.Menu],
-    sprint: [PAD.L3],        // toggle
     shoulder: [PAD.R3],
     dpadUp: [PAD.Up],        // radial de comodines (Fase 4)
     dpadDown: [PAD.Down],    // pistola / pistola de reparación
@@ -70,7 +69,6 @@ export const E_DAY_DEFAULT = Object.freeze({
     melee: ['KeyF'],
     reload: ['KeyR'],
     shoulder: ['KeyQ'],
-    sprint: ['ShiftLeft', 'ShiftRight'],
     interact: ['KeyE'],
     lb: ['KeyG'],
     view: ['Tab'],

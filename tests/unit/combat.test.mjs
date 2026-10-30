@@ -142,14 +142,6 @@ test('pistola semiautomática: un disparo por flanco y tope de cadencia', () => 
   assert.equal(count('weapon:fired'), 1 + PISTOL.fireRate);
 });
 
-test('no dispara en sprint', () => {
-  const { player, step, count } = setup();
-  player.move.mode = 'sprint';
-  player.intent.fire = true;
-  step(30);
-  assert.equal(count('weapon:fired'), 0);
-});
-
 function captureFx(s) {
   const fx = [];
   s.game.events.on('fx:spawn', (p) => fx.push({

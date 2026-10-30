@@ -45,20 +45,19 @@
 //      (o a rig.leftTarget). Ver ik.js.
 //
 // ESTADOS
-//   Cuerpo (rig.setState):  idle walk jog run sprint crouch jump fall land climb vault slide evade
+//   Cuerpo (rig.setState):  idle walk jog run crouch jump fall land climb vault evade (maroma)
 //                           coverLow coverHigh peek swat coverSlide blindfire*… (+ hit stun frozen
 //                           death downed crawl revive revived carry mounted, provisionales)
 //   Torso  (rig.setUpper):  aim fire reload activeReload swap melee none (+ grenade blindfire cast
 //                           repair, provisionales)
 //   Params por estado (todos opcionales; los no dados se derivan de la entidad):
 //     idle                  {}
-//     walk jog run sprint   { speed (m/s, defecto |vel| de la entidad), dir (rad, dirección de
+//     walk jog run         { speed (m/s, defecto |vel| de la entidad), dir (rad, dirección de
 //                             movimiento relativa al frente: 0 delante, +π/2 izquierda; defecto de vel/yaw) }
 //     crouch                { speed, dir }
 //     jump fall             { vy (m/s, defecto vel.y) }
 //     land                  { impact (0..1, defecto 0.6) }
 //     climb vault           { duration (s, defecto config.player.climb/vault.duration), height (m) }
-//     slide                 { duration (defecto config.player.slide.duration) }
 //     evade                 { duration (defecto config.player.evade.duration), dir (rad, relativo al frente) }
 //     coverLow coverHigh    { height:'low'|'high', side:-1|1 (−1 izq., 1 der.), peeking, aimingOver, speed, dir }
 //     peek                  { height, side, aimingOver }
@@ -86,7 +85,7 @@
 //     exit(rig),                        // opcional: cuando su peso llega a 0 tras salir (fin del fade)
 //     // propiedades estáticas opcionales (se mezclan por peso):
 //     aimWeight: 0..1,   // cuánto sigue la columna a la mira (cuerpo y torso se multiplican). Def. 1
-//     lowCarry: 0..1,    // (cuerpo) lleva el arma en posición baja (sprint, vault…). Def. 0
+//     lowCarry: 0..1,    // (cuerpo) lleva el arma en posición baja (maroma, vault…). Def. 0
 //     handsFree: 0..1,   // (cuerpo) suelta la mano izquierda del arma (climb, vault…). Def. 0
 //     transient: bool,   // (torso) estado puntual que vuelve a la base
 //   }
@@ -123,8 +122,8 @@ import { solveTwoBone, worldQuat, worldPos, basisQuat } from './ik.js';
 import { clamp, clamp01, damp, lerp, remap01, wrapAngle, createSpring, stepSpring } from './math.js';
 
 export const BODY_STATES = [
-  'idle', 'walk', 'jog', 'run', 'sprint', 'crouch', 'jump', 'fall', 'land', 'climb', 'vault',
-  'slide', 'evade', 'coverLow', 'coverHigh', 'peek', 'swat', 'coverSlide',
+  'idle', 'walk', 'jog', 'run', 'crouch', 'jump', 'fall', 'land', 'climb', 'vault',
+  'evade', 'coverLow', 'coverHigh', 'peek', 'swat', 'coverSlide',
   'hit', 'stun', 'frozen', 'death', 'downed', 'crawl', 'revive', 'revived', 'carry', 'mounted',
 ];
 export const UPPER_STATES = [

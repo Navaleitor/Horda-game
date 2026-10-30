@@ -15,15 +15,15 @@ Fase de referencia: **1a** (base jugable: menú, movimiento, cobertura, armas, d
 | LS (ejes 0,1) | Mover | `stick('LS',0,1)` 0,6 s → `player.move.mode ∈ walk/jog/run`, desplazamiento > 0,5 m; al soltar → `idle` | auto | 1a | pendiente |
 | LS a media inclinación | Andar (`walk`) vs trotar | `stick('LS',0,0.4)` → `walk`; a fondo → `jog`/`run` | auto (TODO) | 1a | pendiente |
 | RS (ejes 2,3) | Cámara | `stick('RS',1,0)` → `player.yaw`/cámara giran; sensibilidad e inversión con mando real | auto+manual | 1a | pendiente |
-| L3 (10) | Sprint **toggle** | LS adelante + `press('L3')` → `sprint` y se mantiene sin L3; soltar LS → sale de `sprint` | auto | 1a | pendiente |
-| L3 (10) | Sprint se corta al apuntar/disparar | en `sprint`, `trigger('LT',1)` o `trigger('RT',1)` → sale de `sprint` | auto (TODO) | 1a | pendiente |
+| L3 (10) | Sin función | LS a fondo + `press('L3')` → el modo sigue en `run` y la velocidad es 4,14 m/s | auto (humo 1a.1) | 1a.2 | ✅ |
 | R3 (11) | Cambiar hombro | `press('R3')` → `player.shoulder` cambia de signo; la cámara cambia de lado | auto+manual | 1a | pendiente |
 | A (0) | Cobertura media | frente a caja `low` + `press('A')` → `mode='cover'`, `cover.height='low'` | auto | 1a | pendiente |
 | A (0) | Cobertura alta | frente a caja `high` + `press('A')` → `cover.height='high'` | auto | 1a | pendiente |
-| A (0) + dirección | SWAT turn | en borde de cobertura con hueco, LS lateral + A → evento `cover:swat`, acaba en la otra cobertura | auto (TODO posiciones) | 1a | pendiente |
-| A (0) + dirección | Deslizar a cobertura contigua | en esquina, LS lateral + A → evento `cover:slide` | auto (TODO posiciones) | 1a | pendiente |
-| A (0) ×2 | Evadir / rodar | `doubleTap('A',120)` con LS lateral → `player:moveMode` con `mode='evade'` | auto | 1a | pendiente |
-| A (0) en sprint | Deslizar | en `sprint` + `press('A')` → `slide` (o `coverSlide` si hay cobertura delante) | auto | 1a | pendiente |
+| A (0) + dirección | SWAT turn (hueco ≤ 1,5 m) | en borde de cobertura con hueco ≤ 1,5 m, LS lateral + A → evento `cover:swat`, acaba en la otra cobertura | auto (TODO posiciones) | 1a | pendiente |
+| A (0) + dirección | Deslizar a cobertura contigua (hueco > 1,5 m) | en el extremo con hueco > 1,5 m, LS lateral + A → evento `cover:slide` | auto (TODO posiciones) | 1a | pendiente |
+| A (0) en movimiento sin cobertura | Maroma | LS + `press('A')` sin cobertura a tiro → `mode='evade'` (maroma en la dirección del stick); quieto → nada | auto (humo 1a.1) | 1a.2 | ✅ |
+| A (0) ×2 | Maroma (alias) | `doubleTap('A',120)` con LS lateral → `player:moveMode` con `mode='evade'` | auto (humo 1a.1) | 1a.2 | ✅ |
+| A (0) con cobertura a tiro | Entrar corriendo, sin slide | a ≤ `cover.snapDistance` + `press('A')` → `coverSlide` a 4,14 m/s → `cover` | auto | 1a.2 | ✅ |
 | LT (6) | Apuntar | `trigger('LT',1)` → `player.aiming=true`, zoom de cámara | auto+manual | 1a | pendiente |
 | LT (6) en cobertura | Asomarse / apuntar por encima | en `cover` + LT → `cover.peeking` o `cover.aimingOver` | auto | 1a | pendiente |
 | RT (7) | Disparar | LT+RT contra diana → `weapon.mag` baja y `hp` de la diana baja | auto | 1a | pendiente |
@@ -70,5 +70,5 @@ Fase de referencia: **1a** (base jugable: menú, movimiento, cobertura, armas, d
 - Deadzone del stick (sin deriva en reposo, respuesta progresiva).
 - Sensibilidad/aceleración de la cámara con RS y al apuntar.
 - Vibración (`input.rumble`) al disparar / recarga activa / melee. La suite solo comprueba que se llama (`__pad.rumbles`).
-- Latencia percibida de A (cobertura) y del doble toque (evadir) — ventana `config.input.doubleTapWindow`.
+- Latencia percibida de A (cobertura) y del doble toque (maroma) — ventana `config.input.doubleTapWindow`.
 - Cámara siempre en tercera persona, sin atravesar paredes al pegarse a cobertura.

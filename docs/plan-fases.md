@@ -6,13 +6,13 @@ Formato: frontmatter `name`, `description`, `tools`, `model: inherit`; cuerpo co
 | Agente | Dueño de |
 |---|---|
 | `game-architect` | `core/`, `main.js`, `build.js`, `template.html` (esqueleto), `docs/arquitectura.md`; contratos y eventos; revisa todo antes de cerrar fase |
-| `controls-camera-engineer` | `input/`, `camera/`, `player/` (incl. `inventory.js`, `downed.js`) — esquema E-Day, cobertura, sprint, radial ↑, LB toque/mantener |
+| `controls-camera-engineer` | `input/`, `camera/`, `player/` (incl. `inventory.js`, `downed.js`) — esquema E-Day, cobertura, maroma, radial ↑, LB toque/mantener |
 | `gameplay-programmer` | `combat/`, `waves/`, `economy/` (incl. `shop.js`, `unlocks.js`), `modes/`, `classes/` (pasivas, comodines, reflejo en bots), dificultad, reglas de muerte |
 | `ai-engineer` | `ai/` — navGrid, flow-fields, objetivos, comportamientos, jefes, `squad.js` (bots espejo) |
 | `fortifications-engineer` | `fortifications/` — barreras, torretas, centinelas, señuelos, reparación, cargar/colocar, desbloqueo + mejora por pieza, mover |
 | `physics-engineer` | `physics/` — cápsula cinemática, AABB/hash, raycasts, proyectiles, explosiones, ragdoll-lite |
 | `animation-engineer` | `anim/core/` — **líder de animación**: rig, mixer, capas, IK, máquina de estados, API `setState`; integra a los animadores |
-| `locomotion-animator` | `anim/locomotion/` — caminar, trotar, correr, sprint, agacharse, salto, escalar, vault, slide, evadir, cargar pieza |
+| `locomotion-animator` | `anim/locomotion/` — caminar, trotar, correr, agacharse, salto, escalar, vault, maroma, cargar pieza |
 | `cover-animator` | `anim/cover/` — entrar/salir, cobertura media y alta, borde, asomarse, disparo a ciegas, SWAT turn, cambio de hombro |
 | `weapon-animator` | `anim/weapons/` — postura/apuntado por arma, retroceso, recargas, cambio de arma, granada, melee, reparación, torreta |
 | `abilities-animator` | `anim/abilities/` — gestos de comodines, radial, derribado/arrastrarse, revivir, muerte |
@@ -89,7 +89,7 @@ Resumen; el detalle está en `docs/horda-gdd.md`.
 - **4 clases** obligatorias (Médico, Apoyo, Ingeniero, Reconocimiento) con pasivas permanentes rango 1–5.
 - **7 comodines místicos** en el radial ↑ (3 compartidos + 1 exclusivo por clase), con cargas que se pierden al morir.
 - **3 bots espejo** que reflejan tus compras en su clase, con arma fija de clase; no pierden cargas al morir.
-- Controles: sprint **toggle** L3, B melee, R3 hombro, LB toque granada / mantener Tac-Com, View marcador, D-pad ←/→ armas, ↓ pistola o reparación, ↑ radial.
+- Controles: sin sprint (L3 sin función; maroma con A en movimiento), B melee, R3 hombro, LB toque granada / mantener Tac-Com, View marcador, D-pad ←/→ armas, ↓ pistola o reparación, ↑ radial.
 - Enemigos **robots**; archivo final **`horda.html`**.
 
 - El **bot Ingeniero repara fortificaciones solo** con su herramienta de clase (cobra de la bolsa común y respeta una reserva mínima).

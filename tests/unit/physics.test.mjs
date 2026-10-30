@@ -69,10 +69,10 @@ test('sube un escalón ≤ stepHeight y no un obstáculo más alto', () => {
   assert.ok(o.pos.z >= 1 + R - 1e-3, `z=${o.pos.z}: bloqueado por el obstáculo`);
 });
 
-test('no atraviesa la pared a ninguna velocidad (sprint, slide, evade, deltas enormes)', () => {
+test('no atraviesa la pared a ninguna velocidad (correr, maroma, deltas enormes)', () => {
   const { api } = scene();
   const dt = config.core.fixedDt;
-  const speeds = [config.player.speed.sprint, config.player.slide.speed, config.player.evade.speed, 30, 120, 600];
+  const speeds = [config.player.speed.run, config.player.evade.speed, 30, 120, 600];
   for (const v of speeds) {
     const c = cap(0, 0, -3);
     for (let i = 0; i < 120; i++) api.moveCapsule(c, new Vector3(0, 0, -v * dt));
@@ -225,7 +225,8 @@ test('querySwat: cobertura paralela al otro lado del hueco', () => {
   const { api, ids } = scene();
   const c = api.queryCover(new Vector3(6.8, 0, 0.3), new Vector3(0, 0, -1), 2.5);
   assert.ok(c && c.boxId === ids.C && c.atRightEdge);
-  const s = api.querySwat(c, 1, config.cover.swatMaxGap);
+  assert.equal(api.querySwat(c, 1, config.cover.swatMaxGap), null, 'hueco de 2 m > swatMaxGap (1,5): no hay SWAT');
+  const s = api.querySwat(c, 1, 2.5);
   assert.ok(s && s.boxId === ids.D, 'C → D');
   assert.ok(near(s.point.z, -1.5 + R + SKIN) && near(s.point.x, 9 + config.cover.edgeInset));
   assert.equal(api.querySwat(c, 1, 1.0), null, 'hueco mayor que maxGap');

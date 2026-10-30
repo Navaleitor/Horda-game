@@ -7,11 +7,11 @@
 
 | Botón | Combate | Cargando fortificación | Menús (fabricador, radiales) |
 |---|---|---|---|
-| LS (ejes 0,1) | Mover | Mover (más lento) | Navegar |
+| LS (ejes 0,1) | Mover: caminar / trotar / correr según la inclinación (a fondo = **4,14 m/s**, máximo; no hay sprint) | Mover (más lento) | Navegar |
 | RS (ejes 2,3) | Cámara | Cámara / apuntar el lugar | — (en el radial ↑: elegir) |
-| L3 (10) | Sprint **toggle** (se corta al soltar el stick, apuntar o disparar) | — | — |
+| L3 (10) | Sin función | — | — |
 | R3 (11) | Cambiar hombro | — | — |
-| A (0) | Cobertura · A+dirección en cobertura = SWAT turn / deslizar a la cobertura contigua · doble toque = evadir/rodar · A en sprint = deslizar | — | Seleccionar / comprar |
+| A (0) | Cobertura a tiro = entrar (corre a velocidad normal y se pega; sin slide) · **sin cobertura a tiro y moviéndote = maroma** en la dirección del stick · doble toque = maroma (alias) · A+dirección en cobertura = SWAT turn / deslizar a la cobertura contigua | — | Seleccionar / comprar |
 | Y (3) | Saltar · trepar · saltar sobre cobertura | — | — |
 | B (1) | Golpe cuerpo a cuerpo | **Soltar** la pieza en el suelo | Atrás / cerrar |
 | X (2) | Interactuar: fabricador, montar torreta, recoger, **mantener sobre aliado derribado = revivir**. **Toque sobre fortificación** → radial de fortificación (§12) | — | — |
@@ -25,6 +25,7 @@
 | View (8) | Mantener = marcador | — | — |
 | Menu (9) | Pausa | Pausa | Pausa |
 
+- **A sin cobertura**: quieto no hace nada; moviéndote, maroma (rodar) en la dirección del stick. No existe deslizamiento (slide) ni sprint.
 - **A + dirección en el extremo de una cobertura**: si el hueco hasta la siguiente cobertura es de **≤1,5 m** → **SWAT turn**; si es **mayor** → **deslizar a la cobertura contigua**.
 - **Tac-Com** (mantener LB): resalta a través de paredes a aliados, fabricador y fortificaciones (con su salud), dibuja rutas de spawn, enemigos restantes y composición de la siguiente oleada.
 - **Pistola de reparación**: RT mantenido, haz sobre fortificación (≤6 m).
@@ -253,7 +254,7 @@ Coste por enemigo: Rasero 1 · Corredor 0.6 · Tirador 2 · Bruto 4 · Explosivo
 | 25 | **Coloso + Matriarca** | Final → victoria |
 
 ## 15. Personajes y modelos (ligeros, ejemplos de three.js)
-- Jugador y bots: `Soldier.glb` (Idle/Walk/Run) + poses procedurales, IK de brazos; color/accesorio por clase.
+- Jugador y bots: **`Xbot.glb`** (maniquí estilizado de los ejemplos de three.js, tag r170, esqueleto Mixamo `mixamorig`; clips idle/walk/run) + poses procedurales, IK de brazos; color por clase en el material/placas y accesorio por clase.
 - Enemigos: `RobotExpressive.glb` (Idle, Walking, Running, Death, Jump, Punch…) teñido/escalado por tipo; Bruto ×1.4, jefes ×2.5 con piezas añadidas.
 - Armas, torretas, barreras (pinchos, concertina con TubeGeometry helicoidal), láseres (shader aditivo), señuelo (maniquí de cápsulas), fabricador: **geometría procedural**.
 

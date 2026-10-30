@@ -110,17 +110,14 @@ export default {
       },
     },
     {
-      name: 'L3 sprint toggle; se corta al soltar el stick',
+      name: 'L3 sin función (no hay sprint)',
       async run(ctx) {
         await needPlayer(ctx); await resetPlayer(ctx);
-        await ctx.pad.stick('LS', 0, 1); await sleep(200);
-        await ctx.pad.press('L3', 80);
-        await modeIs(ctx.page, ['sprint']);
-        await sleep(300);
-        assert.eq((await player(ctx.page)).mode, 'sprint', 'sigue en sprint sin mantener L3 (toggle)');
+        await ctx.pad.stick('LS', 0, 1); await sleep(300);
+        await ctx.pad.press('L3', 80); await sleep(300);
+        assert.eq((await player(ctx.page)).mode, 'run', 'L3 no cambia el modo');
         await ctx.pad.stick('LS', 0, 0);
-        await modeIs(ctx.page, ['idle', 'walk', 'jog', 'run'], 1500);
-        // TODO: sprint también se corta al apuntar (LT) o disparar (RT) — GDD §1.
+        await modeIs(ctx.page, ['idle'], 1500);
       },
     },
     {
@@ -194,7 +191,7 @@ export default {
       },
     },
     {
-      name: 'doble toque A: evadir/rodar',
+      name: 'doble toque A: maroma (alias)',
       async run(ctx) {
         await needPlayer(ctx); await resetPlayer(ctx);
         await ctx.pad.stick('LS', 1, 0); await sleep(150);
@@ -209,17 +206,14 @@ export default {
       },
     },
     {
-      name: 'A en sprint: deslizar',
+      name: 'A en movimiento sin cobertura: maroma',
       async run(ctx) {
         await needPlayer(ctx); await resetPlayer(ctx);
         await ctx.pad.stick('LS', 0, 1); await sleep(150);
-        await ctx.pad.press('L3', 80);
-        await modeIs(ctx.page, ['sprint']);
-        await sleep(300);
         await ctx.pad.press('A', 80);
-        await modeIs(ctx.page, ['slide', 'coverSlide'], 1500);
+        await modeIs(ctx.page, ['evade', 'coverSlide'], 1500);
         await ctx.pad.stick('LS', 0, 0);
-        // TODO: si hay cobertura delante debe ser 'coverSlide' y acabar en 'cover'; en abierto 'slide'.
+        // TODO: posición sin cobertura a tiro → 'evade'; con cobertura a ≤ snapDistance → 'coverSlide' → 'cover'.
       },
     },
     {

@@ -83,7 +83,7 @@ export function createGameHud(parent, game) {
     hint: '',                 // '' | 'reload' | 'noammo'
     reloading: false, reloadResult: null, reloadHideT: 0,
     buffT: 0,
-    aiming: false, sprint: false, inCover: false, xhHidden: false,
+    aiming: false, inCover: false, xhHidden: false,
     hitFlip: false, toastFlip: false, rlFlip: false,
     slots: (cfg.weapons && cfg.weapons.startSlots ? cfg.weapons.startSlots.slice() : ['assaultRifle', null, 'pistol']),
     lastEmptyAt: -1,
@@ -227,7 +227,7 @@ export function createGameHud(parent, game) {
     updateXhVisibility();
   }
   function updateXhVisibility() {
-    const hide = st.sprint || (st.inCover && !st.aiming);
+    const hide = (st.inCover && !st.aiming);
     if (hide !== st.xhHidden) { st.xhHidden = hide; xh.classList.toggle('hide', hide); }
   }
 
@@ -309,11 +309,6 @@ export function createGameHud(parent, game) {
       if (st.player && source === st.player) hitmarker(part === 'head', killed);
       else if (!st.player && source && source.kind === 'player') hitmarker(part === 'head', killed);
       if (st.player && target === st.player) setHp(target.hp, target.maxHp);
-    },
-    'player:moveMode': ({ who, mode }) => {
-      if (!isMe(who)) return;
-      const s = mode === 'sprint';
-      if (s !== st.sprint) { st.sprint = s; updateXhVisibility(); }
     },
     'cover:enter': ({ who }) => { if (isMe(who)) { st.inCover = true; updateXhVisibility(); } },
     'cover:exit': ({ who }) => { if (isMe(who)) { st.inCover = false; updateXhVisibility(); } },

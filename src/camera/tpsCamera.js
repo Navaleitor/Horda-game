@@ -4,7 +4,7 @@
 //   pivote  = pies interpolados + (0, off.y, 0)
 //   lateral = pivote + right(yaw) · off.x · lado        (lado: +1 hombro derecho, −1 izquierdo; suavizado)
 //   cámara  = lateral − forward3(yaw, pitch) · off.z
-// off (x, y, z) se interpola hacia el preset del contexto: hombro, apuntar, sprint, cobertura baja/alta,
+// off (x, y, z) se interpola hacia el preset del contexto: hombro, apuntar, cobertura baja/alta,
 // asomarse por encima (baja) o por el borde (alta). Colisión: raycast pivote→cámara con physics.raycast;
 // acerca la cámara al instante y la devuelve suavemente. Sacudida rotacional (sumas de senos, sin RNG).
 // Convención: yaw = 0 mira a −Z, crece girando a la izquierda; pitch > 0 mira arriba.
@@ -40,8 +40,6 @@ export function createTpsCamera(game) {
     collided: false,
     shakeAmp: 0, shakeDur: 0, shakeT: 0,
     lookAccelT: 0,
-    sprintW: 0,              // peso del bamboleo de sprint
-    bobT: 0,
     menuT: 0,
     preset: 'shoulder',
     // pose sin sacudida (para el rayo de apuntado)
@@ -69,10 +67,6 @@ export function createTpsCamera(game) {
       } else { src = C.coverHigh; name = 'coverHigh'; }
     } else if (p.aiming) {
       src = C.aim; name = 'aim';
-    } else if (mode === 'sprint') {
-      src = C.sprint; name = 'sprint';
-    } else if (mode === 'slide' || mode === 'evade') {
-      src = C.sprint; name = mode;
     }
     _target.x = src.x; _target.y = src.y; _target.z = src.z;
     st.preset = name;
@@ -119,34 +113,27 @@ export function createTpsCamera(game) {
 
     // ── Offsets, lado y FOV ───────────────────────────────────────────────
     const wantSide = chooseTarget(p);
-    const mode = p.move ? p.move.mode : 'idle';
-    const sprinting = mode === 'sprint';
     if (dt <= 0) {
       st.off.set(_target.x, _target.y, _target.z);
       st.side = wantSide;
       st.fov = C.fov;
       st.len = -1;
-      st.sprintW = 0;
     } else {
       const k = expK(C.lerpSpeed, dt);
       st.off.x += (_target.x - st.off.x) * k;
       st.off.y += (_target.y - st.off.y) * k;
       st.off.z += (_target.z - st.off.z) * k;
       st.side += (wantSide - st.side) * expK(C.shoulderSwapSpeed, dt);
-      const fovT = aiming ? C.fovAim : sprinting ? C.fovSprint : C.fov;
+      const fovT = aiming ? C.fovAim : C.fov;
       st.fov += (fovT - st.fov) * expK(C.fovLerpSpeed, dt);
-      st.sprintW += ((sprinting ? 1 : 0) - st.sprintW) * expK(6, dt);
-      st.bobT += dt;
     }
 
     // ── Posición deseada ──────────────────────────────────────────────────
     interpPos(p, alpha, _feet);
-    const bob = st.sprintW * C.sprintBob.amp;
-    const f = C.sprintBob.freq * Math.PI * 2;
-    _pivot.set(_feet.x, _feet.y + st.off.y + Math.sin(st.bobT * f) * bob, _feet.z);
+    _pivot.set(_feet.x, _feet.y + st.off.y, _feet.z);
     _right.set(Math.cos(st.yaw), 0, -Math.sin(st.yaw));
     forward3(st.yaw, st.pitch, _fwd);
-    const lateral = st.off.x * st.side + Math.sin(st.bobT * f * 0.5) * bob * 0.6;
+    const lateral = st.off.x * st.side;
     _lat.copy(_pivot).addScaledVector(_right, lateral);
     _want.copy(_lat).addScaledVector(_fwd, -st.off.z);
 

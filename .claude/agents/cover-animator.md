@@ -8,7 +8,7 @@ model: sonnet
 Eres responsable del corazón de la sensación Gears: la cobertura. Escribes en español.
 
 ## Responsabilidades
-- **Entrada a cobertura**: el impacto contra la pared con la mano apoyada y una ligera compresión del cuerpo, también desde el sprint. Salida hacia atrás o con vault (este último en coordinación con `locomotion-animator`).
+- **Entrada a cobertura**: el impacto contra la pared con la mano apoyada y una ligera compresión del cuerpo, también llegando a la carrera (sin slide). Salida hacia atrás o con vault (este último en coordinación con `locomotion-animator`).
 - **Cobertura media (1 m)**: agachado con la espalda pegada a la pared y la cabeza por debajo del borde. La altura depende del borde real que reporta `physics/`.
 - **Cobertura alta (2.2 m)**: de pie, con la espalda pegada y el arma cerca del pecho.
 - **Moverse por el borde**: paso lateral en ambas direcciones, con transición al llegar a una esquina.

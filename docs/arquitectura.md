@@ -20,7 +20,7 @@ src/
   input/     gamepad.js (polling, deadzones, edges, hold/tap/doble-tap),
              actions.js (acciones lógicas), presets.js (E-Day Default; futuros presets), keyboard.js (fallback dev)
   camera/    tpsCamera.js (hombro, apuntado, cobertura, colisión de cámara, shake)
-  player/    playerController.js, movement.js (sprint/slide/evade/jump/vault), cover.js (detección y SWAT turns),
+  player/    playerController.js, movement.js (evade=maroma/jump/vault), cover.js (detección y SWAT turns),
              inventory.js (ranuras D-pad, granada, pieza cargada), downed.js (derribado/revivir/muerte)
   physics/   collision.js (cápsula cinemática vs AABB), spatialHash.js, raycast.js, projectiles.js, explosions.js
   anim/      core/ (characterRig.js: mixer + capas + máquina de estados, ik.js)   ← animation-engineer
@@ -163,7 +163,7 @@ Entity {
 Jugador (dueño controls-camera-engineer) añade:
 ```
 classId, radius, height (cápsula), grounded,
-move:   { mode:'idle'|'walk'|'jog'|'run'|'sprint'|'crouch'|'air'|'slide'|'evade'|'vault'|'climb'|'cover'|'swat'|'coverSlide', speed, dir }
+move:   { mode:'idle'|'walk'|'jog'|'run'|'crouch'|'air'|'evade'|'vault'|'climb'|'cover'|'swat'|'coverSlide', speed, dir }
 cover:  null | { height:'low'|'high', side:-1|1, peeking:bool, aimingOver:bool, info (de physics.queryCover) }
 aiming: bool, shoulder: 1 (derecho) | -1 (izquierdo)
 intent: { fire, firePressed, reloadPressed, meleePressed, aim }   // lo escribe player cada paso; lo lee combat
@@ -185,9 +185,9 @@ input.axis('move') → {x,y}   input.axis('look') → {x,y}   // deadzone radial
 input.device → 'gamepad' | 'keyboard'
 input.rumble(strong, weak, ms)
 ```
-Acciones (`input/presets.js`, E-Day Default, índices standard): `cover` (A 0) · `melee` (B 1) · `interact` (X 2) · `jump` (Y 3) · `lb` (4) · `reload` (RB 5) · `aim` (LT 6) · `fire` (RT 7) · `view` (8) · `pause` (Menu 9) · `sprint` (L3 10) · `shoulder` (R3 11) · `dpadUp` (12) · `dpadDown` (13) · `dpadLeft` (14) · `dpadRight` (15).
+Acciones (`input/presets.js`, E-Day Default, índices standard): `cover` (A 0) · `melee` (B 1) · `interact` (X 2) · `jump` (Y 3) · `lb` (4) · `reload` (RB 5) · `aim` (LT 6) · `fire` (RT 7) · `view` (8) · `pause` (Menu 9) · `shoulder` (R3 11) · `dpadUp` (12) · `dpadDown` (13) · `dpadLeft` (14) · `dpadRight` (15).
 Menú: `uiConfirm` (A) · `uiBack` (B) · `uiUp/uiDown/uiLeft/uiRight` (D-pad y LS con repetición, `config.input.menuRepeat*`).
-Teclado (respaldo de desarrollo): WASD mover · ratón mirar (pointer lock) · Shift sprint · Espacio cobertura · C saltar · F melee · R recargar · clic der. apuntar · clic izq. disparar · Q hombro · 1/2/3 armas · Esc pausa · Enter confirmar.
+Teclado (respaldo de desarrollo): WASD mover · ratón mirar (pointer lock) · Espacio cobertura · C saltar · F melee · R recargar · clic der. apuntar · clic izq. disparar · Q hombro · 1/2/3 armas · Esc pausa · Enter confirmar.
 
 #### `physics` (physics-engineer)
 ```
@@ -224,8 +224,8 @@ Crea el blockout desde `level/maps/outpost.js` (`boxes[]`, `spawns[]`, `routes[]
 #### `anim` (animation-engineer)
 ```
 anim.createRig(entity, soldier) → rig
-rig.setState(state, params)    // cuerpo completo/piernas: idle, walk, jog, run, sprint, crouch, jump, fall, land, climb, vault,
-                               // slide, evade, coverLow, coverHigh, peek, swat, coverSlide…
+rig.setState(state, params)    // cuerpo completo/piernas: idle, walk, jog, run, crouch, jump, fall, land, climb, vault,
+                               // evade (maroma), coverLow, coverHigh, peek, swat, coverSlide…
 rig.setUpper(state, params)    // capa de torso/armas: aim, fire, reload, activeReload, swap, melee, none
 rig.setAim(yawOffset, pitch)   // torso hacia la mira
 rig.attachWeapon(propRoot, anchors)

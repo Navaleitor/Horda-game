@@ -97,7 +97,7 @@ export default function create() {
       cover: c ? { height: c.height, side: c.side, peeking: c.peeking, aimingOver: c.aimingOver, moving: c.moving,
         boxId: c.info.boxId, atLeftEdge: c.info.atLeftEdge, atRightEdge: c.info.atRightEdge } : null,
       inCover: ctl.cover.inCover,
-      aiming: p.aiming, sprint: ctl.movement.sprinting, shoulder: p.shoulder,
+      aiming: p.aiming, shoulder: p.shoulder,
       weapon: p.weapon ? p.weapon.id : null, slot: p.inventory.current, slots: [...p.inventory.slots],
       carrying: null, downed: false,
       intent: { ...p.intent },

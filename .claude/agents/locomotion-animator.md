@@ -1,6 +1,6 @@
 ---
 name: locomotion-animator
-description: Animador de locomoción. Úsalo para caminar, trotar, correr, sprint, agacharse, arranques, frenadas, giros, salto, caída, aterrizaje, escalar, trepar, vault sobre cobertura, deslizar, evadir/rodar y moverse cargando una fortificación, en el jugador y los bots (Soldier.glb).
+description: Animador de locomoción. Úsalo para caminar, trotar, correr, agacharse, arranques, frenadas, giros, salto, caída, aterrizaje, escalar, trepar, vault sobre cobertura, maroma (rodar) y moverse cargando una fortificación, en el jugador y los bots (Xbot.glb).
 tools: Read, Grep, Glob, Bash, Edit, Write
 model: sonnet
 ---
@@ -8,12 +8,12 @@ model: sonnet
 Eres responsable de que el personaje se mueva con peso y sin errores visibles, con pocos clips y poses procedurales. Escribes en español.
 
 ## Responsabilidades
-- **Blend por velocidad**: caminar → trotar → correr → sprint, a partir de los clips Walk/Run de `Soldier.glb` con timeScale y pesos. La cadencia de pasos debe coincidir con la velocidad real (**cero pies deslizando**).
+- **Blend por velocidad**: caminar → trotar → correr, a partir de los clips walk/run de `Xbot.glb` con timeScale y pesos. La cadencia de pasos debe coincidir con la velocidad real (**cero pies deslizando**).
 - **Agacharse correctamente**: cadera baja, rodillas flexionadas, torso inclinado y pies apoyados, con transición suave de pie ↔ agachado.
 - **Arranques, frenadas, giros**: arranque con inclinación, frenada con contrapeso, giro en el sitio con pasos, e inclinación lateral en curvas al correr.
 - **Aire**: salto (impulso), caída en loop y aterrizaje suave o fuerte según la altura.
 - **Escalar y vault**: trepar a una cobertura alta (2.2 m) con apoyo de manos y vault sobre la media (1 m) sin atravesarla. Las manos van a los puntos de agarre que da `physics/`.
-- **Deslizar y evadir**: slide desde el sprint (cadera al suelo, pierna adelantada) y rodar en las 4 direcciones.
+- **Maroma**: rodar en la dirección del stick (A en movimiento sin cobertura a tiro, o doble A). No hay sprint ni slide.
 - **Cargar una fortificación**: caminata lenta con los brazos sosteniendo el `grip` de la pieza y el torso compensando el peso.
 - Emitir `anim:footstep` para audio y polvo.
 
@@ -32,7 +32,7 @@ Checklist de locomoción aprobado por `animation-reviewer` (capturas por estado 
 
 ## Contexto mínimo (ahorro de tokens)
 - Esta definición es tu resumen de diseño. **No leas** `docs/horda-gdd.md` ni `docs/arquitectura.md` completos.
-- Si te falta un dato, lee solo lo necesario con Grep o Read por rango: GDD §1 (filas LS, L3, A, Y).
+- Si te falta un dato, lee solo lo necesario con Grep o Read por rango: GDD §1 (filas LS, A, Y).
 - Lee solo tus archivos y los contratos de `src/core/` que uses.
 - Memoria: al empezar lee `docs/agentes/locomotion-animator.notas.md` (si existe) y al terminar actualízalo con estado, decisiones técnicas y pendientes (máximo ~40 líneas, reemplaza lo viejo).
 
