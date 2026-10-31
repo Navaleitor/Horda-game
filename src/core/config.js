@@ -77,7 +77,7 @@ const config = {
     speed: {
       walk: 1.6,
       jog: 3.4,
-      run: 4.14,              // stick a fondo (§1)
+      run: 4.6,               // stick a fondo (§1)
       aim: 2.2,
       crouch: 1.8,
       cover: 2.4,             // desplazamiento lateral en cobertura
@@ -86,10 +86,11 @@ const config = {
     decel: 34,
     airControl: 0.3,
     turnRate: 12,             // rad/s girando el cuerpo hacia la dirección de movimiento
-    jump: { velocity: 6.2, coyoteTime: 0.1 },
-    evade: { speed: 7.5, duration: 0.45, cooldown: 0.3, endFalloff: 0.5 },   // maroma (A en movimiento sin cobertura a tiro / doble A)
+    jump: { velocity: 7.6, coyoteTime: 0.1 },   // 6.2·√1.5: salto un 50 % más alto (~2.9 m de cima)
+    evade: { speed: 7.8, duration: 0.6, cooldown: 0.3, endFalloff: 0.5 },   // maroma ≈ 3.5 m = v·t·(1−falloff/2) (A en movimiento sin cobertura a tiro / doble A)
     vault: { maxHeight: 1.2, duration: 0.45, clearance: 0.25, exitSpeed: 3.4 },
-    climb: { maxHeight: 2.4, duration: 0.8, upFraction: 0.6 },
+    climb: { maxHeight: 2.4, duration: 0.8, upFraction: 0.6 },   // maxHeight: también tope sobre el suelo al agarrarse en el aire
+    airGrab: { groundProbe: 30 },   // m de rayo hacia abajo para medir el suelo al agarrarse en el aire
     // Umbrales del stick izquierdo para el modo de locomoción
     stickIdle: 0.05,
     stickWalkMax: 0.55,       // < → walk
@@ -155,7 +156,8 @@ const config = {
     highHeight: 2.2,          // cobertura alta (§13)
     lowMax: 1.4,              // caja con topY <= lowMax cuenta como 'low'
     snapDistance: 2.5,        // distancia máx. para pegarse con A
-    snapSpeed: 4.14,          // m/s corriendo hacia la cobertura (= speed.run, sin slide)
+    snapSpeed: 4.6,           // m/s corriendo hacia la cobertura (= speed.run, sin slide)
+    evadeSnapDistance: 0.25,  // m: una maroma a esta distancia de una cobertura (hueco cápsula–cara) se pega
     edgePeekMargin: 0.3,
     swatMaxGap: 1.5,          // hueco mayor → deslizar a la contigua (§1)
     slideAdjacentMaxGap: 6.0,
@@ -329,7 +331,7 @@ const config = {
     },
     playbackRef: {            // velocidad (m/s) a la que el clip va a ×1 (respaldo: el rig mide la zancada real)
       walk: 1.6,
-      run: 4.14,
+      run: 4.6,
     },
     // núcleo (animation-engineer): rig, capas, IK. Ver cabecera de src/anim/core/characterRig.js
     core: {
@@ -340,6 +342,7 @@ const config = {
       poseSmoothing: 30,        // 1/s: suavizado de aditivos por hueso y cadera
       holdBlendSpeed: 16,       // 1/s: suavizado de la pose del arma
       ikBlendSpeed: 12,         // 1/s: suavizado de pesos de IK
+      footMinY: 0.075,          // m: altura mínima del tobillo sobre el suelo (rig.groundFeet)
       aimYawMax: 85 * DEG,
       aimPitchMin: -70 * DEG,
       aimPitchMax: 70 * DEG,
@@ -399,10 +402,10 @@ const config = {
       // Pose por altura × (agazapado | asomado). drop = bajada de cadera, back = cadera hacia la pared,
       // lean = inclinación del tronco hacia delante del cuerpo (rad), headUp = cabeza arriba (rad),
       // footW = semianchura de pisada, footF = pie por delante de la cadera, gun = [subir arma (rad), x, y, z] sobre 'ready'.
-      high:     { drop: 0.06, back: 0.17, lean: 0.10, headUp: 0.0,  footW: 0.17, footF: 0.02, gunPitch: 1.55, gunYaw: 0.0, gunY: 0.02 },
-      low:      { drop: 0.68, back: 0.17, lean: 1.25, headUp: -0.3, footW: 0.19, footF: 0.06, gunPitch: 0.3,  gunYaw: 1.2, gunY: 0.0 },
-      peekHigh: { drop: 0.04, back: -0.12, lean: 0.0,  headUp: 0.0,  footW: 0.17, footF: 0.0,  gunPitch: 0.0,  gunYaw: 0.0, gunY: 0.0 },
-      peekLow:  { drop: 0.16, back: 0.0,  lean: 0.1,  headUp: 0.0,  footW: 0.19, footF: 0.0,  gunPitch: 0.0,  gunYaw: 0.0, gunY: 0.0 },
+      high:     { drop: 0.06, back: 0.17, lean: 0.10, headUp: 0.0,  footW: 0.17, footF: 0.02, gunPitch: -0.5, gunYaw: 0.45, gunY: 0.0, gunZ: 0.12 },
+      low:      { drop: 0.68, back: 0.17, lean: 1.25, headUp: -0.3, footW: 0.19, footF: 0.06, gunPitch: 0.3,  gunYaw: 0.4, gunY: 0.0, gunZ: 0.0 },
+      peekHigh: { drop: 0.04, back: -0.12, lean: 0.0,  headUp: 0.0,  footW: 0.17, footF: 0.0,  gunPitch: 0.0,  gunYaw: 0.0, gunY: 0.0, gunZ: 0.0 },
+      peekLow:  { drop: 0.16, back: 0.0,  lean: 0.1,  headUp: 0.0,  footW: 0.19, footF: 0.0,  gunPitch: 0.0,  gunYaw: 0.0, gunY: 0.0, gunZ: 0.0 },
       bodyBackZ: 0.17,          // z (marco de personaje, Idle) de la superficie de la espalda; lo que sobresalga (mochila…) se descuenta de `back`
       headComp: 0.3,            // fracción de la inclinación del tronco que la cabeza devuelve (mira al frente)
       peekShift: 0.32,          // m que se adelanta la cadera hacia el borde al asomarse en alta
