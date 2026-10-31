@@ -11,6 +11,8 @@
 //    cobertura al otro lado del hueco; si no, deslizar a la contigua (physics.queryAdjacentCover).
 //  - Salir: alejar el stick de la cobertura durante config.cover.exitStickHold, o A + atrás (inmediato).
 //  - Y en cobertura: physics.queryLedge hacia la cobertura → vault (baja) / trepar (alta).
+//  - Una maroma que choca con una cobertura (≤ config.cover.evadeSnapDistance) entra por tryEnter.
+//  - L3 no hace nada en cobertura; entrar en cobertura pone de pie (agachado = false).
 // Convención de lado: −1 izquierda, +1 derecha, vista desde el jugador mirando a la cobertura.
 
 import * as THREE from 'three';
@@ -84,6 +86,7 @@ export function createCover(ctx) {
     const q = ctx.physics.queryCover(e.pos, _dir, maxDist);
     if (!q) return false;
     copyInfo(q, next);
+    ctx.movement.setCrouch(false, true);   // en cobertura manda su pose; al salir sigue de pie
     coverRight(next.normal, _right);
     const lat = ctx.wish.x * _right.x + ctx.wish.z * _right.z;
     cs.side = Math.abs(lat) > 0.3 ? Math.sign(lat) : (e.shoulder || 1);

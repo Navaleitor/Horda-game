@@ -72,7 +72,9 @@ export function createPlayerController(game, e) {
     const c = e.cover;
     rigParams.speed = e.move.speed;
     rigParams.side = c ? c.side : 0;
-    rigParams.height = c ? c.height : null;
+    // vault/trepar: altura de la cima sobre la raíz al empezar (traverse.js); importa al agarrarse en el aire.
+    rigParams.height = c ? c.height
+      : (state === 'vault' || state === 'climb') ? +(movement.act.topY - movement.act.from.y).toFixed(3) : null;
     rigParams.moving = c ? c.moving : 0;
     rigParams.over = !!(c && c.aimingOver);
     rigParams.shoulder = e.shoulder;
@@ -133,7 +135,7 @@ export function createPlayerController(game, e) {
   // ── Hitboxes ─────────────────────────────────────────────────────────────
   function updateHitboxes() {
     const m = e.move.mode;
-    const low = m === 'evade' || (m === 'cover' && e.cover && e.cover.height === 'low' && !e.cover.peeking);
+    const low = m === 'evade' || m === 'crouch' || (m === 'cover' && e.cover && e.cover.height === 'low' && !e.cover.peeking);
     const h = low ? P.crouchHeight : P.height;
     const r = e.radius;
     const { x, y, z } = e.pos;

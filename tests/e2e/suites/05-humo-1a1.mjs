@@ -49,6 +49,8 @@ export default {
         }
       };
       window.__ev = [];
+      window.__crouchEv = [];
+      g.events.on('player:crouch', (p) => window.__crouchEv.push(p.crouched));
       for (const t of ['player:moveMode', 'cover:swat', 'weapon:switchRequest', 'prompt:show', 'weapon:reloadStart',
         'weapon:activeReload', 'weapon:reloadCancel', 'damage:dealt', 'melee:swing']) {
         g.events.on(t, (p) => window.__ev.push([t, p.mode || p.result || p.reason || p.text || p.weaponId || p.amount || '']));
@@ -71,15 +73,34 @@ export default {
       },
     },
     {
-      name: 'L3 sin función; velocidad máxima 4,14 m/s',
+      name: 'L3 agacharse/levantarse; velocidad a fondo 4,6 m/s y agachado ≤ 1,8 m/s',
       async run() {
-        await tp(-5, 5, Math.PI / 2);
+        await tp(-5, 5, Math.PI / 2); await clearEv();
         await stick('LS', 0, 1); await adv(500);
-        await press('L3'); await adv(300);
-        const s = await st();
-        assert.eq(s.mode, 'run', 'L3 no cambia el modo');
-        assert.ok(Math.abs(s.speed - 4.14) < 0.05, `velocidad a fondo: ${s.speed}`);
-        await stick('LS', 0, 0); await adv(300);
+        let s = await st();
+        assert.eq(s.mode, 'run', 'modo a fondo');
+        assert.ok(Math.abs(s.speed - 4.6) < 0.05, `velocidad a fondo: ${s.speed}`);
+        assert.eq(s.crouched, false, 'de pie al empezar');
+        await press('L3'); await adv(400);
+        s = await st();
+        assert.eq(s.crouched, true, 'L3 agacha');
+        assert.eq(s.mode, 'crouch', 'modo crouch');
+        assert.ok(s.speed <= 1.8 + 0.02 && s.speed > 1.0, `velocidad agachado: ${s.speed}`);
+        assert.eq((await E(() => window.__crouchEv.slice(-1)[0])), true, 'player:crouch { crouched: true }');
+        await press('L3'); await adv(400);
+        s = await st();
+        assert.eq(s.crouched, false, '2º L3 levanta');
+        assert.eq(s.mode, 'run', 'vuelve a correr');
+        await press('L3'); await adv(200);
+        await press('Y'); await adv(50);
+        s = await st();
+        assert.eq(s.crouched, false, 'Y levanta');
+        await stick('LS', 0, 0); await waitMode(['idle'], 2000);
+        await press('L3'); await adv(100);
+        await press('A'); await adv(50);
+        s = await st();
+        assert.ok(!s.crouched && s.mode === 'evade', `A levanta y hace la maroma (${s.mode})`);
+        await adv(900);
       },
     },
     {
@@ -164,6 +185,70 @@ export default {
         assert.eq((await waitMode(['climb', 'vault'], 800)).mode, 'climb', 'climb');
         const c = await waitMode(['idle'], 2500);
         assert.gt(c.pos[1], 1.9, 'arriba del bloque');
+      },
+    },
+    {
+      name: 'Maroma ≈ 3,5 m en abierto; salto un 50 % más alto',
+      async run() {
+        await tp(-5, 5, Math.PI / 2);
+        const a = await st();
+        await press('A'); await adv(1000);
+        const b = await st();
+        const d = Math.hypot(b.pos[0] - a.pos[0], b.pos[2] - a.pos[2]);
+        assert.ok(Math.abs(d - 3.5) <= 0.4, `distancia de maroma: ${d.toFixed(2)} m`);
+        await tp(-5, 5, 0);
+        const y0 = (await st()).pos[1];
+        await E(() => window.__pad.down('Y'));
+        let top = y0;
+        for (let i = 0; i < 70; i++) { await adv(17); top = Math.max(top, (await st()).pos[1]); }
+        await E(() => window.__pad.up('Y'));
+        const h = top - y0, ref = 6.2 * 6.2 / (2 * 22);
+        assert.ok(Math.abs(h / ref - 1.5) < 0.1, `altura de salto ${h.toFixed(2)} m (×${(h / ref).toFixed(2)})`);
+        await waitMode(['idle'], 2000);
+      },
+    },
+    {
+      name: 'Trepar en el aire: bloque 2 m y barra 0,9 m; contenedor 2,6 m no',
+      async run() {
+        // Bloque trepable x∈[13,15] (2 m): fuera del alcance de Y en el suelo; se agarra en el aire.
+        await tp(11.2, 14, -Math.PI / 2); await clearEv();
+        await stick('LS', 0, 1); await press('Y', 40);
+        let s = await waitMode(['climb', 'vault'], 1200);
+        assert.eq(s.mode, 'climb', `se agarra en el aire (${s.mode})`);
+        assert.ok((await events('player:moveMode')).includes('air'), 'venía del aire');
+        await stick('LS', 0, 0);
+        s = await waitMode(['idle'], 2500);
+        assert.gt(s.pos[1], 1.9, 'arriba del bloque');
+        // Barra saltable x∈[9.5,10] (0.9 m): acaba encima o al otro lado.
+        await tp(7.9, 14, -Math.PI / 2);
+        await stick('LS', 0, 1); await press('Y', 40); await adv(1200);
+        await stick('LS', 0, 0); await adv(400);
+        s = await st();
+        assert.gt(s.pos[0], 9.5, `pasa la barra (x=${s.pos[0].toFixed(2)})`);
+        // Contenedor-4 (2,6 m sobre el suelo > climb.maxHeight): no se agarra.
+        await tp(11, -9.6, 0); await clearEv();
+        await stick('LS', 0, 1); await press('Y', 40); await adv(1200);
+        const c = await st();
+        assert.ok(c.pos[2] < -10.8 && c.pos[2] > -11.6, `llega a la pared del contenedor (z=${c.pos[2].toFixed(2)})`);
+        await stick('LS', 0, 0); await adv(300);
+        const m = await events('player:moveMode');
+        assert.ok(!m.includes('climb') && !m.includes('vault'), `no trepa el contenedor: ${m.join(',')}`);
+        await waitMode(['idle'], 2000);
+      },
+    },
+    {
+      name: 'Maroma contra cobertura → cobertura',
+      async run() {
+        await tp(-5.45, 13.9, 0); await clearEv();
+        await stick('LS', 0, 1); await adv(17);
+        await press('A', 40);
+        const m0 = await waitMode(['evade', 'coverSlide', 'cover'], 400);
+        assert.eq(m0.mode, 'evade', `empieza en maroma (sin cobertura a tiro): ${m0.mode}`);
+        await stick('LS', 0, 0);
+        const s = await waitMode(['cover'], 1500);
+        assert.eq(s.mode, 'cover', `entra en cobertura (${s.mode})`);
+        assert.ok(s.cover && s.cover.height === 'low', 'cobertura media');
+        await stick('LS', 0, -1); await adv(400); await press('A'); await stick('LS', 0, 0); await adv(300);
       },
     },
     {

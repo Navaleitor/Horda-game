@@ -7,12 +7,12 @@
 
 | Botón | Combate | Cargando fortificación | Menús (fabricador, radiales) |
 |---|---|---|---|
-| LS (ejes 0,1) | Mover: caminar / trotar / correr según la inclinación (a fondo = **4,14 m/s**, máximo; no hay sprint) | Mover (más lento) | Navegar |
+| LS (ejes 0,1) | Mover: caminar / trotar / correr según la inclinación (a fondo = **4,6 m/s**, máximo; no hay sprint; agachado ≤ 1,8 m/s) | Mover (más lento) | Navegar |
 | RS (ejes 2,3) | Cámara | Cámara / apuntar el lugar | — (en el radial ↑: elegir) |
-| L3 (10) | Sin función | — | — |
+| L3 (10) | **Agacharse / levantarse** (alterna; fuera de cobertura; agachado ≤ 1,8 m/s, cápsula 1,1 m) | — | — |
 | R3 (11) | Cambiar hombro | — | — |
-| A (0) | Cobertura a tiro = entrar (corre a velocidad normal y se pega; sin slide) · **sin cobertura a tiro = maroma** en la dirección del stick (quieto: hacia delante, a donde mira el personaje) · doble toque = maroma (alias) · A+dirección en cobertura = SWAT turn / deslizar a la cobertura contigua | — | Seleccionar / comprar |
-| Y (3) | Saltar · trepar · saltar sobre cobertura | — | — |
+| A (0) | Cobertura a tiro = entrar (corre a velocidad normal y se pega; sin slide) · **sin cobertura a tiro = maroma** en la dirección del stick (quieto: hacia delante, a donde mira el personaje) · doble toque = maroma (alias) · maroma que choca con una cobertura = se pega a ella · A+dirección en cobertura = SWAT turn / deslizar a la cobertura contigua | — | Seleccionar / comprar |
+| Y (3) | Saltar (+50 %: cima ≈ 1,3 m) · trepar · saltar sobre cobertura · **en el aire, se agarra solo** a un borde saltable/trepable delante (cima ≤ 2,4 m sobre el suelo) | — | — |
 | B (1) | Golpe cuerpo a cuerpo | **Soltar** la pieza en el suelo | Atrás / cerrar |
 | X (2) | Interactuar: fabricador, montar torreta, recoger, **mantener sobre aliado derribado = revivir**. **Toque sobre fortificación** → radial de fortificación (§12) | — | — |
 | RB (5) | Recargar (toque de nuevo = recarga activa) | Rotar +45° | Pestaña → |
@@ -25,7 +25,9 @@
 | View (8) | Mantener = marcador | — | — |
 | Menu (9) | Pausa | Pausa | Pausa |
 
-- **A sin cobertura**: maroma (rodar, 7,5 m/s durante 0,45 s ≈ 2,6 m, 0,3 s de enfriamiento) en la dirección del stick; con el stick suelto, hacia delante (a donde mira el personaje). La cobertura se toma con A a ≤ 2,5 m, corriendo a 4,14 m/s. No existe deslizamiento (slide) ni sprint.
+- **A sin cobertura**: maroma (rodar, 7,8 m/s durante 0,6 s ≈ 3,5 m, 0,3 s de enfriamiento) en la dirección del stick; con el stick suelto, hacia delante (a donde mira el personaje). Si durante la maroma choca con una cobertura (≤ 0,25 m), se pega a ella sin volver a correr. La cobertura se toma con A a ≤ 2,5 m, corriendo a 4,6 m/s. No existe deslizamiento (slide) ni sprint.
+- **L3 agacharse**: alterna agachado/de pie fuera de cobertura (en cobertura manda su pose y L3 no hace nada; al salir sigue de pie). Y y A levantan (y saltan / hacen la maroma); correr a fondo no levanta. Sin hueco encima no se levanta.
+- **Trepar en el aire**: saltando o cayendo, si delante (stick, o dirección de movimiento, o cara) hay un borde de vault/trepar con la cima ≤ 2,4 m sobre el suelo bajo el jugador, se agarra y lo sube (vault si es bajo y estrecho).
 - **A + dirección en el extremo de una cobertura**: si el hueco hasta la siguiente cobertura es de **≤1,5 m** → **SWAT turn**; si es **mayor** → **deslizar a la cobertura contigua**.
 - **Tac-Com** (mantener LB): resalta a través de paredes a aliados, fabricador y fortificaciones (con su salud), dibuja rutas de spawn, enemigos restantes y composición de la siguiente oleada.
 - **Pistola de reparación**: RT mantenido, haz sobre fortificación (≤6 m).

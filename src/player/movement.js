@@ -1,6 +1,7 @@
-// Movimiento del jugador: locomoción relativa a cámara, salto/vault/trepar (Y), maroma (A en movimiento
-// sin cobertura a tiro, o doble toque de A) y las acciones temporizadas que usa la cobertura
-// (entrar corriendo, SWAT turn, deslizar a la contigua). Dueño: controls-camera-engineer.
+// Movimiento del jugador: locomoción relativa a cámara, salto/vault/trepar (Y, y también agarrándose en el
+// aire a un borde alcanzable), maroma (A en movimiento sin cobertura a tiro, o doble toque de A; si choca
+// con una cobertura se pega a ella), agacharse (L3, alterna) y las acciones temporizadas que usa la
+// cobertura (entrar corriendo, SWAT turn, deslizar a la contigua). Dueño: controls-camera-engineer.
 //
 // Todo en paso fijo. La colisión la resuelve physics.moveCapsule; las acciones de transferencia
 // (vault, trepar, SWAT, deslizar a contigua) interpolan la posición sin colisión porque physics ya
@@ -11,6 +12,9 @@ import * as THREE from 'three';
 const _delta = new THREE.Vector3();
 const _dir = new THREE.Vector3();
 const _tmp = new THREE.Vector3();
+const _o = new THREE.Vector3();
+const _up = new THREE.Vector3(0, 1, 0);
+const _down = new THREE.Vector3(0, -1, 0);
 
 /** Modos de acción: bloquean disparo/apuntado y la locomoción normal. */
 export const ACTION_MODES = new Set(['evade', 'vault', 'climb', 'swat', 'coverSlide']);
@@ -46,7 +50,9 @@ export function createMovement(ctx) {
     evadeCD: 0,
     aUsedForCover: false,   // la última pulsación de A fue para cobertura → no cuenta para doble toque
     lastFallSpeed: 0,
+    crouched: false,  // L3: agachado fuera de cobertura
   };
+  const crouchPayload = { who: e, crouched: false };
 
   // Acción temporizada en curso.
   const act = {
@@ -97,6 +103,31 @@ export function createMovement(ctx) {
     else e.vel.y = Math.max(-PH.terminalVelocity, e.vel.y - PH.gravity * dt);
   }
 
+  // ── Agacharse (L3) ───────────────────────────────────────────────────────
+  /** ¿Cabe la cápsula de pie? Rayos verticales (centro + 4 puntos del radio) desde la altura agachado. */
+  function headroomFree() {
+    const r = e.radius * 0.85;
+    const from = P.crouchHeight - 0.05, len = P.height - P.crouchHeight + 0.1;
+    for (let i = 0; i < 5; i++) {
+      const ox = i === 1 ? r : i === 2 ? -r : 0, oz = i === 3 ? r : i === 4 ? -r : 0;
+      _o.set(e.pos.x + ox, e.pos.y + from, e.pos.z + oz);
+      if (ctx.physics.raycast(_o, _up, len)) return false;
+    }
+    return true;
+  }
+
+  /** Agacha/levanta. Levantarse exige hueco salvo `force`. Devuelve true si queda en el estado pedido. */
+  function setCrouch(on, force = false) {
+    if (st.crouched === on) return true;
+    if (!on && !force && !headroomFree()) return false;
+    st.crouched = on;
+    e.crouched = on;
+    e.height = on ? P.crouchHeight : P.height;
+    crouchPayload.crouched = on;
+    ctx.game.events.emit('player:crouch', crouchPayload);
+    return true;
+  }
+
   // ── Locomoción ───────────────────────────────────────────────────────────
   /** Dirección para consultas (cobertura, salientes): stick si se inclina; si no, `fallback`. */
   function queryDir(fallback, out) {
@@ -110,19 +141,23 @@ export function createMovement(ctx) {
 
     // A: cobertura a tiro = entrar (corriendo a velocidad normal) · sin cobertura = maroma en la
     // dirección del stick (quieto: hacia donde mira el personaje) · doble toque = maroma (alias).
+    // Agachado: A pone de pie (si hay hueco) y hace lo que toque.
     if (I.pressed('cover')) {
       const dbl = I.doubleTap('cover') && !st.aUsedForCover;
       st.aUsedForCover = false;
       if (e.grounded) {
-        if (dbl && st.evadeCD <= 0) { startEvade(); return; }
+        if (dbl && st.evadeCD <= 0) { setCrouch(false); startEvade(); return; }
         queryDir(ctx.camFwd, _dir);
         if (ctx.cover.tryEnter(_dir, CC.snapDistance, CC.snapSpeed)) { st.aUsedForCover = true; return; }
-        if (st.evadeCD <= 0) { startEvade(); return; }
+        if (st.evadeCD <= 0) { setCrouch(false); startEvade(); return; }
       }
     }
 
-    // Y: saliente (vault/trepar) o salto.
-    if (I.pressed('jump') && !st.jumped && (e.grounded || st.airT < P.jump.coyoteTime)) {
+    // L3: alterna agachado / de pie (solo en el suelo; levantarse exige hueco).
+    if (I.pressed('crouch') && e.grounded) setCrouch(!st.crouched);
+
+    // Y: saliente (vault/trepar) o salto. Agachado: se levanta y salta (sin hueco no hace nada).
+    if (I.pressed('jump') && !st.jumped && (e.grounded || st.airT < P.jump.coyoteTime) && setCrouch(false)) {
       queryDir(ctx.bodyFwd, _dir);
       if (!tryLedge(_dir)) {
         e.vel.y = P.jump.velocity;
@@ -135,7 +170,10 @@ export function createMovement(ctx) {
     // Velocidad objetivo.
     let target = 0;
     let mode = 'idle';
-    if (mag > P.stickIdle) {
+    if (st.crouched) {
+      mode = 'crouch';
+      if (mag > P.stickIdle) target = P.speed.crouch * Math.min(1, Math.max(0.4, mag / P.stickRunMin));
+    } else if (mag > P.stickIdle) {
       if (ctx.aimDown) { target = P.speed.aim * Math.min(1, mag / P.stickRunMin); mode = 'walk'; }
       else if (mag < P.stickWalkMax) { target = P.speed.walk * Math.max(0.4, mag / P.stickWalkMax); mode = 'walk'; }
       else if (mag < P.stickRunMin) { target = P.speed.jog; mode = 'jog'; }
@@ -156,7 +194,10 @@ export function createMovement(ctx) {
     physMove(e.vel.x * dt, e.vel.y * dt, e.vel.z * dt);
     if (!e.grounded) st.airT += dt;
 
-    if (!e.grounded && (st.jumped || st.airT > P.jump.coyoteTime)) mode = 'air';
+    if (!e.grounded && (st.jumped || st.airT > P.jump.coyoteTime)) {
+      mode = 'air';
+      if (tryAirLedge()) return;
+    }
     ctx.setMode(mode);
 
     // Orientación: apuntando/disparando mira con la cámara; si no, hacia donde se mueve.
@@ -200,6 +241,26 @@ export function createMovement(ctx) {
     else begin('climb', 'climb', P.climb.duration);
     e.vel.set(0, 0, 0);
     return true;
+  }
+
+  /**
+   * En el aire (salto o caída): si delante (stick, velocidad o cara) hay un borde de vault/trepar, se agarra.
+   * queryLedge mide desde los pies actuales; además la cima no puede quedar a más de climb.maxHeight
+   * sobre el suelo bajo el jugador (un borde inalcanzable desde el suelo tampoco se alcanza saltando).
+   */
+  function tryAirLedge() {
+    if (ctx.stickMag > P.queryStickMin) _dir.copy(ctx.wish);
+    else if (Math.hypot(e.vel.x, e.vel.z) > P.faceMinSpeed) _dir.set(e.vel.x, 0, e.vel.z).normalize();
+    else _dir.copy(ctx.bodyFwd);
+    const L = ctx.physics.queryLedge(e.pos, _dir);
+    if (!L || (L.kind !== 'vault' && L.kind !== 'climb')) return false;
+    _o.set(e.pos.x, e.pos.y + 0.05, e.pos.z);
+    const g = ctx.physics.raycast(_o, _down, P.airGrab.groundProbe);
+    const groundY = g ? g.point.y : e.pos.y;
+    if (L.topY - groundY > P.climb.maxHeight + 1e-3) return false;
+    if (!setCrouch(false)) return false;
+    _tmp.copy(_dir);
+    return tryLedge(_tmp);
   }
 
   /** Correr hasta un punto con colisión (entrar en cobertura). */
@@ -248,6 +309,12 @@ export function createMovement(ctx) {
         applyGravity(dt);
         physMove(e.vel.x * dt, e.vel.y * dt, e.vel.z * dt);
         e.yaw = turnToward(e.yaw, yawFromDir(act.dir.x, act.dir.z), P.actionTurnRate * dt);
+        // Choca con una cobertura en la dirección de la maroma → se pega (mismo flujo que A, tramo corto).
+        _tmp.copy(act.dir);
+        if (ctx.cover.tryEnter(_tmp, CC.evadeSnapDistance, CC.snapSpeed)) {
+          st.evadeCD = P.evade.cooldown; st.aUsedForCover = true;
+          break;
+        }
         if (k >= 1) { st.evadeCD = P.evade.cooldown; e.vel.x *= 0.4; e.vel.z *= 0.4; finish(); }
         break;
       }
@@ -340,11 +407,12 @@ export function createMovement(ctx) {
   function reset() {
     cancel();
     st.airT = 0; st.jumped = false; st.landT = 0; st.evadeCD = 0; st.aUsedForCover = false;
+    setCrouch(false, true);
     e.vel.set(0, 0, 0);
   }
 
   return {
-    st, act, step, reset, cancel, tryLedge, startMoveTo, startTransfer, physMove, applyGravity, queryDir,
+    st, act, step, reset, cancel, tryLedge, setCrouch, startMoveTo, startTransfer, physMove, applyGravity, queryDir,
     get busy() { return act.type !== null; },
   };
 }

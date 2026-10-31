@@ -245,6 +245,7 @@ El sistema de animación escucha `weapon:*` / `melee:*` filtrando por `who === e
 | `game:pauseToggle` | `{}` | hud (botón Menu / Esc) → core |
 | `player:spawned` | `{ entity }` | player → camera, hud, combat |
 | `player:moveMode` | `{ who, mode, prev }` | player → anim, hud |
+| `player:crouch` | `{ who, crouched }` | player (L3; Y/A/cobertura levantan) → hud (indicador) |
 | `cover:enter` / `cover:exit` | `{ who, height, side }` | player → camera, anim, hud |
 | `cover:swat` / `cover:slide` | `{ who, from, to }` | player → anim, camera |
 | `player:shoulder` | `{ who, shoulder }` | player → camera, anim |

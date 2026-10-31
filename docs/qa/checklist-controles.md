@@ -15,22 +15,26 @@ Fase de referencia: **1a** (base jugable: menú, movimiento, cobertura, armas, d
 | LS (ejes 0,1) | Mover | `stick('LS',0,1)` 0,6 s → `player.move.mode ∈ walk/jog/run`, desplazamiento > 0,5 m; al soltar → `idle` | auto | 1a | pendiente |
 | LS a media inclinación | Andar (`walk`) vs trotar | `stick('LS',0,0.4)` → `walk`; a fondo → `jog`/`run` | auto (TODO) | 1a | pendiente |
 | RS (ejes 2,3) | Cámara | `stick('RS',1,0)` → `player.yaw`/cámara giran; sensibilidad e inversión con mando real | auto+manual | 1a | pendiente |
-| L3 (10) | Sin función | LS a fondo + `press('L3')` → el modo sigue en `run` y la velocidad es 4,14 m/s | auto (humo 1a.1) | 1a.2 | ✅ |
+| L3 (10) | Agacharse / levantarse (alterna) | LS a fondo (`run`, 4,6 m/s) + `press('L3')` → `crouched=true`, `mode='crouch'`, velocidad ≤ 1,8 m/s, evento `player:crouch`; 2º L3 → de pie y `run`; agachado + Y o A → de pie (salta / maroma); en cobertura no hace nada | auto (humo 1a.1) | 1a.3 | pendiente |
+| LS a fondo | Velocidad máxima | LS a fondo 0,5 s → `run` a 4,6 m/s (sin sprint) | auto (humo 1a.1) | 1a.3 | pendiente |
 | R3 (11) | Cambiar hombro | `press('R3')` → `player.shoulder` cambia de signo; la cámara cambia de lado | auto+manual | 1a | pendiente |
 | A (0) | Cobertura media | frente a caja `low` + `press('A')` → `mode='cover'`, `cover.height='low'` | auto | 1a | pendiente |
 | A (0) | Cobertura alta | frente a caja `high` + `press('A')` → `cover.height='high'` | auto | 1a | pendiente |
 | A (0) + dirección | SWAT turn (hueco ≤ 1,5 m) | en borde de cobertura con hueco ≤ 1,5 m, LS lateral + A → evento `cover:swat`, acaba en la otra cobertura | auto (TODO posiciones) | 1a | pendiente |
 | A (0) + dirección | Deslizar a cobertura contigua (hueco > 1,5 m) | en el extremo con hueco > 1,5 m, LS lateral + A → evento `cover:slide` | auto (TODO posiciones) | 1a | pendiente |
 | A (0) sin cobertura | Maroma | LS + `press('A')` sin cobertura a tiro → `mode='evade'` en la dirección del stick; quieto → `evade` hacia delante (a donde mira) | auto (humo 1a.1) | 1a.2 | ✅ |
+| A (0) sin cobertura, distancia | Maroma ≈ 3,5 m | `press('A')` quieto en abierto → desplazamiento 3,5 ± 0,4 m (7,8 m/s × 0,6 s) | auto (humo 1a.1) | 1a.3 | pendiente |
+| A (0) maroma → cobertura | Pegarse al chocar | maroma hacia una cobertura media fuera de `snapDistance` → al chocar `coverSlide` corto → `mode='cover'` | auto (humo 1a.1) | 1a.3 | pendiente |
 | A (0) ×2 | Maroma (alias) | `doubleTap('A',120)` con LS lateral → `player:moveMode` con `mode='evade'` | auto (humo 1a.1) | 1a.2 | ✅ |
-| A (0) con cobertura a tiro | Entrar corriendo, sin slide | a ≤ `cover.snapDistance` + `press('A')` → `coverSlide` a 4,14 m/s → `cover` | auto | 1a.2 | ✅ |
+| A (0) con cobertura a tiro | Entrar corriendo, sin slide | a ≤ `cover.snapDistance` + `press('A')` → `coverSlide` a 4,6 m/s → `cover` | auto | 1a.2 | ✅ |
 | LT (6) | Apuntar | `trigger('LT',1)` → `player.aiming=true`, zoom de cámara | auto+manual | 1a | pendiente |
 | LT (6) en cobertura | Asomarse / apuntar por encima | en `cover` + LT → `cover.peeking` o `cover.aimingOver` | auto | 1a | pendiente |
 | RT (7) | Disparar | LT+RT contra diana → `weapon.mag` baja y `hp` de la diana baja | auto | 1a | pendiente |
 | RB (5) | Recargar | `press('RB')` con cargador incompleto → `weapon:reloadStart`, luego `weapon:reloaded` | auto | 1a | pendiente |
 | RB (5) ×2 | Recarga activa | segundo RB dentro de `activeWindow` → `weapon:activeReload {result:'perfect'}`; fuera → `failed` (atasco) | auto (+caso failed TODO) | 1a | pendiente |
 | B (1) | Melee | `press('B')` → evento `melee:swing`; cerca de diana → `melee:hit` | auto | 1a | pendiente |
-| Y (3) | Saltar | `press('Y')` en abierto → `air` y vuelve al suelo | auto | 1a | pendiente |
+| Y (3) | Saltar (+50 %) | `press('Y')` en abierto → `air`, cima ≈ 1,3 m (×1,5 respecto a 6,2 m/s) y vuelve al suelo | auto (humo 1a.1) | 1a.3 | pendiente |
+| Y (3) en el aire | Trepar en el aire | correr hacia el bloque de 2 m (fuera del alcance de Y) + Y → `air` → `climb` → arriba; barra 0,9 m → acaba al otro lado; contenedor 2,6 m → no se agarra | auto (humo 1a.1) | 1a.3 | pendiente |
 | Y (3) | Saltar sobre cobertura / trepar | en cobertura `low` + Y → `vault`, termina al otro lado; muro alto → `climb` | auto (TODO) | 1a | pendiente |
 | D-pad ← (14) | Rifle de asalto | `press('Left')` → `inventory.current=0`, `weapon.id='assaultRifle'` | auto | 1a | pendiente |
 | D-pad → (15) | Arma comprada | Fase 1a: ranura vacía → no cambia de arma (o HUD "vacía") | auto | 1a | pendiente |

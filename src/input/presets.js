@@ -38,6 +38,7 @@ export const E_DAY_DEFAULT = Object.freeze({
     view: [PAD.View],        // mantener = marcador (Fase 4)
     pause: [PAD.Menu],
     shoulder: [PAD.R3],
+    crouch: [PAD.L3],        // alterna agachado / de pie (fuera de cobertura)
     dpadUp: [PAD.Up],        // radial de comodines (Fase 4)
     dpadDown: [PAD.Down],    // pistola / pistola de reparación
     dpadLeft: [PAD.Left],    // rifle de asalto (ranura 0)
@@ -69,6 +70,7 @@ export const E_DAY_DEFAULT = Object.freeze({
     melee: ['KeyF'],
     reload: ['KeyR'],
     shoulder: ['KeyQ'],
+    crouch: ['KeyZ'],
     interact: ['KeyE'],
     lb: ['KeyG'],
     view: ['Tab'],
