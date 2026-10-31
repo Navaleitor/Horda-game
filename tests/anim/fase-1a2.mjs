@@ -41,7 +41,7 @@ const side = (yawOff = Math.PI / 2, pitch = 0.1) => E(([o, p]) => { const g = wi
 
 // --- Idle
 await tp(0.65, 14, 0); await adv(500); await shot('loc-idle');
-// --- Run 4.14
+// --- Run 4.6
 await stick('LS', 0, 1); await adv(700); R.run = await rec(120); await shot('loc-run'); await shot('loc-run-frontal','front'); await shot('loc-run-juego','game'); 
 await E(() => window.__pad.stick('LS', 0, 0.45)); await adv(600); R.walk = await rec(90); await shot('loc-walk');
 await stick('LS', 0, 0.75); await adv(600); R.jog = await rec(90); await shot('loc-jog');

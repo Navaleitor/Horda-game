@@ -1,0 +1,189 @@
+diff --git a/src/anim/core/characterRig.js b/src/anim/core/characterRig.js
+index 10c9f87..f7a28f8 100644
+--- a/src/anim/core/characterRig.js
++++ b/src/anim/core/characterRig.js
+@@ -103,6 +103,11 @@
+ //     rig.ik(left, right)             peso de IK de cada mano hacia el arma (defecto 1, 1)
+ //     rig.leftTarget(x,y,z, space, weight)  lleva la mano izq. a un punto ('weapon' = espacio del
+ //                                     arma, 'char' = espacio de personaje) en vez del support
++//     rig.groundFeet(weight=1)        red de seguridad: ningún tobillo baja de core.footMinY (IK de piernas con peso 1
++//                                     sobre la pose final). Para estados con IK de piernas propio cuyos aditivos se
++//                                     mezclan al hacer crossfade y hunden el pie (cobertura: swat→coverLow)
++//     rig.armYaw(yaw)                 giro (rad, eje Y) del cuerpo respecto a la raíz para orientar el polo de los
++//                                     codos (p. ej. π en cobertura, de espaldas a la pared); aditivo, escalado por w
+ //     rig.recoil(back, up)            impulso al muelle de retroceso del arma
+ //     rig.emit(type, id?)             emite un evento { who, id, foot } (anim:footstep, anim:reload:insert…)
+ //     rig.speed, rig.moveDir, rig.aimYaw, rig.aimPitch, rig.aimW   lecturas útiles
+@@ -245,6 +250,7 @@ export class CharacterRig {
+     this._hold = new Float32Array(6); this._holdInit = false;
+     this._ikL = 0; this._ikR = 0; this._ikWSum = 0; this._ikLSm = 0; this._ikRSm = 0;
+     this._ltAcc = new THREE.Vector3(); this._ltW = 0; this._ltSpace = 'weapon';
++    this._poleYaw = 0; this._ground = 0; this._groundSm = 0;
+     this._loco = { w: 0, speed: 0, stride: 0, back: 0, n: 0 };
+     this.locoPhase = 0;
+     this._lastFootPhase = 0;
+@@ -478,6 +484,8 @@ export class CharacterRig {
+     this._ltW += w;
+     this._ltSpace = space;
+   }
++  groundFeet(weight = 1) { this._ground += this.w * weight; }
++  armYaw(yaw) { this._poleYaw += yaw * this.w; }
+   recoil(back, up) {
+     this._recBack.v += back;
+     this._recUp.v += up;
+@@ -618,7 +626,7 @@ export class CharacterRig {
+     this._aimWBody = 0; this._aimWUp = 0; this._lowCarry = 0; this._handsFree = 0;
+     this._holdAcc.fill(0); this._holdW = 0; this._holdAdd.fill(0);
+     this._ikL = 0; this._ikR = 0; this._ikWSum = 0;
+-    this._ltAcc.set(0, 0, 0); this._ltW = 0;
++    this._ltAcc.set(0, 0, 0); this._ltW = 0; this._poleYaw = 0; this._ground = 0;
+     const L = this._loco; L.w = 0; L.speed = 0; L.stride = 0; L.back = 0; L.n = 0;
+     for (let i = 0; i < this.actions.length; i++) { this.actions[i].req = 0; this.actions[i].rate = 1; }
+   }
+@@ -660,7 +668,7 @@ export class CharacterRig {
+     if (isBody) {
+       this._aimWBody += aw * w;
+       if (p.lowCarry) this._lowCarry += p.lowCarry * w;
+-      if (p.handsFree) this._handsFree += p.handsFree * w;
++      if (p.handsFree) this._handsFree += (typeof p.handsFree === 'function' ? p.handsFree(this) : p.handsFree) * w;
+     } else {
+       this._aimWUp += aw * w;
+     }
+@@ -793,9 +801,29 @@ export class CharacterRig {
+       this.bones[0].position.add(_v);
+     }
+     this._plantSm = damp(this._plantSm, clamp01(this._plant), this.core.ikBlendSpeed, dt);
++    this._groundSm = clamp01(this._ground);
++  }
++
++  /** Tobillos por debajo de core.footMinY (espacio de la raíz) → IK de pierna a esa altura, conservando rodilla y orientación del pie. */
++  _groundFeet(w) {
++    const minY = this.core.footMinY;
++    for (let s = 0; s < 2; s++) {
++      const ft = this.bones[this._legs[s][2]];
++      worldPos(ft, _tgt);
++      this.root.worldToLocal(_tgt);
++      if (_tgt.y >= minY) continue;
++      const up = this.bones[this._legs[s][0]], lo = this.bones[this._legs[s][1]];
++      _tgt.y = minY;
++      this.root.localToWorld(_tgt);
++      worldQuat(ft, _q);
++      worldPos(lo, _pole);
++      solveTwoBone(up, lo, ft, _tgt, _pole, w, _q, 1);
++      up.updateMatrixWorld(true);
++    }
+   }
+ 
+   _applyFeetIK() {
++    if (this._groundSm > 0.01 && this._plantSm < 0.01) this._groundFeet(this._groundSm);
+     const w = this._plantSm;
+     if (w < 0.01) return;
+     // Pies a su posición antes del offset de cadera (y nunca por debajo del suelo).
+@@ -811,6 +839,7 @@ export class CharacterRig {
+       solveTwoBone(up, lo, ft, _tgt, _pole, w, _q, 1);
+       up.updateMatrixWorld(true);
+     }
++    if (this._groundSm > 0.01) this._groundFeet(this._groundSm);
+   }
+ 
+   _rootWorldQ(out) { return worldQuat(this.root, out); }
+@@ -889,7 +918,12 @@ export class CharacterRig {
+     const arm = this.bones[side > 0 ? this._arms[1][0] : this._arms[0][0]];
+     worldPos(arm, out);
+     const p = this.core.elbowPole;
+-    _v.set(p[0] * side, p[1], p[2]).applyQuaternion(this._rootWorldQ(_qw));
++    _v.set(p[0] * side, p[1], p[2]);
++    if (this._poleYaw !== 0) {
++      const c = Math.cos(this._poleYaw), s = Math.sin(this._poleYaw), x = _v.x;
++      _v.x = x * c + _v.z * s; _v.z = -x * s + _v.z * c;
++    }
++    _v.applyQuaternion(this._rootWorldQ(_qw));
+     return out.add(_v);
+   }
+ 
+diff --git a/src/anim/cover/poses.js b/src/anim/cover/poses.js
+index 1b39709..7428806 100644
+--- a/src/anim/cover/poses.js
++++ b/src/anim/cover/poses.js
+@@ -95,8 +95,8 @@ function gearDepth(rig, C) {
+ const mixP = (C, key, kl, pk) => lerp(lerp(C.high[key], C.low[key], kl), lerp(C.peekHigh[key], C.peekLow[key], kl), pk);
+ 
+ /** Mueve el arma con el giro del cuerpo (yaw respecto a la raíz) y, si mirror>0, al otro hombro. Relativo a la tabla base. */
+-function weaponFollow(rig, base, yaw, mirror, dPitch, dY, dYaw = 0) {
+-  const x = base[0] * (1 - 2 * mirror), y = base[1] + dY, z = base[2];
++function weaponFollow(rig, base, yaw, mirror, dPitch, dY, dYaw = 0, dZ = 0) {
++  const x = base[0] * (1 - 2 * mirror), y = base[1] + dY, z = base[2] + dZ;
+   const c = Math.cos(yaw), s = Math.sin(yaw);
+   rig.holdAdd(x * c + z * s - base[0], y - base[1], -x * s + z * c - base[2],
+     dPitch, yaw + dYaw - 2 * mirror * base[4], -2 * mirror * base[5]);
+@@ -216,6 +216,8 @@ function poseCover(rig, cv, C) {
+     step.tx = cv.dirSign * cp; step.tz = -cv.dirSign * sp;
+   }
+   bodyFrame(rig, C, yaw, hx, hz, drop, _chest, footF, footW, step, lean, headUp);
++  rig.armYaw(yaw);
++  rig.groundFeet(1);
+ 
+   // Inclinación lateral del tronco hacia el borde (alta, asomado)
+   if (Math.abs(cv.lean) > 0.001) {
+@@ -230,7 +232,8 @@ function poseCover(rig, cv, C) {
+     const aim = rig.upper === 'aim' || rig.upper === 'fire';
+     const mirror = aim ? pk * (1 - cv.ws) * 0.5 : 0;
+     weaponFollow(rig, aim ? tbl.aim : tbl.ready, yaw, mirror,
+-      aim ? 0 : mixP(C, 'gunPitch', kl, pk), mixP(C, 'gunY', kl, pk) + cv.lift * 0.3, aim ? 0 : mixP(C, 'gunYaw', kl, pk));
++      aim ? 0 : mixP(C, 'gunPitch', kl, pk), mixP(C, 'gunY', kl, pk) + cv.lift * 0.3, aim ? 0 : mixP(C, 'gunYaw', kl, pk),
++      aim ? 0 : mixP(C, 'gunZ', kl, pk));
+     if (aim && mirror > 0.001 && tbl.stance) {
+       // Hombro contrario: invierte el giro de columna que aplica el torso (postura de tiro).
+       const s = tbl.stance.aim * 2 * mirror;
+@@ -351,6 +354,8 @@ function dash(rig, dt, kind) {
+   DASH_STEP.tx = -su; DASH_STEP.tz = -cu;
+   bodyFrame(rig, C, yaw, 0, 0, D.drop * lerp(0.6, 1, k), _chest.set(0, 0, 0), 0, D.footW, DASH_STEP, D.lean, 0);
+   weaponFollow(rig, holdTable(rig).low, yaw, 0, 0, 0);
++  rig.armYaw(yaw);
++  rig.groundFeet(1);
+ }
+ 
+ // ── Disparo a ciegas (torso) ─────────────────────────────────────────────────
+diff --git a/src/anim/locomotion/evade.js b/src/anim/locomotion/evade.js
+index daef03b..a6234bd 100644
+--- a/src/anim/locomotion/evade.js
++++ b/src/anim/locomotion/evade.js
+@@ -15,8 +15,11 @@ import { cfg, releaseIk, dynTrack, quickFade, cancelStance, plantFull } from './
+ const TAU = Math.PI * 2;
+ 
+ export const evade = {
+-  aimWeight: 0, lowCarry: 1, handsFree: 1,
++  aimWeight: 0, lowCarry: 1,
++  // Manos libres (IK de la izq. apagado) hasta que termina el giro; después vuelven al arma durante la recuperación.
++  handsFree: (rig) => (rig.mem.evadeHands === undefined ? 1 : rig.mem.evadeHands),
+   enter(rig, p) {
++    rig.mem.evadeHands = 1;
+     rig.mem.evadeDir = p.dir !== undefined ? p.dir : rig.moveDir;
+     quickFade(rig, cfg(rig).fade.evade);
+   },
+@@ -36,7 +39,9 @@ export const evade = {
+     const r = remap01(t, E.roll[0], E.roll[1]);                      // progreso del giro
+     const u = remap01(t, E.roll[1], 1);                              // recuperación
+     const tuck = into * (1 - ease.smooth(u));
+-    const ang = TAU * (1 + E.extraTurns) * (0.75 * r + 0.25 * ease.smooth(r));
++    // Terminado el giro el ángulo vuelve a 0 (≡ 2π): los aditivos se escalan por el peso del estado, y al irse
++    // el estado con 2π·w la cadera daba media vuelta atrás (cabeza abajo) mientras se desvanecía.
++    const ang = r >= 1 ? 0 : TAU * (1 + E.extraTurns) * (0.75 * r + 0.25 * ease.smooth(r));
+ 
+     // ── Giro de la cadera (composición Ry(dirViva)·Roll·Ry(−c)) ──
+     const cd = lerp(d0, dLive, ease.smooth(r));
+@@ -74,8 +79,12 @@ export const evade = {
+     plantFull(rig, ease.smooth(remap01(u, -0.1, 0.1)));
+ 
+     // El arma: suelta del IK y a la espalda mientras dura el giro
+-    const hold = bell(clamp01((t - 0.02) / 0.96)) ;
+-    releaseIk(rig, Math.min(1, hold * 1.4));
++    // Las manos vuelven al arma ya durante la recuperación (si el IK entra tarde, lo hace sobre el vaivén del Run
++    // y el brazo da un tirón al cruzar los pesos intermedios).
++    const hold = bell(clamp01((t - 0.02) / 0.96));
++    const back = ease.smooth(remap01(t, E.roll[1] - 0.04, E.roll[1] + 0.3 * (1 - E.roll[1])));
++    rig.mem.evadeHands = 1 - back;
++    releaseIk(rig, Math.min(1, hold * 1.4) * (1 - back));
+     rig.holdAdd(0.05 * hold, 0.15 * hold, 0.3 * hold, 0, 0, 0);
+   },
+ };

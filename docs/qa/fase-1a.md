@@ -56,3 +56,22 @@ Controles E-Day (§1 del GDD), cámara siempre en tercera persona, cobertura med
 - D3 (baja): patinaje 0,25–0,34 m/s en trote/carrera/strafe según la métrica del revisor.
 - Núcleo: `handsFreeR` (soltar la mano derecha), pasar altura/landPos de queryLedge al rig, protección de clips con rate 0, `measureClip` del Run.
 - Agacharse no tiene botón todavía (no revisado en juego).
+
+# Fase 1a.3 — Correcciones de control y HUD (alcance reducido): reporte de cierre
+
+## Estado
+- `node build.js` OK (`horda.html` 4,51 MB). `node tests/e2e/run.mjs` → **44/44 PASS, 0 errores de consola** (2 avisos). Headless SwiftShader: 2 FPS medio en combate, 50 draw calls, ~55 k triángulos (render por software; no representa el rendimiento real).
+- Firmas: comprobaciones de contratos (eventos por `core/events.js`, cifras en `config.js`) y de QA hechas por el chat de la fase. Sin revisión de animación: fuera del alcance reducido.
+
+## Hecho
+- **Destello al disparar**: la sacudida de cámara leía `st.bobT` sin inicializar → NaN en la cámara → solo se pintaba el fondo naranja durante ~5 frames. Test `suites/15-destello.mjs` (brillo medio del frame con y sin disparo).
+- Correr a fondo 4,6 m/s (`speed.run`, `cover.snapSpeed`, `anim.playbackRef.run`). Salto 7,6 m/s (+50 % de altura).
+- Trepar en el aire: saltando o cayendo, un borde delante (≤ `climb.maxHeight` sobre el suelo) → vault/climb automático.
+- L3 alterna agachado/de pie fuera de cobertura (`speed.crouch` 1,8 m/s); evento `player:crouch`; indicador «Agachado» en el HUD.
+- Ya estaban hechas cuando se redujo el alcance (se mantienen, con tests): maroma ≈ 3,5 m (7,8 m/s × 0,6 s) y maroma contra cobertura → cobertura.
+- Suite de controles + HUD `suites/10-controles.mjs` (sustituye a `pendiente-1a3/`).
+
+## Pendiente
+- Pose de cobertura alta y agarre de manos/IK, D1–D3: WIP aparcado en `docs/agentes/anim-wip-1a3.patch` (ver `.md`).
+- Revisión de `animation-reviewer` con capturas.
+- Dudas: ¿bajar la cámara al agacharse? ¿seguir agachado tras caer de un borde? ¿acortar la subida tras agarrarse en el aire?

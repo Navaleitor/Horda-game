@@ -82,7 +82,7 @@ export function dynamics(rig, dt, v, c) {
 export function applyLean(rig, d, c, v) {
   const L = c.lean, B = c.bank;
   let x = clamp(-d.acc * L.gain, -L.maxFwd, L.maxBack);
-  x -= c.leanRun * remap01(v, 2.5, 4.14);
+  x -= c.leanRun * remap01(v, 2.5, 4.6);
   const z = clamp(d.yr * v * B.gain, -B.max, B.max) * remap01(v, B.minSpeed, B.minSpeed + 1);
   if (x === 0 && z === 0) return;
   rig.rot('spine', x * 0.4, 0, z * 0.4);

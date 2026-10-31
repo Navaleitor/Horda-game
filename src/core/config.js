@@ -342,7 +342,6 @@ const config = {
       poseSmoothing: 30,        // 1/s: suavizado de aditivos por hueso y cadera
       holdBlendSpeed: 16,       // 1/s: suavizado de la pose del arma
       ikBlendSpeed: 12,         // 1/s: suavizado de pesos de IK
-      footMinY: 0.075,          // m: altura mínima del tobillo sobre el suelo (rig.groundFeet)
       aimYawMax: 85 * DEG,
       aimPitchMin: -70 * DEG,
       aimPitchMax: 70 * DEG,
@@ -402,10 +401,10 @@ const config = {
       // Pose por altura × (agazapado | asomado). drop = bajada de cadera, back = cadera hacia la pared,
       // lean = inclinación del tronco hacia delante del cuerpo (rad), headUp = cabeza arriba (rad),
       // footW = semianchura de pisada, footF = pie por delante de la cadera, gun = [subir arma (rad), x, y, z] sobre 'ready'.
-      high:     { drop: 0.06, back: 0.17, lean: 0.10, headUp: 0.0,  footW: 0.17, footF: 0.02, gunPitch: -0.5, gunYaw: 0.45, gunY: 0.0, gunZ: 0.12 },
-      low:      { drop: 0.68, back: 0.17, lean: 1.25, headUp: -0.3, footW: 0.19, footF: 0.06, gunPitch: 0.3,  gunYaw: 0.4, gunY: 0.0, gunZ: 0.0 },
-      peekHigh: { drop: 0.04, back: -0.12, lean: 0.0,  headUp: 0.0,  footW: 0.17, footF: 0.0,  gunPitch: 0.0,  gunYaw: 0.0, gunY: 0.0, gunZ: 0.0 },
-      peekLow:  { drop: 0.16, back: 0.0,  lean: 0.1,  headUp: 0.0,  footW: 0.19, footF: 0.0,  gunPitch: 0.0,  gunYaw: 0.0, gunY: 0.0, gunZ: 0.0 },
+      high:     { drop: 0.06, back: 0.17, lean: 0.10, headUp: 0.0,  footW: 0.17, footF: 0.02, gunPitch: 1.55, gunYaw: 0.0, gunY: 0.02 },
+      low:      { drop: 0.68, back: 0.17, lean: 1.25, headUp: -0.3, footW: 0.19, footF: 0.06, gunPitch: 0.3,  gunYaw: 1.2, gunY: 0.0 },
+      peekHigh: { drop: 0.04, back: -0.12, lean: 0.0,  headUp: 0.0,  footW: 0.17, footF: 0.0,  gunPitch: 0.0,  gunYaw: 0.0, gunY: 0.0 },
+      peekLow:  { drop: 0.16, back: 0.0,  lean: 0.1,  headUp: 0.0,  footW: 0.19, footF: 0.0,  gunPitch: 0.0,  gunYaw: 0.0, gunY: 0.0 },
       bodyBackZ: 0.17,          // z (marco de personaje, Idle) de la superficie de la espalda; lo que sobresalga (mochila…) se descuenta de `back`
       headComp: 0.3,            // fracción de la inclinación del tronco que la cabeza devuelve (mira al frente)
       peekShift: 0.32,          // m que se adelanta la cadera hacia el borde al asomarse en alta
