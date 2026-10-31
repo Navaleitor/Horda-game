@@ -92,6 +92,54 @@ export default {
       },
     },
     {
+      name: 'agachado: la cámara baja ~0,35 m con transición suave',
+      async run() {
+        await tp(-5, 5, Math.PI / 2); await adv(400);
+        const y0 = await E(() => window.__game.cameraState().offset[1]);
+        await press('L3'); await adv(50);
+        const yMid = await E(() => window.__game.cameraState().offset[1]);
+        await adv(800);
+        const cs = await E(() => window.__game.cameraState());
+        assert.eq(cs.preset, 'crouch', 'preset de cámara agachado');
+        assert.ok(Math.abs((y0 - cs.offset[1]) - 0.35) < 0.03, `baja ${(y0 - cs.offset[1]).toFixed(3)} m`);
+        assert.ok(yMid < y0 && yMid > cs.offset[1] + 0.02, 'transición suave (no salta)');
+        await press('L3'); await adv(800);
+        assert.ok(Math.abs(await E(() => window.__game.cameraState().offset[1]) - y0) < 0.02, 'vuelve a la altura de pie');
+      },
+    },
+    {
+      name: 'caer de un borde agachado → de pie al aterrizar',
+      async run() {
+        // Bloque trepable x∈[13,15] (2 m): subir, agacharse y bajar andando por el borde oeste.
+        await tp(11.2, 14, -Math.PI / 2);
+        await stick('LS', 0, 1); await press('Y', 40);
+        await waitMode(['climb'], 1200); await stick('LS', 0, 0);
+        let s = await waitMode(['idle'], 2500);
+        assert.gt(s.pos[1], 1.9, 'encima del bloque');
+        await E(() => window.__game.teleport(13.4, 14, Math.PI / 2)); await adv(200);
+        await press('L3'); await adv(200);
+        assert.ok((await st()).crouched, 'agachado arriba');
+        await stick('LS', 0, 1); await adv(1500); await stick('LS', 0, 0); await adv(500);
+        s = await st();
+        assert.lt(s.pos[1], 0.3, `en el suelo (y=${s.pos[1].toFixed(2)})`);
+        assert.ok(!s.crouched, 'de pie tras aterrizar');
+      },
+    },
+    {
+      name: 'subida agarrado en el aire ∝ altura que falta (0,35–0,8 s)',
+      async run() {
+        await tp(11.2, 14, -Math.PI / 2);
+        await stick('LS', 0, 1); await press('Y', 40);
+        const s = await waitMode(['climb'], 1200);
+        assert.eq(s.mode, 'climb', 'se agarra');
+        const P = await E(() => window.__game.config.player.climb);
+        let t = 0;
+        while ((await st()).mode === 'climb' && t < 2000) { await adv(17); t += 17; }
+        await stick('LS', 0, 0); await adv(300);
+        assert.ok(t >= P.minAirDuration * 1000 - 40 && t < P.duration * 1000 - 40, `duración de la subida ${t} ms`);
+      },
+    },
+    {
       name: 'L3 en cobertura no cambia la pose (manda la cobertura)',
       async run() {
         await tp(-5.45, 11.5, 0);

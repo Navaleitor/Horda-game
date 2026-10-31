@@ -68,6 +68,8 @@ export function createTpsCamera(game) {
       } else { src = C.coverHigh; name = 'coverHigh'; }
     } else if (p.aiming) {
       src = C.aim; name = 'aim';
+    } else if (p.crouched) {
+      src = C.crouch; name = 'crouch';
     }
     _target.x = src.x; _target.y = src.y; _target.z = src.z;
     st.preset = name;

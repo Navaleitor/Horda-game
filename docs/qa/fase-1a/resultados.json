@@ -1,6 +1,6 @@
 {
   "fase": "fase-1a",
-  "fecha": "2026-10-31T01:47:56.067Z",
+  "fecha": "2026-10-31T01:54:34.314Z",
   "chromiumArgs": [
     "--use-gl=angle",
     "--use-angle=swiftshader",
@@ -12,14 +12,14 @@
   "build": {
     "ok": true,
     "release": {
-      "ms": 384
+      "ms": 516
     },
     "debug": {
-      "ms": 438
+      "ms": 447
     },
     "sizes": {
-      "horda.html": 4727909,
-      "horda-debug.html": 5463244
+      "horda.html": 4728157,
+      "horda-debug.html": 5463828
     }
   },
   "suites": [
@@ -30,55 +30,55 @@
         {
           "name": "window.__game existe",
           "status": "PASS",
-          "ms": 7,
+          "ms": 942,
           "error": null
         },
         {
           "name": "estado inicial 'menu'",
           "status": "PASS",
-          "ms": 4,
+          "ms": 16,
           "error": null
         },
         {
           "name": "canvas WebGL en la página",
           "status": "PASS",
-          "ms": 5,
+          "ms": 18,
           "error": null
         },
         {
           "name": "el loop avanza (frames y ticks)",
           "status": "PASS",
-          "ms": 1081,
+          "ms": 712,
           "error": null
         },
         {
           "name": "stats() responde con fpsAvg/fpsP5/drawCalls/triangles",
           "status": "PASS",
-          "ms": 6,
+          "ms": 8,
           "error": null
         },
         {
           "name": "mando simulado visible para la página",
           "status": "PASS",
-          "ms": 9,
+          "ms": 7,
           "error": null
         },
         {
           "name": "input lee el mando (device, down('cover'), axis('move'))",
           "status": "PASS",
-          "ms": 316,
+          "ms": 315,
           "error": null
         },
         {
           "name": "captura del menú",
           "status": "PASS",
-          "ms": 1046,
+          "ms": 1718,
           "error": null
         },
         {
           "name": "horda.html (release) carga sin errores y sin __game",
           "status": "PASS",
-          "ms": 11167,
+          "ms": 10427,
           "error": null
         },
         {
@@ -96,91 +96,91 @@
         {
           "name": "(setup)",
           "status": "PASS",
-          "ms": 2838,
+          "ms": 2856,
           "error": null
         },
         {
           "name": "LS mueve (run) y al soltar vuelve a idle",
           "status": "PASS",
-          "ms": 59,
+          "ms": 67,
           "error": null
         },
         {
           "name": "L3 agacharse/levantarse; velocidad a fondo 4,6 m/s y agachado ≤ 1,8 m/s",
           "status": "PASS",
-          "ms": 270,
+          "ms": 307,
           "error": null
         },
         {
           "name": "R3 cambia de hombro",
           "status": "PASS",
-          "ms": 53,
+          "ms": 47,
           "error": null
         },
         {
           "name": "A cobertura media + LT asomarse + SWAT turn",
           "status": "PASS",
-          "ms": 193,
+          "ms": 210,
           "error": null
         },
         {
           "name": "A cobertura alta y LT asoma desde el borde",
           "status": "PASS",
-          "ms": 111,
+          "ms": 149,
           "error": null
         },
         {
           "name": "A sin cobertura = maroma (stick o, quieto, hacia delante); doble A = maroma",
           "status": "PASS",
-          "ms": 176,
+          "ms": 188,
           "error": null
         },
         {
           "name": "Y salta, vault sobre la barra y trepa el bloque",
           "status": "PASS",
-          "ms": 409,
+          "ms": 489,
           "error": null
         },
         {
           "name": "Maroma ≈ 3,5 m en abierto; salto un 50 % más alto",
           "status": "PASS",
-          "ms": 258,
+          "ms": 301,
           "error": null
         },
         {
           "name": "Trepar en el aire: bloque 2 m y barra 0,9 m; contenedor 2,6 m no",
           "status": "PASS",
-          "ms": 308,
+          "ms": 312,
           "error": null
         },
         {
           "name": "Maroma contra cobertura → cobertura",
           "status": "PASS",
-          "ms": 135,
+          "ms": 176,
           "error": null
         },
         {
           "name": "LT+RT a una diana baja su vida",
           "status": "PASS",
-          "ms": 74,
+          "ms": 71,
           "error": null
         },
         {
           "name": "RB recarga y 2º RB en la zona perfecta → perfect",
           "status": "PASS",
-          "ms": 229,
+          "ms": 307,
           "error": null
         },
         {
           "name": "B golpe cuerpo a cuerpo cancela la recarga",
           "status": "PASS",
-          "ms": 37,
+          "ms": 48,
           "error": null
         },
         {
           "name": "D-pad: ↓ pistola, → vacía (no cambia), ← rifle",
           "status": "PASS",
-          "ms": 51,
+          "ms": 43,
           "error": null
         },
         {
@@ -204,55 +204,73 @@
         {
           "name": "(setup)",
           "status": "PASS",
-          "ms": 156,
+          "ms": 187,
           "error": null
         },
         {
           "name": "LS: poca inclinación = walk, media = jog, a fondo = run (4,6 m/s)",
           "status": "PASS",
-          "ms": 126,
+          "ms": 149,
           "error": null
         },
         {
           "name": "RS gira la cámara",
           "status": "PASS",
-          "ms": 38,
+          "ms": 37,
           "error": null
         },
         {
           "name": "sin entradas el jugador queda en idle",
           "status": "PASS",
-          "ms": 18,
+          "ms": 30,
           "error": null
         },
         {
           "name": "L3 alterna agachado/de pie; agachado ≤ speed.crouch; indicador en el HUD",
           "status": "PASS",
-          "ms": 72,
+          "ms": 563,
+          "error": null
+        },
+        {
+          "name": "agachado: la cámara baja ~0,35 m con transición suave",
+          "status": "PASS",
+          "ms": 59,
+          "error": null
+        },
+        {
+          "name": "caer de un borde agachado → de pie al aterrizar",
+          "status": "PASS",
+          "ms": 289,
+          "error": null
+        },
+        {
+          "name": "subida agarrado en el aire ∝ altura que falta (0,35–0,8 s)",
+          "status": "PASS",
+          "ms": 202,
           "error": null
         },
         {
           "name": "L3 en cobertura no cambia la pose (manda la cobertura)",
           "status": "PASS",
-          "ms": 442,
+          "ms": 91,
           "error": null
         },
         {
           "name": "HUD: vida, arma y munición",
           "status": "PASS",
-          "ms": 39,
+          "ms": 59,
           "error": null
         },
         {
           "name": "HUD: recarga activa (barra y resultado)",
           "status": "PASS",
-          "ms": 201,
+          "ms": 265,
           "error": null
         },
         {
           "name": "HUD: prompt «Cubrirse» (A) junto a una cobertura",
           "status": "PASS",
-          "ms": 51,
+          "ms": 58,
           "error": null
         },
         {
@@ -270,19 +288,19 @@
         {
           "name": "(setup)",
           "status": "PASS",
-          "ms": 150,
+          "ms": 212,
           "error": null
         },
         {
           "name": "brillo medio del frame con y sin disparo (±6 %)",
           "status": "PASS",
-          "ms": 1449,
+          "ms": 1677,
           "error": null
         },
         {
           "name": "sacudida de aterrizaje sin NaN",
           "status": "PASS",
-          "ms": 846,
+          "ms": 835,
           "error": null
         },
         {
@@ -300,13 +318,13 @@
         {
           "name": "entrar en partida (si el menú lo permite)",
           "status": "PASS",
-          "ms": 3035,
+          "ms": 3786,
           "error": null
         },
         {
           "name": "FPS 5 s + draw calls",
           "status": "PASS",
-          "ms": 14626,
+          "ms": 14847,
           "error": null
         },
         {
@@ -324,13 +342,13 @@
       {
         "suite": "15-destello.mjs",
         "type": "warning",
-        "text": "[.WebGL-0x904001a5400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "text": "[.WebGL-0x2304001a5400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
         "where": "horda-debug.html?lowgfx:0"
       },
       {
         "suite": "15-destello.mjs",
         "type": "warning",
-        "text": "[.WebGL-0x904001a5400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)",
+        "text": "[.WebGL-0x2304001a5400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)",
         "where": "horda-debug.html?lowgfx:0"
       }
     ]
@@ -339,25 +357,25 @@
     "escena": "combate",
     "ms": 5000,
     "raf": {
-      "frames": 10,
-      "fpsAvg": 2,
-      "fpsP5": 1.4
+      "frames": 9,
+      "fpsAvg": 1.8,
+      "fpsP5": 1.2
     },
     "stats": {
-      "fpsAvg": 5.1,
+      "fpsAvg": 4.9,
       "fpsP5": 1.4,
       "drawCalls": 50,
-      "triangles": 54978,
+      "triangles": 54976,
       "geometries": 31,
       "textures": 8,
-      "frames": 47,
-      "tick": 103,
-      "samples": 46,
+      "frames": 49,
+      "tick": 102,
+      "samples": 48,
       "state": "playing"
     }
   },
   "resumen": {
-    "pass": 44,
+    "pass": 47,
     "fail": 0,
     "skip": 0,
     "erroresConsola": 0,
@@ -366,15 +384,15 @@
   },
   "arranque": {
     "statsMenu": {
-      "fpsAvg": 8.4,
-      "fpsP5": 1,
+      "fpsAvg": 19.9,
+      "fpsP5": 5.8,
       "drawCalls": 58,
       "triangles": 7212,
       "geometries": 18,
       "textures": 1,
-      "frames": 14,
-      "tick": 25,
-      "samples": 13,
+      "frames": 45,
+      "tick": 61,
+      "samples": 44,
       "state": "menu"
     }
   },

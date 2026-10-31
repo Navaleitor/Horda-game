@@ -89,7 +89,7 @@ const config = {
     jump: { velocity: 7.6, coyoteTime: 0.1 },   // 6.2·√1.5: salto un 50 % más alto (~2.9 m de cima)
     evade: { speed: 7.8, duration: 0.6, cooldown: 0.3, endFalloff: 0.5 },   // maroma ≈ 3.5 m = v·t·(1−falloff/2) (A en movimiento sin cobertura a tiro / doble A)
     vault: { maxHeight: 1.2, duration: 0.45, clearance: 0.25, exitSpeed: 3.4 },
-    climb: { maxHeight: 2.4, duration: 0.8, upFraction: 0.6 },   // maxHeight: también tope sobre el suelo al agarrarse en el aire
+    climb: { maxHeight: 2.4, duration: 0.8, minAirDuration: 0.35, upFraction: 0.6 },   // agarrado en el aire: duración ∝ altura que falta, [minAirDuration, duration]   // maxHeight: también tope sobre el suelo al agarrarse en el aire
     airGrab: { groundProbe: 30 },   // m de rayo hacia abajo para medir el suelo al agarrarse en el aire
     // Umbrales del stick izquierdo para el modo de locomoción
     stickIdle: 0.05,
@@ -130,6 +130,7 @@ const config = {
     far: 400,
     // offsets relativos al jugador (x = lateral según hombro, y = arriba, z = atrás)
     shoulder: { x: 0.55, y: 1.65, z: 2.8 },
+    crouch: { x: 0.55, y: 1.30, z: 2.8 },     // agachado (L3): 0,35 m más baja que shoulder, mismo suavizado (lerpSpeed)
     aim: { x: 0.65, y: 1.6, z: 1.4 },
     coverLow: { x: 0.7, y: 1.25, z: 2.6 },
     coverHigh: { x: 0.9, y: 1.7, z: 2.6 },

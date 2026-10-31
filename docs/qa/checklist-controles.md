@@ -15,7 +15,7 @@ Fase de referencia: **1a** (base jugable: menú, movimiento, cobertura, armas, d
 | LS (ejes 0,1) | Mover | `stick('LS',0,1)` 0,6 s → `player.move.mode ∈ walk/jog/run`, desplazamiento > 0,5 m; al soltar → `idle` | auto | 1a | pendiente |
 | LS a media inclinación | Andar (`walk`) vs trotar | `stick('LS',0,0.4)` → `walk`; a fondo → `jog`/`run` | auto (TODO) | 1a | pendiente |
 | RS (ejes 2,3) | Cámara | `stick('RS',1,0)` → `player.yaw`/cámara giran; sensibilidad e inversión con mando real | auto+manual | 1a | pendiente |
-| L3 (10) | Agacharse / levantarse (alterna) | LS a fondo (`run`, 4,6 m/s) + `press('L3')` → `crouched=true`, `mode='crouch'`, velocidad ≤ 1,8 m/s, evento `player:crouch`; 2º L3 → de pie y `run`; agachado + Y o A → de pie (salta / maroma); en cobertura no hace nada | auto (humo 1a.1) | 1a.3 | pendiente |
+| L3 (10) | Agacharse / levantarse (alterna) | LS a fondo (`run`, 4,6 m/s) + `press('L3')` → `crouched=true`, `mode='crouch'`, velocidad ≤ 1,8 m/s, evento `player:crouch`; 2º L3 → de pie y `run`; agachado + Y o A → de pie (salta / maroma); en cobertura no hace nada; cámara `preset='crouch'` 0,35 m más baja con transición; caer de un borde agachado → de pie | auto (humo 1a.1 + suite 10) | 1a.3 | ✅ |
 | LS a fondo | Velocidad máxima | LS a fondo 0,5 s → `run` a 4,6 m/s (sin sprint) | auto (humo 1a.1) | 1a.3 | pendiente |
 | R3 (11) | Cambiar hombro | `press('R3')` → `player.shoulder` cambia de signo; la cámara cambia de lado | auto+manual | 1a | pendiente |
 | A (0) | Cobertura media | frente a caja `low` + `press('A')` → `mode='cover'`, `cover.height='low'` | auto | 1a | pendiente |
@@ -34,7 +34,7 @@ Fase de referencia: **1a** (base jugable: menú, movimiento, cobertura, armas, d
 | RB (5) ×2 | Recarga activa | segundo RB dentro de `activeWindow` → `weapon:activeReload {result:'perfect'}`; fuera → `failed` (atasco) | auto (+caso failed TODO) | 1a | pendiente |
 | B (1) | Melee | `press('B')` → evento `melee:swing`; cerca de diana → `melee:hit` | auto | 1a | pendiente |
 | Y (3) | Saltar (+50 %) | `press('Y')` en abierto → `air`, cima ≈ 1,3 m (×1,5 respecto a 6,2 m/s) y vuelve al suelo | auto (humo 1a.1) | 1a.3 | pendiente |
-| Y (3) en el aire | Trepar en el aire | correr hacia el bloque de 2 m (fuera del alcance de Y) + Y → `air` → `climb` → arriba; barra 0,9 m → acaba al otro lado; contenedor 2,6 m → no se agarra | auto (humo 1a.1) | 1a.3 | pendiente |
+| Y (3) en el aire | Trepar en el aire | correr hacia el bloque de 2 m (fuera del alcance de Y) + Y → `air` → `climb` → arriba; barra 0,9 m → acaba al otro lado; contenedor 2,6 m → no se agarra; subida agarrado en el aire ∝ altura que falta (0,35–0,8 s) | auto (humo 1a.1 + suite 10) | 1a.3 | ✅ |
 | Y (3) | Saltar sobre cobertura / trepar | en cobertura `low` + Y → `vault`, termina al otro lado; muro alto → `climb` | auto (TODO) | 1a | pendiente |
 | D-pad ← (14) | Rifle de asalto | `press('Left')` → `inventory.current=0`, `weapon.id='assaultRifle'` | auto | 1a | pendiente |
 | D-pad → (15) | Arma comprada | Fase 1a: ranura vacía → no cambia de arma (o HUD "vacía") | auto | 1a | pendiente |

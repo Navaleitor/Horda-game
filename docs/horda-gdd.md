@@ -26,8 +26,8 @@
 | Menu (9) | Pausa | Pausa | Pausa |
 
 - **A sin cobertura**: maroma (rodar, 7,8 m/s durante 0,6 s ≈ 3,5 m, 0,3 s de enfriamiento) en la dirección del stick; con el stick suelto, hacia delante (a donde mira el personaje). Si durante la maroma choca con una cobertura (≤ 0,25 m), se pega a ella sin volver a correr. La cobertura se toma con A a ≤ 2,5 m, corriendo a 4,6 m/s. No existe deslizamiento (slide) ni sprint.
-- **L3 agacharse**: alterna agachado/de pie fuera de cobertura (en cobertura manda su pose y L3 no hace nada; al salir sigue de pie). Y y A levantan (y saltan / hacen la maroma); correr a fondo no levanta. Sin hueco encima no se levanta.
-- **Trepar en el aire**: saltando o cayendo, si delante (stick, o dirección de movimiento, o cara) hay un borde de vault/trepar con la cima ≤ 2,4 m sobre el suelo bajo el jugador, se agarra y lo sube (vault si es bajo y estrecho).
+- **L3 agacharse**: alterna agachado/de pie fuera de cobertura (en cobertura manda su pose y L3 no hace nada; al salir sigue de pie). Y y A levantan (y saltan / hacen la maroma); correr a fondo no levanta. Sin hueco encima no se levanta. Agachado, la cámara baja 0,35 m (`camera.crouch`, transición suave). Si cae de un borde agachado, al aterrizar se pone de pie.
+- **Trepar en el aire**: saltando o cayendo, si delante (stick, o dirección de movimiento, o cara) hay un borde de vault/trepar con la cima ≤ 2,4 m sobre el suelo bajo el jugador, se agarra y lo sube (vault si es bajo y estrecho). La subida dura en proporción a la altura que falta: entre 0,35 y 0,8 s.
 - **A + dirección en el extremo de una cobertura**: si el hueco hasta la siguiente cobertura es de **≤1,5 m** → **SWAT turn**; si es **mayor** → **deslizar a la cobertura contigua**.
 - **Tac-Com** (mantener LB): resalta a través de paredes a aliados, fabricador y fortificaciones (con su salud), dibuja rutas de spawn, enemigos restantes y composición de la siguiente oleada.
 - **Pistola de reparación**: RT mantenido, haz sobre fortificación (≤6 m).

@@ -74,4 +74,4 @@ Controles E-Day (§1 del GDD), cámara siempre en tercera persona, cobertura med
 ## Pendiente
 - Pose de cobertura alta y agarre de manos/IK, D1–D3: WIP aparcado en `docs/agentes/anim-wip-1a3.patch` (ver `.md`).
 - Revisión de `animation-reviewer` con capturas.
-- Dudas: ¿bajar la cámara al agacharse? ¿seguir agachado tras caer de un borde? ¿acortar la subida tras agarrarse en el aire?
+- Dudas resueltas por el usuario: la cámara baja 0,35 m al agacharse; caer agachado de un borde → de pie; subida en el aire ∝ altura (0,35–0,8 s). Se mantienen la maroma ≈ 3,5 m y maroma→cobertura.

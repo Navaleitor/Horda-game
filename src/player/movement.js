@@ -87,6 +87,8 @@ export function createMovement(ctx) {
   }
 
   function onLand() {
+    // Caer de un borde agachado: al aterrizar se pone de pie (si hay hueco).
+    if (st.crouched) setCrouch(false);
     const fall = -e.vel.y;
     st.lastFallSpeed = fall;
     if (fall > P.landMinSpeed) {
@@ -226,7 +228,7 @@ export function createMovement(ctx) {
   }
 
   /** Y: consulta queryLedge en `dir`. Devuelve true si empieza vault/trepar. */
-  function tryLedge(dir) {
+  function tryLedge(dir, airFull = 0) {
     const L = ctx.physics.queryLedge(e.pos, dir);
     if (!L || (L.kind !== 'vault' && L.kind !== 'climb')) return false;
     const lp = L.landPos;
@@ -238,7 +240,12 @@ export function createMovement(ctx) {
     act.dir.y = 0; act.dir.normalize();
     act.yaw = yawFromDir(act.dir.x, act.dir.z);
     if (L.kind === 'vault') begin('vault', 'vault', P.vault.duration);
-    else begin('climb', 'climb', P.climb.duration);
+    else {
+      // Agarrado en el aire: la subida dura en proporción a lo que falta (cima − pies) sobre la altura total.
+      let dur = P.climb.duration;
+      if (airFull > 0) dur = Math.min(P.climb.duration, Math.max(P.climb.minAirDuration, P.climb.duration * (L.topY - e.pos.y) / airFull));
+      begin('climb', 'climb', dur);
+    }
     e.vel.set(0, 0, 0);
     return true;
   }
@@ -260,7 +267,7 @@ export function createMovement(ctx) {
     if (L.topY - groundY > P.climb.maxHeight + 1e-3) return false;
     if (!setCrouch(false)) return false;
     _tmp.copy(_dir);
-    return tryLedge(_tmp);
+    return tryLedge(_tmp, Math.max(1e-3, L.topY - groundY));
   }
 
   /** Correr hasta un punto con colisión (entrar en cobertura). */
